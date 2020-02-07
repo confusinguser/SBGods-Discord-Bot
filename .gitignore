@@ -1,0 +1,16 @@
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle wrapper
+gradle
+
+# Ignore Eclipse data
+.settings
+.project
+
+# Ignore compiled class binaries
+.class
+bin
+
+# Ignore Gradle build output directory
+build
