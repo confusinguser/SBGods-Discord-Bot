@@ -91,7 +91,7 @@ public class ApiUtil {
 
 	public ArrayList<String> getGuildMembers() {
 		StringBuilder url_string = new StringBuilder(BASE_URL);
-		url_string.append("guild").append("?key=" + main.getApikey()).append("&name=" + main.getGuildName());
+		url_string.append("guild").append("?key=" + main.getApikey()).append("&id=" + main.getGuildId());
 
 		String response = getResponse(url_string.toString());
 

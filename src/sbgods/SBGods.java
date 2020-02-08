@@ -31,8 +31,8 @@ public class SBGods {
 		return "1040878f-c8b0-4098-a89c-06b7619a77f4";
 	}
 
-	public String getGuildName() {
-		return "skyblock%20gods";
+	public String getGuildId() {
+		return "5cd01bdf77ce84cf1204cd61";
 	}
 
 	public ApiUtil getApiUtil() {

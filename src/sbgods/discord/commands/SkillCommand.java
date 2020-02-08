@@ -5,15 +5,12 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import sbgods.SBGods;
 import sbgods.discord.DiscordBot;
 
-public class SkillCommand extends ListenerAdapter {
+public class SkillCommand extends Command {
 
-	SBGods main;
-	DiscordBot discord;
-	String name;
+	private HashMap<String, Double> usernameAverageSkillLevel = new HashMap<String, Double>();
 
 	public SkillCommand(SBGods main, DiscordBot discord) {
 		this.main = main;
@@ -71,8 +68,7 @@ public class SkillCommand extends ListenerAdapter {
 			}
 
 			e.getChannel().editMessageById(messageId, "Getting everyone's skyblock skill levels (0 / " + guildMemberUuids.size() + ")").queue();
-			HashMap<String, Double> usernameAverageSkillLevel = new HashMap<String, Double>();
-
+//
 			for (int i = 0; i < guildMemberUuids.size(); i++) {
 				String UUID = guildMemberUuids.get(i);
 				ArrayList<String> profiles = main.getApiUtil().getSkyblockProfilesAndUsernameFromUUID(UUID);
@@ -91,7 +87,7 @@ public class SkillCommand extends ListenerAdapter {
 
 				usernameAverageSkillLevel.put(profiles.get(0), highestAverageSkillLevel);
 			}
-
+//
 			StringBuilder response = new StringBuilder("**Average skill level Leaderboard:**\n");
 			if (args.length > 2) {
 				response.append("\n");
@@ -164,5 +160,13 @@ public class SkillCommand extends ListenerAdapter {
 		}
 
 		e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
+	}
+
+	public void setAvgSkillLevelHashMap(HashMap<String, Double> input) {
+		usernameAverageSkillLevel = input;
+	}
+
+	public HashMap<String, Double> getAvgSkillLevelHashMap() {
+		return usernameAverageSkillLevel;
 	}
 }
