@@ -45,7 +45,7 @@ public class DiscordBot {
 				.setToken(token)
 				.setStatus(OnlineStatus.ONLINE)
 				.setActivity(Activity.playing("Type -help for help!"))
-				.addEventListeners(commands)
+				.addEventListeners(slayerCommand, skillCommand, helpCommand)
 				.build();
 	}
 

@@ -5,12 +5,13 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.EventListener;
 import sbgods.SBGods;
 import sbgods.discord.DiscordBot;
 
-public class SlayerCommand extends Command {
+public class SlayerCommand extends Command implements EventListener {
 
-	private HashMap<String, Integer> usernameSlayerXPHashMap = new HashMap<String, Integer>();
+	private HashMap<String, Integer> usernameSlayerXP = new HashMap<String, Integer>();
 
 
 	public SlayerCommand(SBGods main, DiscordBot discord) {
@@ -69,31 +70,23 @@ public class SlayerCommand extends Command {
 				topX = 10;
 			}
 
-			e.getChannel().editMessageById(messageId, "Getting everyone's skyblock slayer XP (0 / " + guildMemberUuids.size() + ")").queue();
-//
-			for (int i = 0; i < guildMemberUuids.size(); i++) {
-				String UUID = guildMemberUuids.get(i);
-				ArrayList<String> profiles = main.getApiUtil().getSkyblockProfilesAndUsernameFromUUID(UUID);
-
-				int highestSlayerXP = 0;
-				// Get how much slayer xp the profile with the most of it has
-				for (int j = 1; j < profiles.size(); j++) {
-					String profile = profiles.get(j);
-					highestSlayerXP = Math.max(highestSlayerXP, main.getApiUtil().getProfileSlayerXP(profile, UUID));
-				}
-				usernameSlayerXPHashMap.put(profiles.get(0), highestSlayerXP);
-				e.getChannel().editMessageById(messageId, "Getting everyone's skyblock slayer XP (" + i + " / " + guildMemberUuids.size() + ")  (" + profiles.get(0) + " [" + Math.decrementExact(profiles.size()) + "]" + ")").queue();
-			}
-//
 			StringBuilder response = new StringBuilder("**Slayer XP Leaderboard:**\n");
 			if (args.length > 2) {
 				response.append("\n");
 			} else {
 				response.append("*Tip: " + this.name + " leaderboard [length / all]*\n\n");
 			}
+
+			HashMap<String, Integer> usernameSlayerXPCache = new HashMap<String, Integer>();
+			usernameSlayerXPCache.putAll(usernameSlayerXP);
+
+			if (usernameSlayerXPCache.size() == 0) {
+				e.getChannel().editMessageById(messageId, "Bot is still indexing names, please try again in a few minutes!").queue();
+			}
+
 			for (int i = 0; i < topX; i++) {
-				Entry<String, Integer> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSlayerXPHashMap);
-				usernameSlayerXPHashMap.remove(currentEntry.getKey());
+				Entry<String, Integer> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSlayerXPCache);
+				usernameSlayerXPCache.remove(currentEntry.getKey());
 				response.append("**#" + Math.addExact(i, 1) + "** *" + currentEntry.getKey() + ":* " + currentEntry.getValue().toString() + "\n");
 				if (i != topX - 1) {
 					response.append("\n");
@@ -146,10 +139,6 @@ public class SlayerCommand extends Command {
 	}
 
 	public void setSlayerXPHashMap(HashMap<String, Integer> input) {
-		usernameSlayerXPHashMap = input;
-	}
-
-	public HashMap<String, Integer> getAvgSkillLevelHashMap() {
-		return usernameSlayerXPHashMap;
+		usernameSlayerXP = input;
 	}
 }

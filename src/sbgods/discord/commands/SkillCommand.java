@@ -5,10 +5,11 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.EventListener;
 import sbgods.SBGods;
 import sbgods.discord.DiscordBot;
 
-public class SkillCommand extends Command {
+public class SkillCommand extends Command implements EventListener {
 
 	private HashMap<String, Double> usernameAverageSkillLevel = new HashMap<String, Double>();
 
@@ -164,9 +165,5 @@ public class SkillCommand extends Command {
 
 	public void setAvgSkillLevelHashMap(HashMap<String, Double> input) {
 		usernameAverageSkillLevel = input;
-	}
-
-	public HashMap<String, Double> getAvgSkillLevelHashMap() {
-		return usernameAverageSkillLevel;
 	}
 }
