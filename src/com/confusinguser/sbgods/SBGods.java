@@ -3,18 +3,20 @@ package com.confusinguser.sbgods;
 import javax.security.auth.login.LoginException;
 
 import com.confusinguser.sbgods.discord.DiscordBot;
-import com.confusinguser.sbgods.updater.LeaderboardUpdater;
 import com.confusinguser.sbgods.utils.ApiUtil;
+import com.confusinguser.sbgods.utils.LangUtil;
 import com.confusinguser.sbgods.utils.SBUtil;
 import com.confusinguser.sbgods.utils.Util;
 
 public class SBGods {
-
-	String[] guildMemberUuids;
 	private ApiUtil apiutil;
 	private Util util;
-	private DiscordBot discordBot;
 	private SBUtil sbUtil;
+	private LangUtil langUtil;
+	private DiscordBot discordBot;
+
+	public static SBGods instance;
+
 	public static final String version = "0.7";
 	public static final String versionDescription = "The version where `-pets` was added";
 
@@ -22,6 +24,8 @@ public class SBGods {
 		this.apiutil = new ApiUtil(this);
 		this.util = new Util(this);
 		this.sbUtil = new SBUtil(this);
+		this.langUtil = new LangUtil(this);
+		instance = this;
 		try {
 			this.discordBot = new DiscordBot(this);
 		} catch (LoginException e) {
@@ -57,11 +61,15 @@ public class SBGods {
 		return Start.updater;
 	}
 
-	public boolean isTestCopy() {
-		return true;
+	public Boolean isTestCopy() {
+		return null;
 	}
 
 	public void logInfo(String message) {
 		System.out.println(message);
+	}
+
+	public LangUtil getLangUtil() {
+		return langUtil;
 	}
 }

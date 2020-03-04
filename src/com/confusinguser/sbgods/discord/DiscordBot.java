@@ -83,13 +83,10 @@ public class DiscordBot {
 	}
 
 	public boolean shouldRun(MessageReceivedEvent e) {
-		if (main.isTestCopy() && !e.getGuild().getId().contentEquals(sbgods_guild_id)) {
-			return true;
-		} else if (!main.isTestCopy() && e.getGuild().getId().contentEquals(sbgods_guild_id)) {
-			return true;
-		} else {
-			return false;
-		}
+		if (main.isTestCopy() == null) return true;
+		else if (main.isTestCopy() && !e.getGuild().getId().contentEquals(sbgods_guild_id)) return true;
+		else if (!main.isTestCopy() && e.getGuild().getId().contentEquals(sbgods_guild_id)) return true;
+		else return false;
 	}
 
 	public String escapeMarkdown(String text) {

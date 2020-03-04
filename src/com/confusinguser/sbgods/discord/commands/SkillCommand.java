@@ -6,13 +6,15 @@ import java.util.Map.Entry;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
+import com.confusinguser.sbgods.objects.SkillLevels;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 
 public class SkillCommand extends Command implements EventListener {
 
-	private HashMap<String, Double> usernameAverageSkillLevel = new HashMap<String, Double>();
+	private HashMap<String, SkillLevels> usernameSkillLevels = new HashMap<String, SkillLevels>();
 
 	public SkillCommand(SBGods main, DiscordBot discord) {
 		this.main = main;
@@ -48,10 +50,10 @@ public class SkillCommand extends Command implements EventListener {
 			String messageId = e.getChannel().sendMessage("...").complete().getId();
 			ArrayList<String> guildMemberUuids = main.getApiUtil().getGuildMembers();
 
-			HashMap<String, Double> usernameAverageSkillLevelCache = new HashMap<String, Double>();
-			usernameAverageSkillLevelCache.putAll(usernameAverageSkillLevel);
-			if (usernameAverageSkillLevelCache.size() == 0) {
-				e.getChannel().editMessageById(messageId, "Bot is still indexing names, please try again in a few minutes!").queue();
+			HashMap<String, SkillLevels> usernameSkillLevelCopy = new HashMap<String, SkillLevels>();
+			usernameSkillLevelCopy.putAll(usernameSkillLevels);
+			if (usernameSkillLevelCopy.size() == 0) {
+				e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes!").queue();
 				return;
 			}
 
@@ -63,7 +65,7 @@ public class SkillCommand extends Command implements EventListener {
 					try {
 						topX = Math.min(guildMemberUuids.size(), Integer.parseInt(args[2]));
 					} catch (NumberFormatException exception) {
-						e.getChannel().editMessageById(messageId, "**" + args[2] + "** is not a valid number!").queue();
+						e.getChannel().sendMessage("**" + args[2] + "** is not a valid number! Try: `" + this.name + " player " + args[2] + "`").queue();
 						return;
 					}
 				}
@@ -79,13 +81,13 @@ public class SkillCommand extends Command implements EventListener {
 			}
 
 			for (int i = 0; i < topX; i++) {
-				Entry<String, Double> currentEntry = main.getUtil().getHighestKeyValuePair(usernameAverageSkillLevelCache, true);
-				usernameAverageSkillLevelCache.remove(currentEntry.getKey());
+				Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillLevelCopy, true);
+				usernameSkillLevelCopy.remove(currentEntry.getKey());
 
-				if (currentEntry.getValue() == 0) {
+				if (currentEntry.getValue().getAvgSkillLevel() == 0) {
 					response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* **Skill API off**\n");
 				} else {
-					response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + main.getUtil().round(currentEntry.getValue(), 2) + "\n");
+					response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2) + "\n");
 				}
 
 				if (i != topX - 1) {
@@ -110,35 +112,46 @@ public class SkillCommand extends Command implements EventListener {
 		}
 
 		if (args[1].equalsIgnoreCase("player")) {
-			String messageId = e.getChannel().sendMessage("...").complete().getId();
-
 			if (args.length >= 3) {
 				ArrayList<String> profiles = main.getApiUtil().getSkyblockProfilesAndDisplaynameAndUUIDFromUsername(args[2]);
 
 				if (profiles.isEmpty()) {
-					e.getChannel().editMessageById(messageId, "Player **" + args[2] + "** does not exist").queue();
+					e.getChannel().sendMessage("Player **" + args[2] + "** does not exist! Try `" + this.name + " player " + args[2] + "`").queue();
 					return;
 				}
 
-				double highestAverageSkillLevel = 0;
+				SkillLevels highestSkillLevels = new SkillLevels();
 				for (int j = 2; j < profiles.size(); j++) {
 					String profile = profiles.get(j);
-					ArrayList<Double> skillLevels = new ArrayList<Double>();
-					for (Integer skill : main.getApiUtil().getProfileSkills(profile, profiles.get(1))) {
-						skillLevels.add(main.getSBUtil().toSkillLevel(skill));
+					SkillLevels skillLevels = main.getApiUtil().getProfileSkills(profile, profiles.get(1));
+
+					if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
+						highestSkillLevels = skillLevels;
 					}
-					highestAverageSkillLevel = Math.max(highestAverageSkillLevel, main.getUtil().getAverage(skillLevels));
 				}
 
-				if (highestAverageSkillLevel == 0) {
-					e.getChannel().editMessageById(messageId, "Player **" + profiles.get(0) + "** does not have skill API on").queue();
+				if (highestSkillLevels.getAvgSkillLevel() == 0) {
+					e.getChannel().sendMessage("Player **" + profiles.get(0) + "** does not have skill API on").queue();
 					return;
 				}
 
-				e.getChannel().editMessageById(messageId, "Player **" + profiles.get(0) + "** has an average skill level of **" + main.getUtil().round(highestAverageSkillLevel, 3) + "**").queue();
+				EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(main.getLangUtil().makePossessiveForm(profiles.get(0)) + " skill levels");
+				embedBuilder.setDescription(embedBuilder.getDescriptionBuilder()
+						.append("Average skill level: " + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "\n\n")
+						.append("Farming: " + highestSkillLevels.getFarming() + "\n")
+						.append("Mining: " + highestSkillLevels.getMining() + "\n")
+						.append("Combat: " + highestSkillLevels.getCombat() + "\n")
+						.append("Foraging: " + highestSkillLevels.getForaging() + "\n")
+						.append("Fishing: " + highestSkillLevels.getFishing() + "\n")
+						.append("Enchanting: " + highestSkillLevels.getEnchanting() + "\n")
+						.append("Alchemy: " + highestSkillLevels.getAlchemy() + "\n")
+						.toString());
+
+				e.getChannel().sendMessage(embedBuilder.build()).queue();
 				return;
+
 			} else {
-				e.getChannel().editMessageById(messageId, "Invalid usage! Usage: *" + this.name + " player <IGN>*").queue();
+				e.getChannel().sendMessage("Invalid usage! Usage: *" + this.name + " player <IGN>*").queue();
 				return;
 			}
 		}
@@ -146,7 +159,7 @@ public class SkillCommand extends Command implements EventListener {
 		e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
 	}
 
-	public void setAvgSkillLevelHashMap(HashMap<String, Double> input) {
-		usernameAverageSkillLevel = input;
+	public void setAvgSkillLevelHashMap(HashMap<String, SkillLevels> input) {
+		usernameSkillLevels = input;
 	}
 }

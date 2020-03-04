@@ -110,7 +110,7 @@ public class SlayerCommand extends Command implements EventListener {
 			if (args.length >= 3) {
 				ArrayList<String> profiles = main.getApiUtil().getSkyblockProfilesAndDisplaynameAndUUIDFromUsername(args[2]);
 				if (profiles.isEmpty()) {
-					e.getChannel().editMessageById(messageId, "Player **" + args[2] + "** does not exist").queue();
+					e.getChannel().editMessageById(messageId, "Player **" + args[2] + "** does not exist! Try `" + this.name + " player " + args[2] + "`").queue();
 					return;
 				}
 

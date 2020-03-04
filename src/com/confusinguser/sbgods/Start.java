@@ -5,8 +5,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 
-import com.confusinguser.sbgods.updater.LeaderboardUpdater;
-
 public class Start {
 
 	public static LeaderboardUpdater updater;

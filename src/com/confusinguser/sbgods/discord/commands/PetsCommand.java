@@ -2,12 +2,11 @@ package com.confusinguser.sbgods.discord.commands;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.Random;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
+import com.confusinguser.sbgods.objects.Pet;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -41,24 +40,24 @@ public class PetsCommand extends Command implements EventListener {
 			e.getChannel().sendMessage("Player **" + args[1] + "** does not exist!").queue();
 		}
 
-		HashMap<String, Entry<Integer, Boolean>> totalPets = new HashMap<String, Entry<Integer, Boolean>>();
+		ArrayList<Pet> totalPets = new ArrayList<Pet>();
 
 		for (int i = 2; i < skyblockProfiles.size(); i++) {
-			HashMap<String, Entry<Integer, Boolean>> pets = main.getApiUtil().getProfilePets(skyblockProfiles.get(i), skyblockProfiles.get(1)); // Pets in profile
+			ArrayList<Pet> pets = main.getApiUtil().getProfilePets(skyblockProfiles.get(i), skyblockProfiles.get(1)); // Pets in profile
 			// Remove from pets if totalPets has higher level of same pet
-			totalPets.putAll(main.getSBUtil().keepHighestLevelOfPet(pets, totalPets));
+			totalPets.addAll(main.getSBUtil().keepHighestLevelOfPet(pets, totalPets));
 		}
 
-		EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(skyblockProfiles.get(0) + "\'s pets");
+		EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(main.getLangUtil().makePossessiveForm(skyblockProfiles.get(0)) + " pets");
 		Random colorRandom = new Random();
 
 		StringBuilder descriptionBuilder = embedBuilder.getDescriptionBuilder();
 
-		for (Entry<String, Entry<Integer, Boolean>> pet : totalPets.entrySet()) {
-			if (pet.getValue().getValue()) { // IsActive
-				descriptionBuilder.append("**" + pet.getKey() + " (" + pet.getValue().getKey() + ")" + "**\n");
+		for (Pet pet : totalPets) {
+			if (pet.isActive()) {
+				descriptionBuilder.append("**" + main.getUtil().toLowerCaseButFirstLetter(pet.getTier().toString()) + " " + pet.getType() + " (" + pet.getLevel() + ")" + "**\n");
 			} else {
-				descriptionBuilder.append(pet.getKey() + "(" + pet.getValue().getKey() + ")\n");
+				descriptionBuilder.append(main.getUtil().toLowerCaseButFirstLetter(pet.getTier().toString())+ " " + pet.getType() + " (" + pet.getLevel() + ")\n");
 			}
 		}
 

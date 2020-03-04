@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.confusinguser.sbgods.SBGods;
+import com.confusinguser.sbgods.objects.SkillLevels;
 
 public class Util {
 
@@ -29,14 +30,14 @@ public class Util {
 		return maxEntry;
 	}
 
-	public Map.Entry<String, Double> getHighestKeyValuePair(HashMap<String, Double> map, boolean isDouble) {
+	public Map.Entry<String, SkillLevels> getHighestKeyValuePair(HashMap<String, SkillLevels> map, boolean isDouble) {
 		if (!isDouble) {
 			return null;
 		}
-		Entry<String, Double> maxEntry = null;
+		Entry<String, SkillLevels> maxEntry = null;
 
-		for (Entry<String, Double> entry : map.entrySet()) {
-			if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0) {
+		for (Entry<String, SkillLevels> entry : map.entrySet()) {
+			if (maxEntry == null || entry.getValue().getAvgSkillLevel() > maxEntry.getValue().getAvgSkillLevel()) {
 				maxEntry = entry;
 			}
 		}
@@ -76,6 +77,11 @@ public class Util {
 
 	public double round(double num, int toPlaces) {
 		return Double.valueOf(String.format("%." + toPlaces + "f", num));
+	}
+
+
+	public String toLowerCaseButFirstLetter(String text) {
+		return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
 	}
 
 }
