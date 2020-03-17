@@ -6,7 +6,8 @@ import java.util.Map.Entry;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
-import com.confusinguser.sbgods.objects.SkillLevels;
+import com.confusinguser.sbgods.entities.SkillLevels;
+import com.confusinguser.sbgods.entities.SkyblockPlayer;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -28,6 +29,11 @@ public class SkillCommand extends Command implements EventListener {
 			return;
 		}
 
+		if (!discord.isLeaderboardChannel(e)) {
+			e.getChannel().sendMessage("Skill commands cannot be ran in this channel!").queue();
+			return;
+		}
+
 		main.logInfo(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
 
 		String[] args = e.getMessage().getContentRaw().split(" ");
@@ -38,21 +44,9 @@ public class SkillCommand extends Command implements EventListener {
 		}
 
 		if (args[1].equalsIgnoreCase("leaderboard")) {
-			if (!discord.isLeaderboardChannel(e)) {
-				if (discord.getJDA().getTextChannelById(discord.leaderboard_channel_id) == null) {
-					e.getChannel().sendMessage("Leaderboard commands can only be ran in a channel I don't have access to").queue();
-				} else {
-					e.getChannel().sendMessage("Leaderboard commands can only be ran in " + discord.getJDA().getTextChannelById(discord.leaderboard_channel_id).getAsMention()).queue();
-				}
-				return;
-			}
+			ArrayList<SkyblockPlayer> guildMemberUuids = main.getApiUtil().getGuildMembers();
 
-			String messageId = e.getChannel().sendMessage("...").complete().getId();
-			ArrayList<String> guildMemberUuids = main.getApiUtil().getGuildMembers();
-
-			HashMap<String, SkillLevels> usernameSkillLevelCopy = new HashMap<String, SkillLevels>();
-			usernameSkillLevelCopy.putAll(usernameSkillLevels);
-			if (usernameSkillLevelCopy.size() == 0) {
+			if (usernameSkillLevels.size() == 0) {
 				e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes!").queue();
 				return;
 			}
@@ -65,7 +59,7 @@ public class SkillCommand extends Command implements EventListener {
 					try {
 						topX = Math.min(guildMemberUuids.size(), Integer.parseInt(args[2]));
 					} catch (NumberFormatException exception) {
-						e.getChannel().sendMessage("**" + args[2] + "** is not a valid number! Try: `" + this.name + " player " + args[2] + "`").queue();
+						e.getChannel().sendMessage("**" + args[2] + "** is not a valid number!").queue();
 						return;
 					}
 				}
@@ -81,25 +75,18 @@ public class SkillCommand extends Command implements EventListener {
 			}
 
 			for (int i = 0; i < topX; i++) {
-				Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillLevelCopy, true);
-				usernameSkillLevelCopy.remove(currentEntry.getKey());
-
-				if (currentEntry.getValue().getAvgSkillLevel() == 0) {
-					response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* **Skill API off**\n");
-				} else {
-					response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2) + "\n");
+				Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillLevels, i, true);
+				response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2));
+				if (currentEntry.getValue().isApproximate()) {
+					response.append("*(approximate)*");
 				}
-
-				if (i != topX - 1) {
-					response.append("\n");
-				}
+				response.append("\n\n");
 			}
 
 			String responseString = response.toString();
 			// Split the message every 2000 characters in a nice looking way because of discord limitations
 			ArrayList<String> responseList = main.getUtil().processMessageForDiscord(responseString, 2000);
 
-			e.getChannel().deleteMessageById(messageId).queue();
 			for (int i = 0; i < responseList.size(); i++) {
 				String message = responseList.get(i);
 				if (i == 0) {
@@ -110,20 +97,19 @@ public class SkillCommand extends Command implements EventListener {
 			}
 			return;
 		}
-
 		if (args[1].equalsIgnoreCase("player")) {
 			if (args.length >= 3) {
-				ArrayList<String> profiles = main.getApiUtil().getSkyblockProfilesAndDisplaynameAndUUIDFromUsername(args[2]);
+				SkyblockPlayer thePlayer = main.getApiUtil().getSkyblockPlayerFromUsername(args[2]);
 
-				if (profiles.isEmpty()) {
-					e.getChannel().sendMessage("Player **" + args[2] + "** does not exist! Try `" + this.name + " player " + args[2] + "`").queue();
+				if (thePlayer.getSkyblockProfiles().isEmpty()) {
+					e.getChannel().sendMessage("Player **" + args[2] + "** does not exist!").queue();
 					return;
 				}
 
+				boolean approximate = false;
 				SkillLevels highestSkillLevels = new SkillLevels();
-				for (int j = 2; j < profiles.size(); j++) {
-					String profile = profiles.get(j);
-					SkillLevels skillLevels = main.getApiUtil().getProfileSkills(profile, profiles.get(1));
+				for (String profile : thePlayer.getSkyblockProfiles()) {
+					SkillLevels skillLevels = main.getApiUtil().getProfileSkills(profile, thePlayer.getUUID());
 
 					if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
 						highestSkillLevels = skillLevels;
@@ -131,13 +117,24 @@ public class SkillCommand extends Command implements EventListener {
 				}
 
 				if (highestSkillLevels.getAvgSkillLevel() == 0) {
-					e.getChannel().sendMessage("Player **" + profiles.get(0) + "** does not have skill API on").queue();
-					return;
+					approximate = true;
+					SkillLevels skillLevels = main.getApiUtil().getProfileSkillsAlternate(thePlayer.getUUID());
+
+					if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
+						highestSkillLevels = skillLevels;
+					}
 				}
 
-				EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(main.getLangUtil().makePossessiveForm(profiles.get(0)) + " skill levels");
-				embedBuilder.setDescription(embedBuilder.getDescriptionBuilder()
-						.append("Average skill level: " + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "\n\n")
+				EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x03731d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " skill levels");
+				StringBuilder descriptionBuilder = embedBuilder.getDescriptionBuilder();
+
+				if (approximate) {
+					descriptionBuilder.append("Approximate average skill level: " + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "\n\n");
+				} else {
+					descriptionBuilder.append("Average skill level: " + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "\n\n");
+				}
+
+				embedBuilder.setDescription(descriptionBuilder
 						.append("Farming: " + highestSkillLevels.getFarming() + "\n")
 						.append("Mining: " + highestSkillLevels.getMining() + "\n")
 						.append("Combat: " + highestSkillLevels.getCombat() + "\n")

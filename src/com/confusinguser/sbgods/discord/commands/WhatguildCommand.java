@@ -1,9 +1,8 @@
 package com.confusinguser.sbgods.discord.commands;
 
-import java.util.ArrayList;
-
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
+import com.confusinguser.sbgods.entities.SkyblockPlayer;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
@@ -31,18 +30,18 @@ public class WhatguildCommand extends Command implements EventListener{
 			e.getChannel().editMessageById(messageId, "Invalid usage! Usage: " + this.name + " <IGN>").queue();
 			return;
 		}
-		ArrayList<String> playerInfo = main.getApiUtil().getSkyblockProfilesAndDisplaynameAndUUIDFromUsername(args[1]);
-		if (playerInfo.isEmpty()) {
+		SkyblockPlayer thePlayer = main.getApiUtil().getSkyblockPlayerFromUsername(args[1]);
+		if (thePlayer.getSkyblockProfiles().isEmpty()) {
 			e.getChannel().editMessageById(messageId, "Player **" + args[1] + "** does not exist").queue();
 			return;
 		}
-		String guildName = main.getApiUtil().getGuildFromUUID(playerInfo.get(1));
+		String guildName = main.getApiUtil().getGuildFromUUID(thePlayer.getUUID());
 
 		if (guildName == null) {
-			e.getChannel().editMessageById(messageId, "**" + playerInfo.get(0) + "** is not in a guild").queue();
+			e.getChannel().editMessageById(messageId, "**" + thePlayer.getDisplayName() + "** is not in a guild").queue();
 			return;
 		}
 
-		e.getChannel().editMessageById(messageId, "**" + playerInfo.get(0) + "** is in **" + guildName + "**").queue();
+		e.getChannel().editMessageById(messageId, "**" + thePlayer.getDisplayName() + "** is in **" + guildName + "**").queue();
 	}
 }

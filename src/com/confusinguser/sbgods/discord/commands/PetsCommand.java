@@ -6,7 +6,8 @@ import java.util.Random;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
-import com.confusinguser.sbgods.objects.Pet;
+import com.confusinguser.sbgods.entities.Pet;
+import com.confusinguser.sbgods.entities.SkyblockPlayer;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -35,35 +36,37 @@ public class PetsCommand extends Command implements EventListener {
 			return;
 		}
 
-		ArrayList<String> skyblockProfiles = main.getApiUtil().getSkyblockProfilesAndDisplaynameAndUUIDFromUsername(args[1]);
-		if (skyblockProfiles.isEmpty()) {
-			e.getChannel().sendMessage("Player **" + args[1] + "** does not exist!").queue();
+		String messageId = e.getChannel().sendMessage("...").complete().getId();
+
+		SkyblockPlayer thePlayer = main.getApiUtil().getSkyblockPlayerFromUsername(args[1]);
+		if (thePlayer.getSkyblockProfiles().isEmpty()) {
+			e.getChannel().editMessageById(messageId, "Player **" + args[1] + "** does not exist!").queue();
+			return;
 		}
 
 		ArrayList<Pet> totalPets = new ArrayList<Pet>();
-
-		for (int i = 2; i < skyblockProfiles.size(); i++) {
-			ArrayList<Pet> pets = main.getApiUtil().getProfilePets(skyblockProfiles.get(i), skyblockProfiles.get(1)); // Pets in profile
-			// Remove from pets if totalPets has higher level of same pet
-			totalPets.addAll(main.getSBUtil().keepHighestLevelOfPet(pets, totalPets));
+		for (String profile : thePlayer.getSkyblockProfiles()) {
+			ArrayList<Pet> pets = main.getApiUtil().getProfilePets(profile, thePlayer.getUUID()); // Pets in profile
+			totalPets.addAll(pets);
 		}
 
-		EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(main.getLangUtil().makePossessiveForm(skyblockProfiles.get(0)) + " pets");
+		EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " pets");
 		Random colorRandom = new Random();
 
 		StringBuilder descriptionBuilder = embedBuilder.getDescriptionBuilder();
 
 		for (Pet pet : totalPets) {
 			if (pet.isActive()) {
-				descriptionBuilder.append("**" + main.getUtil().toLowerCaseButFirstLetter(pet.getTier().toString()) + " " + pet.getType() + " (" + pet.getLevel() + ")" + "**\n");
+				descriptionBuilder.append("**" + main.getLangUtil().toLowerCaseButFirstLetter(pet.getTier().toString()) + " " + pet.getType() + " (" + pet.getLevel() + ")" + "**\n");
 			} else {
-				descriptionBuilder.append(main.getUtil().toLowerCaseButFirstLetter(pet.getTier().toString())+ " " + pet.getType() + " (" + pet.getLevel() + ")\n");
+				descriptionBuilder.append(main.getLangUtil().toLowerCaseButFirstLetter(pet.getTier().toString())+ " " + pet.getType() + " (" + pet.getLevel() + ")\n");
 			}
 		}
 
 		embedBuilder = embedBuilder.setDescription(descriptionBuilder.toString());
 		embedBuilder.setColor(new Color(colorRandom.nextFloat(), colorRandom.nextFloat(), colorRandom.nextFloat()));
 
+		e.getChannel().deleteMessageById(messageId).queue();
 		e.getChannel().sendMessage(embedBuilder.build()).queue();
 	}
 }

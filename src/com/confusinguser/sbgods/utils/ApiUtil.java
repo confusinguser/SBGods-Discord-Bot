@@ -6,16 +6,18 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.confusinguser.sbgods.SBGods;
-import com.confusinguser.sbgods.objects.Pet;
-import com.confusinguser.sbgods.objects.PetTier;
-import com.confusinguser.sbgods.objects.SkillLevels;
+import com.confusinguser.sbgods.entities.Pet;
+import com.confusinguser.sbgods.entities.PetTier;
+import com.confusinguser.sbgods.entities.SkillLevels;
+import com.confusinguser.sbgods.entities.SkyblockPlayer;
+import com.confusinguser.sbgods.entities.SlayerExp;
 
 public class ApiUtil {
 
@@ -28,9 +30,11 @@ public class ApiUtil {
 		this.main = main;
 	}
 
-	private final int REQUEST_RATE = 30; // unit: requests
+	private final int REQUEST_RATE = 30; // unit: requests per second
 	private long LAST_CHECK = System.currentTimeMillis();
 	int allowance = REQUEST_RATE; // unit: requests
+
+	private int fails = 0;
 
 	private String getResponse(String url_string) {
 		long current = System.currentTimeMillis();
@@ -46,7 +50,7 @@ public class ApiUtil {
 				e.printStackTrace();
 			}
 		} else {
-			allowance -= 1.0;
+			allowance -= 1;
 		}
 
 		StringBuffer response = null;
@@ -67,16 +71,21 @@ public class ApiUtil {
 			in.close();
 
 		} catch (IOException e) {
-			System.out.println("Failed to connect to the Hypixel API. Retrying in 30 seconds...");
+			fails++;
+			if (fails % 10 == 0) {
+				main.logInfo("Failed to connect to the Hypixel API " + fails + " times, this may be a problem...");
+			}
 			try {
-				Thread.sleep(30000);
+				Thread.sleep(5000);
 			} catch (InterruptedException e1) {
 				e.printStackTrace();
 			}
 			return getResponse(url_string);
 		}
 
-		if (new JSONObject(response.toString()).has("throttle") && new JSONObject(response.toString()).getBoolean("throttle")) {
+		JSONObject jsonObject = new JSONObject(response.toString());
+
+		if (jsonObject.has("throttle") && jsonObject.getBoolean("throttle")) {
 			//System.out.println("Got throttled, pausing for 17 seconds");
 			try {
 				Thread.sleep(17000);
@@ -84,20 +93,25 @@ public class ApiUtil {
 				e.printStackTrace();
 			}
 			return getResponse(url_string);
-		} else if (new JSONObject(response.toString()).has("cause") && new JSONObject(response.toString()).getString("cause") == "Invalid API key!") {
-			System.out.println("API key is invalid. Please contact ConfusingUser#5712 for further assistance.");
+
+		} else if (jsonObject.has("cause") && jsonObject.getString("cause") == "Invalid API key!") {
+			main.logInfo("[WARNING] API key is invalid!");
+			fails = 0;
+			return null;
 		}
+		fails = 0;
 		return response.toString();
 	}
 
 
-	public ArrayList<String> getGuildMembers() {
+	public ArrayList<SkyblockPlayer> getGuildMembers() {
 		StringBuilder url_string = new StringBuilder(BASE_URL);
 		url_string.append("guild").append("?key=" + main.getApikey()).append("&id=" + main.getGuildId());
 
 		String response = getResponse(url_string.toString());
+		if (response == null) return getGuildMembers();
 
-		ArrayList<String> output = new ArrayList<String>();
+		ArrayList<SkyblockPlayer> output = new ArrayList<SkyblockPlayer>();
 		JSONObject jsonObject = new JSONObject(response);
 		jsonObject = jsonObject.getJSONObject("guild");
 		JSONArray members = jsonObject.getJSONArray("members");
@@ -108,40 +122,18 @@ public class ApiUtil {
 		for (int i = 0; i < members.length(); i++) {
 			currentMember = members.getJSONObject(i);
 			currentUuid = currentMember.getString("uuid");
-			output.add(currentUuid);
+			output.add(new SkyblockPlayer(currentUuid, null, null));
 		}
 
 		return output;
 	}
 
-	public ArrayList<String> getSkyblockProfilesAndUsernameFromUUID(String UUID) {
+	public SkyblockPlayer getSkyblockProfilesAndUsernameFromUUID(String UUID) {
 		StringBuilder url_string = new StringBuilder(BASE_URL);
 		url_string.append("player").append("?key=" + main.getApikey()).append("&uuid=" + UUID);
 
 		String response = getResponse(url_string.toString());
-
-		JSONObject jsonObject = new JSONObject(response);
-		String currentName;
-		try {
-			currentName = jsonObject.getJSONObject("player").getString("displayname");
-			jsonObject = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
-		} catch (JSONException e) {
-			return new ArrayList<String>();
-		}
-
-		Set<String> profilesSet = jsonObject.keySet();
-		ArrayList<String> output = new ArrayList<String>();
-		output.add(currentName);
-		output.addAll(profilesSet);
-
-		return output;
-	}
-
-	public ArrayList<String> getSkyblockProfilesAndDisplaynameAndUUIDFromUsername(String name) {
-		StringBuilder url_string = new StringBuilder(BASE_URL);
-		url_string.append("player").append("?key=" + main.getApikey()).append("&name=" + name);
-
-		String response = getResponse(url_string.toString());
+		if (response == null) return new SkyblockPlayer();
 
 		JSONObject jsonObject = new JSONObject(response);
 		String currentName;
@@ -152,43 +144,73 @@ public class ApiUtil {
 			currentUuid = jsonObject.getJSONObject("player").getString("uuid");
 			profiles = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
 		} catch (JSONException e) {
-			return new ArrayList<String>();
+			return new SkyblockPlayer();
 		}
 
-		Set<String> profilesSet = profiles.keySet();
-		ArrayList<String> output = new ArrayList<String>();
-		output.add(currentName);
-		output.add(currentUuid);
-		output.addAll(profilesSet);
+		SkyblockPlayer output = new SkyblockPlayer(currentUuid, currentName, new ArrayList<String>(profiles.keySet()));
+
+		return output;
+	}
+
+	public SkyblockPlayer getSkyblockPlayerFromUsername(String name) {
+		StringBuilder url_string = new StringBuilder(BASE_URL);
+		url_string.append("player").append("?key=" + main.getApikey()).append("&name=" + name);
+
+		String response = getResponse(url_string.toString());
+		if (response == null) return new SkyblockPlayer();
+
+		JSONObject jsonObject = new JSONObject(response);
+		String currentName;
+		String currentUuid;
+		JSONObject profiles;
+		try {
+			currentName = jsonObject.getJSONObject("player").getString("displayname");
+			currentUuid = jsonObject.getJSONObject("player").getString("uuid");
+			profiles = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
+		} catch (JSONException e) {
+			return new SkyblockPlayer();
+		}
+
+		SkyblockPlayer output = new SkyblockPlayer(currentUuid, currentName, new ArrayList<String>(profiles.keySet()));
 
 		return output;
 	}
 
 
-	public int getProfileSlayerXP(String profileUUID, String playerUUID) {
+	public SlayerExp getPlayerSlayerExp(String playerUUID) {
 
-		StringBuilder url_string = new StringBuilder(BASE_URL);
-		url_string.append("skyblock/profile").append("?key=" + main.getApikey()).append("&profile=" + profileUUID);
-
-		String response = getResponse(url_string.toString());
-
-		String[] slayer_types = {"zombie", "spider", "wolf"};
-
-		JSONObject jsonObject = new JSONObject(response);
-
-		try {
-			jsonObject = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(playerUUID).getJSONObject("slayer_bosses");
-		} catch (JSONException e) {
-			return 0;
+		HashMap<String, Integer> output = new HashMap<String, Integer>();
+		for (String slayer_type : Constants.slayer_types) {
+			output.put(slayer_type, 0);
 		}
 
-		int output = 0;
-		for (String slayer_type : slayer_types) {
+		SkyblockPlayer thePlayer = getSkyblockProfilesAndUsernameFromUUID(playerUUID);
+
+		for (String profileUUID : thePlayer.getSkyblockProfiles()) {
+
+			StringBuilder url_string = new StringBuilder(BASE_URL);
+			url_string.append("skyblock/profile").append("?key=" + main.getApikey()).append("&profile=" + profileUUID);
+
+			String response = getResponse(url_string.toString());
+			if (response == null) return new SlayerExp();
+
+			JSONObject jsonObject = new JSONObject(response);
+
 			try {
-				output += jsonObject.getJSONObject(slayer_type).getInt("xp");
-			} catch (JSONException e) {}
+				jsonObject = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(playerUUID).getJSONObject("slayer_bosses");
+			} catch (JSONException e) {
+				continue;
+			}
+
+			for (String slayer_type : Constants.slayer_types) {
+				try {
+					output.put(slayer_type, output.get(slayer_type) + jsonObject.getJSONObject(slayer_type).getInt("xp"));
+				} catch (JSONException e) {
+					continue;
+				}
+			}
 		}
-		return output;
+		return new SlayerExp(output);
 	}
 
 
@@ -197,8 +219,7 @@ public class ApiUtil {
 		url_string.append("skyblock/profile").append("?key=" + main.getApikey()).append("&profile=" + profileUUID);
 
 		String response = getResponse(url_string.toString());
-
-		String[] skill_types = {"experience_skill_farming", "experience_skill_mining", "experience_skill_combat", "experience_skill_foraging", "experience_skill_fishing", "experience_skill_enchanting", "experience_skill_alchemy"};
+		if (response == null) return new SkillLevels();
 
 		JSONObject jsonObject = new JSONObject(response);
 
@@ -208,15 +229,41 @@ public class ApiUtil {
 			return new SkillLevels();
 		}
 
-		ArrayList<Integer> skillArray = new ArrayList<Integer>();
-		for (String skill_type : skill_types) {
+		HashMap<String, Integer> skillArray = new HashMap<String, Integer>();
+		for (String skill_type : Constants.skill_types) {
 			try {
-				skillArray.add((int) Math.floor(jsonObject.getDouble(skill_type)));
+				skillArray.put(skill_type, (int) Math.floor(jsonObject.getDouble("experience_skill_" + skill_type)));
 			} catch (JSONException e) {
-				skillArray.add(0);
+				skillArray.put(skill_type, 0);
 			}
 		}
 		return new SkillLevels(skillArray);
+	}
+
+	public SkillLevels getProfileSkillsAlternate(String playerUUID) {
+		StringBuilder url_string = new StringBuilder(BASE_URL);
+		url_string.append("player").append("?key=" + main.getApikey()).append("&uuid=" + playerUUID);
+
+		String response = getResponse(url_string.toString());
+		if (response == null) return new SkillLevels();
+
+		JSONObject jsonObject = new JSONObject(response);
+
+		try {
+			jsonObject = jsonObject.getJSONObject("player").getJSONObject("achievements");
+		} catch (JSONException e) {
+			return new SkillLevels();
+		}
+
+		HashMap<String, Integer> skillMap = new HashMap<String, Integer>();
+		for (String skill_type : Constants.alternate_skill_types) {
+			try {
+				skillMap.put(main.getSBUtil().alternateToNormalSkillTypes(skill_type), main.getSBUtil().toSkillExp(jsonObject.getInt("skyblock_" + skill_type)));
+			} catch (JSONException e) {
+				skillMap.put(skill_type, 0);
+			}
+		}
+		return new SkillLevels(skillMap, true);
 	}
 
 	public String getGuildFromUUID(String UUID) {
@@ -225,6 +272,8 @@ public class ApiUtil {
 		url_string.append("guild").append("?key=" + main.getApikey()).append("&player=" + UUID);
 
 		String response = getResponse(url_string.toString());
+		if (response == null) return null;
+
 		JSONObject jsonObject = new JSONObject(response);
 
 		try {
@@ -239,6 +288,8 @@ public class ApiUtil {
 		url_string.append("skyblock/profile").append("?key=" + main.getApikey()).append("&profile=" + profileUUID);
 
 		String response = getResponse(url_string.toString());
+		if (response == null) return new ArrayList<Pet>();
+
 		JSONObject jsonObject = new JSONObject(response);
 
 		try {
@@ -275,6 +326,58 @@ public class ApiUtil {
 			type = type.substring(0, 1).toUpperCase() + type.substring(1);
 
 			output.add(new Pet(type, tier, active, xp));
+		}
+		return output;
+	}
+
+	public HashMap<String, Integer> getProfileKills(String profileUUID, String playerUUID) {
+
+		HashMap<String, Integer> output = new HashMap<String, Integer>();
+
+		StringBuilder url_string = new StringBuilder(BASE_URL);
+		url_string.append("skyblock/profile").append("?key=" + main.getApikey()).append("&profile=" + profileUUID);
+
+		String response = getResponse(url_string.toString());
+		if (response == null) return new HashMap<String, Integer>();
+
+		JSONObject jsonObject = new JSONObject(response);
+
+		try {
+			jsonObject = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(playerUUID).getJSONObject("stats");
+		} catch (JSONException e) {
+			return new HashMap<String, Integer>();
+		}
+
+		for (String type : jsonObject.keySet()) {
+			if (type.startsWith("kills_")) {
+				output.put(main.getLangUtil().toLowerCaseButFirstLetter(type.replace("kills_", "").replace("_", " ")), jsonObject.getInt(type));
+			}
+		}
+		return output;
+	}
+
+	public HashMap<String, Integer> getProfileDeaths(String profileUUID, String playerUUID) {
+
+		HashMap<String, Integer> output = new HashMap<String, Integer>();
+
+		StringBuilder url_string = new StringBuilder(BASE_URL);
+		url_string.append("skyblock/profile").append("?key=" + main.getApikey()).append("&profile=" + profileUUID);
+
+		String response = getResponse(url_string.toString());
+		if (response == null) return new HashMap<String, Integer>();
+
+		JSONObject jsonObject = new JSONObject(response);
+
+		try {
+			jsonObject = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(playerUUID).getJSONObject("stats");
+		} catch (JSONException e) {
+			return new HashMap<String, Integer>();
+		}
+
+		for (String type : jsonObject.keySet()) {
+			if (type.startsWith("deaths_")) {
+				output.put(main.getLangUtil().toLowerCaseButFirstLetter(type.replace("deaths_", "").replace("_", " ")), jsonObject.getInt(type));
+			}
 		}
 		return output;
 	}

@@ -1,4 +1,4 @@
-package com.confusinguser.sbgods.objects;
+package com.confusinguser.sbgods.entities;
 
 public enum PetTier {
 	COMMON,

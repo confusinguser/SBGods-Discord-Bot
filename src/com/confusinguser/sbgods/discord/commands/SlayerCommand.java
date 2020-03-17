@@ -6,7 +6,10 @@ import java.util.Map.Entry;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
+import com.confusinguser.sbgods.entities.SkyblockPlayer;
+import com.confusinguser.sbgods.entities.SlayerExp;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 
@@ -26,6 +29,11 @@ public class SlayerCommand extends Command implements EventListener {
 			return;
 		}
 
+		if (!discord.isLeaderboardChannel(e)) {
+			e.getChannel().sendMessage("Slayer commands cannot be ran in this channel!").queue();
+			return;
+		}
+
 		main.logInfo(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
 
 		String[] args = e.getMessage().getContentRaw().split(" ");
@@ -37,23 +45,13 @@ public class SlayerCommand extends Command implements EventListener {
 
 		if (args[1].equalsIgnoreCase("leaderboard")) {
 
-			if (!discord.isLeaderboardChannel(e)) {
-				if (discord.getJDA().getTextChannelById(discord.leaderboard_channel_id) == null) {
-					e.getChannel().sendMessage("Leaderboard commands can only be ran in a channel I don't have access to").queue();
-				} else {
-					e.getChannel().sendMessage("Leaderboard commands can only be ran in " + discord.getJDA().getTextChannelById(discord.leaderboard_channel_id).getAsMention()).queue();
-				}
-				return;
-			}
 
 			String messageId = e.getChannel().sendMessage("...").complete().getId();
-			ArrayList<String> guildMemberUuids = main.getApiUtil().getGuildMembers();
+			ArrayList<SkyblockPlayer> guildMemberUuids = main.getApiUtil().getGuildMembers();
 
-			HashMap<String, Integer> usernameSlayerXPCache = new HashMap<String, Integer>();
-			usernameSlayerXPCache.putAll(usernameSlayerXP);
-
-			if (usernameSlayerXPCache.size() == 0) {
+			if (usernameSlayerXP.size() == 0) {
 				e.getChannel().editMessageById(messageId, "Bot is still indexing names, please try again in a few minutes!").queue();
+				return;
 			}
 
 			int topX;
@@ -80,8 +78,7 @@ public class SlayerCommand extends Command implements EventListener {
 			}
 
 			for (int i = 0; i < topX; i++) {
-				Entry<String, Integer> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSlayerXPCache);
-				usernameSlayerXPCache.remove(currentEntry.getKey());
+				Entry<String, Integer> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSlayerXP, i);
 				response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + currentEntry.getValue().toString() + "\n");
 				if (i != topX - 1) {
 					response.append("\n");
@@ -107,28 +104,34 @@ public class SlayerCommand extends Command implements EventListener {
 		if (args[1].equalsIgnoreCase("player")) {
 			String messageId = e.getChannel().sendMessage("...").complete().getId();
 
+			SkyblockPlayer thePlayer;
 			if (args.length >= 3) {
-				ArrayList<String> profiles = main.getApiUtil().getSkyblockProfilesAndDisplaynameAndUUIDFromUsername(args[2]);
-				if (profiles.isEmpty()) {
-					e.getChannel().editMessageById(messageId, "Player **" + args[2] + "** does not exist! Try `" + this.name + " player " + args[2] + "`").queue();
+				thePlayer = main.getApiUtil().getSkyblockPlayerFromUsername(args[2]);
+				if (thePlayer.getSkyblockProfiles().isEmpty()) {
+					e.getChannel().editMessageById(messageId, "Player **" + args[2] + "** does not exist!").queue();
 					return;
 				}
 
-				int highestSlayerXP = 0;
-				// Get how much slayer xp the profile with the most of it has
-				for (int j = 2; j < profiles.size(); j++) {
-					String profile = profiles.get(j);
-					highestSlayerXP = Math.max(highestSlayerXP, main.getApiUtil().getProfileSlayerXP(profile, profiles.get(1)));
-				}
-				e.getChannel().editMessageById(messageId, "Player **" + profiles.get(0) + "** has **" + highestSlayerXP + "** slayer XP").queue();
+				SlayerExp playerSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer.getUUID());
+
+				EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x51047d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " slayer xp");
+				embedBuilder.setDescription(embedBuilder.getDescriptionBuilder()
+						.append("Total slayer xp: " + playerSlayerExp.getTotalExp() + "\n\n")
+						.append("Zombie: " + playerSlayerExp.getZombie() + "\n")
+						.append("Spider: " + playerSlayerExp.getSpider() + "\n")
+						.append("Wolf: " + playerSlayerExp.getWolf() + "\n")
+						.toString());
+
+				e.getChannel().deleteMessageById(messageId).queue();
+				e.getChannel().sendMessage(embedBuilder.build()).queue();
 				return;
 			} else {
 				e.getChannel().editMessageById(messageId, "Invalid usage! Usage: *" + this.name + " player <IGN>*").queue();
 				return;
 			}
 		}
-		e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
 
+		e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`! Try `" + this.name + " player " + args[2] + "`").queue();
 	}
 
 	public void setSlayerXPHashMap(HashMap<String, Integer> input) {

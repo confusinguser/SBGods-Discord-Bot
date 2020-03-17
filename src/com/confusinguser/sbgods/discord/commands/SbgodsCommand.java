@@ -32,11 +32,11 @@ public class SbgodsCommand extends Command implements EventListener {
 		}
 
 		if (args[1].equalsIgnoreCase("version")) {
-			User creatorUserObj = discord.getJDA().getUserById("244786205873405952");
+			User creatorUserObj = discord.getJDA().getUserById(main.getCreatorId());
 
 			EmbedBuilder embedBuilder = new EmbedBuilder()
 					.setTitle("Version " + SBGods.version)
-					.setDescription("Version " + SBGods.version + ": " + SBGods.versionDescription)
+					.setDescription(SBGods.versionDescription)
 					.setFooter("Made by " + creatorUserObj.getName() + "#" + creatorUserObj.getDiscriminator());
 			e.getChannel().sendMessage(embedBuilder.build()).queue();
 			return;
