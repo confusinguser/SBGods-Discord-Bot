@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
+import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SkyblockPlayer;
 
@@ -15,21 +16,22 @@ import net.dv8tion.jda.api.hooks.EventListener;
 
 public class SkillCommand extends Command implements EventListener {
 
-	private HashMap<String, SkillLevels> usernameSkillLevels = new HashMap<String, SkillLevels>();
-
 	public SkillCommand(SBGods main, DiscordBot discord) {
 		this.main = main;
 		this.discord = discord;
 		this.name = discord.commandPrefix + "skill";
+		this.aliases = new String[] {"skills"};
 	}
 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e) {
-		if (e.getAuthor().isBot() || !e.getMessage().getContentRaw().toLowerCase().startsWith(this.name) || !discord.shouldRun(e)) {
+		if (e.getAuthor().isBot() || !isTheCommand(e) || !discord.shouldRun(e)) {
 			return;
 		}
 
-		if (!discord.isLeaderboardChannel(e)) {
+		DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromEvent(e);
+
+		if (currentDiscordServer.getChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getChannelId())) {
 			e.getChannel().sendMessage("Skill commands cannot be ran in this channel!").queue();
 			return;
 		}
@@ -38,21 +40,22 @@ public class SkillCommand extends Command implements EventListener {
 
 		String[] args = e.getMessage().getContentRaw().split(" ");
 
-		if (args.length == 1) {
+		if (args.length <= 1) {
 			e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
 			return;
 		}
 
 		if (args[1].equalsIgnoreCase("leaderboard")) {
-			ArrayList<SkyblockPlayer> guildMemberUuids = main.getApiUtil().getGuildMembers();
+			ArrayList<SkyblockPlayer> guildMemberUuids = main.getApiUtil().getGuildMembers(DiscordServer.getDiscordServerFromEvent(e).getHypixelGuild());
+			HashMap<String, SkillLevels> usernameSkillExpHashMap = currentDiscordServer.getHypixelGuild().getSkillExpHashmap();
 
-			if (usernameSkillLevels.size() == 0) {
+			if (usernameSkillExpHashMap.size() == 0) {
 				e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes!").queue();
 				return;
 			}
 
 			int topX;
-			if (args.length > 2) {
+			if (args.length >= 2) {
 				if (args[2].equalsIgnoreCase("all")) {
 					topX = guildMemberUuids.size();
 				} else {
@@ -75,28 +78,29 @@ public class SkillCommand extends Command implements EventListener {
 			}
 
 			for (int i = 0; i < topX; i++) {
-				Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillLevels, i, true);
+				Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillExpHashMap, i, true);
 				response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2));
 				if (currentEntry.getValue().isApproximate()) {
-					response.append("*(approximate)*");
+					response.append(" *(appr.)*");
 				}
 				response.append("\n\n");
 			}
+			response.append("**Average guild skill level: " + main.getUtil().round(main.getUtil().getAverageFromSkillLevelArray(usernameSkillExpHashMap.values().toArray(new SkillLevels[usernameSkillExpHashMap.size()])), 2) + "**");
 
 			String responseString = response.toString();
 			// Split the message every 2000 characters in a nice looking way because of discord limitations
 			ArrayList<String> responseList = main.getUtil().processMessageForDiscord(responseString, 2000);
-
-			for (int i = 0; i < responseList.size(); i++) {
-				String message = responseList.get(i);
-				if (i == 0) {
-					e.getChannel().sendMessage(message).complete();
+			for (int j = 0; j < responseList.size(); j++) {
+				String message = responseList.get(j);
+				if (j == 0) {
+					e.getChannel().sendMessage(message).queue();
 				} else {
-					e.getChannel().sendMessage("\u200E" + message).complete();
+					e.getChannel().sendMessage("\u200E" + message).queue();
 				}
 			}
 			return;
 		}
+
 		if (args[1].equalsIgnoreCase("player")) {
 			if (args.length >= 3) {
 				SkyblockPlayer thePlayer = main.getApiUtil().getSkyblockPlayerFromUsername(args[2]);
@@ -106,7 +110,6 @@ public class SkillCommand extends Command implements EventListener {
 					return;
 				}
 
-				boolean approximate = false;
 				SkillLevels highestSkillLevels = new SkillLevels();
 				for (String profile : thePlayer.getSkyblockProfiles()) {
 					SkillLevels skillLevels = main.getApiUtil().getProfileSkills(profile, thePlayer.getUUID());
@@ -117,7 +120,6 @@ public class SkillCommand extends Command implements EventListener {
 				}
 
 				if (highestSkillLevels.getAvgSkillLevel() == 0) {
-					approximate = true;
 					SkillLevels skillLevels = main.getApiUtil().getProfileSkillsAlternate(thePlayer.getUUID());
 
 					if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
@@ -128,7 +130,7 @@ public class SkillCommand extends Command implements EventListener {
 				EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x03731d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " skill levels");
 				StringBuilder descriptionBuilder = embedBuilder.getDescriptionBuilder();
 
-				if (approximate) {
+				if (highestSkillLevels.isApproximate()) {
 					descriptionBuilder.append("Approximate average skill level: " + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "\n\n");
 				} else {
 					descriptionBuilder.append("Average skill level: " + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "\n\n");
@@ -154,9 +156,5 @@ public class SkillCommand extends Command implements EventListener {
 		}
 
 		e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
-	}
-
-	public void setAvgSkillLevelHashMap(HashMap<String, SkillLevels> input) {
-		usernameSkillLevels = input;
 	}
 }

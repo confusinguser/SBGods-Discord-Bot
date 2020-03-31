@@ -20,4 +20,31 @@ public class LangUtil {
 	public String toLowerCaseButFirstLetter(String text) {
 		return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
 	}
+
+	public String prettifyInt(int input) {
+		if (input < 1000) {
+			return String.valueOf(input);
+		}
+		if (input % 100000 == 0) {
+			if (input >= 1000000 && !(input % 1000000 == 0)) {
+				return String.valueOf((double) input / 1000000) + "M";
+			}
+			return String.valueOf(input / 1000000) + "M";
+		}
+		if (input % 100 == 0 && input < 1000000) {
+			if (((double) input) / 1000 % 1 == 0) {
+				return String.valueOf(input / 1000) + "K";
+			} else {
+				return String.valueOf((double) input / 1000) + "K";
+			}
+		}
+		return String.valueOf(input);
+	}
+	
+	public String prettifyDouble(double input) {
+		if (input % 1 == 0) {
+			return String.valueOf((int) Math.floor(input));
+		}
+		return String.valueOf(input);
+	}
 }

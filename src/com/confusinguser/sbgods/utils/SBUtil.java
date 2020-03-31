@@ -17,20 +17,12 @@ public class SBUtil {
 
 	public int toPetLevel(int xpAmount, PetTier tier) {
 
-		final int rarityOffset = Constants.pet_tier_offset.get(tier);
+		final int rarityOffset = tier.getRairityOffset();
 		final List<Integer> levels = new ArrayList<Integer>(Arrays.asList(Constants.pet_levels)).subList(rarityOffset, rarityOffset + 99);
-
-		/*
-		int xpMaxLevel = 0;
-		for (Integer level : levels) {
-			xpMaxLevel += level;
-		}
-		 */
 
 		int xpTotal = 0;
 		int level = 1;
 
-		//int xpForNext = 0;
 
 		for(int i = 0; i < 100; i++){
 			xpTotal += levels.get(i);
@@ -43,48 +35,49 @@ public class SBUtil {
 			}
 		}
 
-		//int xpCurrent = (int) Math.floor(xpAmount - xpTotal);
-		//int progress;
-
-		if(level < 100) {
-			//xpForNext = (int) Math.ceil(levels.get(level - 1));
-			//progress = Math.max(0, Math.min(xpCurrent / xpForNext, 1));
-		} else {
+		if(level > 100) {
 			level = 100;
-			//xpCurrent = xpAmount - levels.get(99);
-			//xpForNext = 0;
-			//progress = 1;
 		}
 
 		return level;
 	}
 
-	public double toSkillLevel(int xpAmount) {
-		ArrayList<Integer> xpLevelArray = new ArrayList<Integer>(Arrays.asList(0, 50, 175, 375, 675, 1175, 1925, 2925, 4425, 6425, 9925, 14925, 22425, 32425, 47425, 67425, 97425, 147425, 222425, 322425, 522425, 822425, 1222425, 1722425, 2322425, 3022425, 3822425, 4722425, 5722425, 6822425, 8022425, 9322425, 10722425, 12222425, 13822425, 15522425, 17322425, 19222425, 21222425, 23322425, 25522425, 27822425, 30222425, 32722425, 35322425, 38072425, 40972425, 44072425, 47472425, 51172425, 55172425));
-		int level;
-		double output = xpAmount;
-		for (Integer xpLevel: xpLevelArray) {
-			if (xpAmount == 0) {
-				return 0;
-			}
-			if (xpAmount > xpLevel) {
-				continue;
+	public double toSkillLevel(int xp) {
+		ArrayList<Integer> skillExpLevels = new ArrayList<Integer>(Arrays.asList(Constants.skill_exp_levels));
+
+		int xpTotal = 0;
+		int level = 0;
+		double xpForNext = Double.POSITIVE_INFINITY;
+		int maxLevel = skillExpLevels.size() - 1;
+
+		for(int x = 1; x < maxLevel; x++){
+			xpTotal += skillExpLevels.get(x);
+
+			if(xpTotal > xp){
+				xpTotal -= skillExpLevels.get(x);
+				break;
 			} else {
-				level = xpLevelArray.indexOf(xpLevel) - 1;
-				// Get the decimal number
-				output -= xpLevelArray.get(xpLevelArray.indexOf(xpLevel) - 1);
-				output /= xpLevelArray.get(xpLevelArray.indexOf(xpLevel));
-				output += level;
-				return output;
+				level = x;
 			}
 		}
-		return 50;
+
+		int xpCurrent = (int) Math.floor(xp - xpTotal);
+		if(level < maxLevel)
+			xpForNext = Math.ceil(skillExpLevels.get(level + 1));
+		double progress = Math.max(0, Math.min(xpCurrent / xpForNext, 1));
+
+		return level + progress;
 	}
 
 	public int toSkillExp(int level) {
-		ArrayList<Integer> xpLevelArray = new ArrayList<Integer>(Arrays.asList(0, 50, 175, 375, 675, 1175, 1925, 2925, 4425, 6425, 9925, 14925, 22425, 32425, 47425, 67425, 97425, 147425, 222425, 322425, 522425, 822425, 1222425, 1722425, 2322425, 3022425, 3822425, 4722425, 5722425, 6822425, 8022425, 9322425, 10722425, 12222425, 13822425, 15522425, 17322425, 19222425, 21222425, 23322425, 25522425, 27822425, 30222425, 32722425, 35322425, 38072425, 40972425, 44072425, 47472425, 51172425, 55172425));
+		return Constants.skill_exp_levels_total[level + 1];
+	}
 
-		return xpLevelArray.get(level + 1);
+	public int toSkillExp(double level) {		
+		int exp = Constants.skill_exp_levels_total[((int) Math.floor(level))];
+		exp += exp * (level - Math.floor(level));
+
+		return exp;
 	}
 
 	public ArrayList<Pet> keepHighestLevelOfPet(ArrayList<Pet> profilePets, ArrayList<Pet> totalPets) {

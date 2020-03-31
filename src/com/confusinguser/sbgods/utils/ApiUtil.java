@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.confusinguser.sbgods.SBGods;
+import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.Pet;
 import com.confusinguser.sbgods.entities.PetTier;
 import com.confusinguser.sbgods.entities.SkillLevels;
@@ -37,6 +38,13 @@ public class ApiUtil {
 	private int fails = 0;
 
 	private String getResponse(String url_string) {
+
+		// See if request already in cache
+		String cacheResponse = main.getCacheUtil().getCachedResponse(main.getCacheUtil().stripUnnecesaryInfo(url_string)).getJson();
+		if (cacheResponse != null) {
+			return cacheResponse;
+		}
+
 		long current = System.currentTimeMillis();
 		int time_passed = (int) ((current - LAST_CHECK) / 1000);
 		LAST_CHECK = current;
@@ -95,7 +103,7 @@ public class ApiUtil {
 			return getResponse(url_string);
 
 		} else if (jsonObject.has("cause") && jsonObject.getString("cause") == "Invalid API key!") {
-			main.logInfo("[WARNING] API key is invalid!");
+			main.logInfo("[FATAL ERROR] API key is invalid!");
 			fails = 0;
 			return null;
 		}
@@ -104,31 +112,28 @@ public class ApiUtil {
 	}
 
 
-	public ArrayList<SkyblockPlayer> getGuildMembers() {
+	public ArrayList<SkyblockPlayer> getGuildMembers(HypixelGuild guild) {
 		StringBuilder url_string = new StringBuilder(BASE_URL);
-		url_string.append("guild").append("?key=" + main.getApikey()).append("&id=" + main.getGuildId());
+		url_string.append("guild").append("?key=" + main.getApikey()).append("&id=" + guild.getGuildId());
 
 		String response = getResponse(url_string.toString());
-		if (response == null) return getGuildMembers();
+		if (response == null) return getGuildMembers(guild);
 
 		ArrayList<SkyblockPlayer> output = new ArrayList<SkyblockPlayer>();
 		JSONObject jsonObject = new JSONObject(response);
 		jsonObject = jsonObject.getJSONObject("guild");
 		JSONArray members = jsonObject.getJSONArray("members");
 
-		JSONObject currentMember;
-		String currentUuid;
-
 		for (int i = 0; i < members.length(); i++) {
-			currentMember = members.getJSONObject(i);
-			currentUuid = currentMember.getString("uuid");
-			output.add(new SkyblockPlayer(currentUuid, null, null));
+			JSONObject currentMember = members.getJSONObject(i);
+			String uuid = currentMember.getString("uuid");
+			output.add(new SkyblockPlayer(uuid, null, null, null));
 		}
 
 		return output;
 	}
 
-	public SkyblockPlayer getSkyblockProfilesAndUsernameFromUUID(String UUID) {
+	public SkyblockPlayer getSkyblockPlayerFromUUID(String UUID) {
 		StringBuilder url_string = new StringBuilder(BASE_URL);
 		url_string.append("player").append("?key=" + main.getApikey()).append("&uuid=" + UUID);
 
@@ -136,18 +141,25 @@ public class ApiUtil {
 		if (response == null) return new SkyblockPlayer();
 
 		JSONObject jsonObject = new JSONObject(response);
-		String currentName;
-		String currentUuid;
+		String username;
+		String uuid;
+		String discord;
 		JSONObject profiles;
 		try {
-			currentName = jsonObject.getJSONObject("player").getString("displayname");
-			currentUuid = jsonObject.getJSONObject("player").getString("uuid");
+			uuid = jsonObject.getJSONObject("player").getString("uuid");
+			username = jsonObject.getJSONObject("player").getString("displayname");
 			profiles = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
 		} catch (JSONException e) {
 			return new SkyblockPlayer();
 		}
+		try {
+			// Does not necessarily exist while the other things above have to.
+			discord = jsonObject.getJSONObject("player").getJSONObject("socialMedia").getJSONObject("links").getString("DISCORD");
+		} catch (JSONException e) {
+			discord = null;
+		}
 
-		SkyblockPlayer output = new SkyblockPlayer(currentUuid, currentName, new ArrayList<String>(profiles.keySet()));
+		SkyblockPlayer output = new SkyblockPlayer(uuid, username, discord, new ArrayList<String>(profiles.keySet()));
 
 		return output;
 	}
@@ -160,18 +172,25 @@ public class ApiUtil {
 		if (response == null) return new SkyblockPlayer();
 
 		JSONObject jsonObject = new JSONObject(response);
-		String currentName;
-		String currentUuid;
+		String username;
+		String uuid;
+		String discord;
 		JSONObject profiles;
 		try {
-			currentName = jsonObject.getJSONObject("player").getString("displayname");
-			currentUuid = jsonObject.getJSONObject("player").getString("uuid");
+			uuid = jsonObject.getJSONObject("player").getString("uuid");
+			username = jsonObject.getJSONObject("player").getString("displayname");
 			profiles = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
 		} catch (JSONException e) {
 			return new SkyblockPlayer();
 		}
+		try {
+			// Does not necessarily exist while the other things above have to.
+			discord = jsonObject.getJSONObject("player").getJSONObject("socialMedia").getJSONObject("links").getString("DISCORD");
+		} catch (JSONException e) {
+			discord = null;
+		}
 
-		SkyblockPlayer output = new SkyblockPlayer(currentUuid, currentName, new ArrayList<String>(profiles.keySet()));
+		SkyblockPlayer output = new SkyblockPlayer(uuid, username, discord, new ArrayList<String>(profiles.keySet()));
 
 		return output;
 	}
@@ -184,7 +203,7 @@ public class ApiUtil {
 			output.put(slayer_type, 0);
 		}
 
-		SkyblockPlayer thePlayer = getSkyblockProfilesAndUsernameFromUUID(playerUUID);
+		SkyblockPlayer thePlayer = getSkyblockPlayerFromUUID(playerUUID);
 
 		for (String profileUUID : thePlayer.getSkyblockProfiles()) {
 
@@ -380,5 +399,31 @@ public class ApiUtil {
 			}
 		}
 		return output;
+	}
+
+	public SkillLevels getBestPlayerSkillLevels(String uuid) {
+		SkyblockPlayer thePlayer = getSkyblockPlayerFromUUID(uuid);
+
+		if (thePlayer.getSkyblockProfiles().isEmpty()) {
+			return null;
+		}
+
+		SkillLevels highestSkillLevels = new SkillLevels();
+		for (String profile : thePlayer.getSkyblockProfiles()) {
+			SkillLevels skillLevels = getProfileSkills(profile, thePlayer.getUUID());
+
+			if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
+				highestSkillLevels = skillLevels;
+			}
+		}
+
+		if (highestSkillLevels.getAvgSkillLevel() == 0) {
+			SkillLevels skillLevels = getProfileSkillsAlternate(thePlayer.getUUID());
+
+			if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
+				highestSkillLevels = skillLevels;
+			}
+		}
+		return highestSkillLevels;
 	}
 }

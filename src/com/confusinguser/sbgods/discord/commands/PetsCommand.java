@@ -20,10 +20,11 @@ public class PetsCommand extends Command implements EventListener {
 		this.discord = discord;
 		this.name = discord.commandPrefix + "pets";
 		this.usage = this.name + " <IGN>";
+		this.aliases = new String[] {};
 	}
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e) {
-		if (e.getAuthor().isBot() || !e.getMessage().getContentRaw().toLowerCase().startsWith(this.name) || !discord.shouldRun(e)) {
+		if (e.getAuthor().isBot() || !isTheCommand(e) || !discord.shouldRun(e)) {
 			return;
 		}
 

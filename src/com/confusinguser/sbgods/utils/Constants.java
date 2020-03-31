@@ -1,21 +1,6 @@
 package com.confusinguser.sbgods.utils;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.confusinguser.sbgods.entities.PetTier;
-
 public class Constants {
-
-
-	public static final Map<PetTier, Integer> pet_tier_offset = new HashMap<PetTier, Integer>()
-	{{
-		put(PetTier.COMMON, 0);
-		put(PetTier.UNCOMMON, 6);
-		put(PetTier.RARE, 11);
-		put(PetTier.EPIC, 16);
-		put(PetTier.LEGENDARY, 20);
-	}};
 
 	public static final Integer[] pet_levels = {
 			100,
@@ -136,9 +121,118 @@ public class Constants {
 			1496700,
 			1616700,
 			1746700,
-			1886700};
+			1886700
+	};
 
-	public static String[] slayer_types = {
+	public static final Integer[] skill_exp_levels_total = {
+			0,
+			50,
+			175,
+			375,
+			675,
+			1175,
+			1925,
+			2925,
+			4425,
+			6425,
+			9925,
+			14925,
+			22425,
+			32425,
+			47425,
+			67425,
+			97425,
+			147425,
+			222425,
+			322425,
+			522425,
+			822425,
+			1222425,
+			1722425,
+			2322425,
+			3022425,
+			3822425,
+			4722425,
+			5722425,
+			6822425,
+			8022425,
+			9322425,
+			10722425,
+			12222425,
+			13822425,
+			15522425,
+			17322425,
+			19222425,
+			21222425,
+			23322425,
+			25522425,
+			27822425,
+			30222425,
+			32722425,
+			35322425,
+			38072425,
+			40972425,
+			44072425,
+			47472425,
+			51172425,
+			55172425
+	};
+
+	public static final Integer[] skill_exp_levels = {
+			0,
+			50,
+			125,
+			200,
+			300,
+			500,
+			750,
+			1000,
+			1500,
+			2000,
+			3500,
+			5000,
+			7500,
+			10000,
+			15000,
+			20000,
+			30000,
+			50000,
+			75000,
+			100000,
+			200000,
+			300000,
+			400000,
+			500000,
+			600000,
+			700000,
+			800000,
+			900000,
+			1000000,
+			1100000,
+			1200000,
+			1300000,
+			1400000,
+			1500000,
+			1600000,
+			1700000,
+			1800000,
+			1900000,
+			2000000,
+			2100000,
+			2200000,
+			2300000,
+			2400000,
+			2500000,
+			2600000,
+			2750000,
+			2900000,
+			3100000,
+			3400000,
+			3700000,
+			4000000
+	};
+
+	public static final String[] slayer_types = {
 			"zombie",
 			"spider",
 			"wolf"
@@ -163,6 +257,4 @@ public class Constants {
 			"augmentation",
 			"concoctor"
 	};
-
-
 }

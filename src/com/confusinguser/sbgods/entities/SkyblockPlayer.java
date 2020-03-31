@@ -6,17 +6,20 @@ public class SkyblockPlayer {
 
 	private String UUID;
 	private String displayName;
+	private String discordTag;
 	private ArrayList<String> skyblockProfiles;
 
 	public SkyblockPlayer() {
-		this.UUID = "";
-		this.displayName = "";
+		this.UUID = null;
+		this.displayName = null;
+		this.discordTag = null;
 		this.skyblockProfiles = new ArrayList<String>();
 	}
 
-	public SkyblockPlayer(String uuid, String displayName, ArrayList<String> skyblockProfiles) {
+	public SkyblockPlayer(String uuid, String displayName, String discordTag, ArrayList<String> skyblockProfiles) {
 		this.UUID = uuid;
 		this.displayName = displayName;
+		this.discordTag = discordTag;
 		this.skyblockProfiles = skyblockProfiles;
 	}
 
@@ -26,6 +29,10 @@ public class SkyblockPlayer {
 
 	public String getDisplayName() {
 		return displayName;
+	}
+	
+	public String getDiscordTag() {
+		return discordTag;
 	}
 
 	public ArrayList<String> getSkyblockProfiles() {

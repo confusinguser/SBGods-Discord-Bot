@@ -15,8 +15,6 @@ public class Start {
 	private static ServerSocket s;
 
 	public static void main(String[] args) {
-		System.out.println("Starting the bot to run on the server: Skyblock Gods");
-
 		try {
 			s = new ServerSocket(PORT, 10, InetAddress.getLocalHost());
 		} catch (UnknownHostException e) {

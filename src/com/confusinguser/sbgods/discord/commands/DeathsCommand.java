@@ -17,11 +17,12 @@ public class DeathsCommand extends Command {
 		this.discord = discord;
 		this.name = discord.commandPrefix + "deaths";
 		this.usage = this.name + " player <IGN>";
+		this.aliases = new String[] {};
 	}
 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e) {
-		if (e.getAuthor().isBot() || !e.getMessage().getContentRaw().toLowerCase().startsWith(this.name) || !discord.shouldRun(e)) {
+		if (e.getAuthor().isBot() || !isTheCommand(e) || !discord.shouldRun(e)) {
 			return;
 		}
 
@@ -45,6 +46,7 @@ public class DeathsCommand extends Command {
 				return;
 			}
 
+
 			for (String profile : thePlayer.getSkyblockProfiles()) {
 				for (Entry<String, Integer> deathType : main.getApiUtil().getProfileDeaths(profile, thePlayer.getUUID()).entrySet()) {
 					if (totalDeaths.containsKey(deathType.getKey())) {
@@ -55,15 +57,24 @@ public class DeathsCommand extends Command {
 				}
 			}
 
-			EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x5820e6).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " deaths");
-
-			int totalDeathsInt = 0;
-			for (Entry<String, Integer> death : totalDeaths.entrySet()) {
-				totalDeathsInt += death.getValue();
+			EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x2154fc).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " deaths");
+			
+			int topX;
+			if (args.length > 3) {
+				if (args[3].contentEquals("all")) {
+					topX = totalDeaths.size();
+				} else {
+					try {
+						topX = Math.min(totalDeaths.size(), Integer.parseInt(args[3]));
+					} catch (NumberFormatException exception) {
+						e.getChannel().editMessageById(messageId, "**" + args[3] + "** is not a valid number!").queue();
+						return;
+					}
+				}
+			} else {
+				topX = 10;
 			}
-			embedBuilder.appendDescription("Total amount of deaths: " + totalDeathsInt + "\n\n");
-
-			int topX = Math.min(totalDeaths.size(), 10);
+			
 			for (int i = 0; i < topX; i++) {
 				Entry<String, Integer> currentEntry = main.getUtil().getHighestKeyValuePair(totalDeaths, i);
 				embedBuilder.appendDescription("**#" + Math.incrementExact(i) + "**\t" + currentEntry.getKey() + ": " + currentEntry.getValue() + "\n");

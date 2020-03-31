@@ -16,11 +16,12 @@ public class HelpCommand extends Command implements EventListener {
 		this.main = main;
 		this.discord = discord;
 		this.name = discord.commandPrefix + "help";
+		this.aliases = new String[] {};
 	}
 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e) {
-		if (e.getAuthor().isBot() || !e.getMessage().getContentRaw().toLowerCase().startsWith(this.name) || !discord.shouldRun(e)) {
+		if (e.getAuthor().isBot() || !isTheCommand(e) || !discord.shouldRun(e)) {
 			return;
 		}
 

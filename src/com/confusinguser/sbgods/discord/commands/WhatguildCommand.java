@@ -13,23 +13,27 @@ public class WhatguildCommand extends Command implements EventListener{
 		this.main = main;
 		this.discord = discord;
 		this.name = discord.commandPrefix + "whatguild";
+		this.usage = this.name + " <IGN>";
+		this.aliases = new String[] {"wg"};
 	}
 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e) {
-		if (e.getAuthor().isBot() || !e.getMessage().getContentRaw().toLowerCase().startsWith(this.name) || !discord.shouldRun(e)) {
+		if (e.getAuthor().isBot() || !isTheCommand(e) || !discord.shouldRun(e)) {
 			return;
 		}
 
 		main.logInfo(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
 
 		String[] args = e.getMessage().getContentRaw().split(" ");
-
-		String messageId = e.getChannel().sendMessage("...").complete().getId();
+		
 		if (args.length <= 1) {
-			e.getChannel().editMessageById(messageId, "Invalid usage! Usage: " + this.name + " <IGN>").queue();
+			e.getChannel().sendMessage("Invalid usage! Usage: " + this.usage).queue();
 			return;
 		}
+		
+		String messageId = e.getChannel().sendMessage("...").complete().getId();
+		
 		SkyblockPlayer thePlayer = main.getApiUtil().getSkyblockPlayerFromUsername(args[1]);
 		if (thePlayer.getSkyblockProfiles().isEmpty()) {
 			e.getChannel().editMessageById(messageId, "Player **" + args[1] + "** does not exist").queue();

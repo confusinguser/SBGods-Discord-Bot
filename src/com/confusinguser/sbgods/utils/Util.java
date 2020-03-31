@@ -5,8 +5,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.SkillLevels;
+import com.confusinguser.sbgods.entities.SlayerExp;
 
 public class Util {
 
@@ -43,6 +45,17 @@ public class Util {
 		return list.get(position);
 	}
 
+	public Entry<String, SlayerExp> getHighestKeyValuePairForSlayerExp(HashMap<String, SlayerExp> map, int position) {
+		List<Entry<String, SlayerExp>> list = new ArrayList<Entry<String, SlayerExp>>(map.entrySet());
+		list.sort(new Comparator<Entry<String, SlayerExp>>() {
+			public int compare(Entry<String, SlayerExp> o1, Entry<String, SlayerExp> o2) {
+				return ((Integer) o2.getValue().getTotalExp()).compareTo(o1.getValue().getTotalExp());
+			}
+		});
+
+		return list.get(position);
+	}
+
 	public ArrayList<String> processMessageForDiscord(String message, int limit) {
 		return processMessageForDiscord(message, limit, new ArrayList<String>());
 	}
@@ -52,7 +65,7 @@ public class Util {
 		if (message.length() > limit) {
 			int lastIndex = 0;
 			for (int index = message.indexOf("\n"); index >= 0; index = message.indexOf("\n", index + 1)) {
-				if (index > limit) {
+				if (index >= limit) {
 					output.add(message.substring(0, lastIndex));
 					message = message.substring(lastIndex);
 					return processMessageForDiscord(message, limit, output);
@@ -65,7 +78,7 @@ public class Util {
 		return output;
 	}
 
-	public double getAverage(List<Double> list) {
+	public double getAverageFromDoubleList(List<Double> list) {
 		double output = 0;
 		for (int i = 0; i < list.size(); i++) {
 			output += list.get(i);
@@ -76,5 +89,25 @@ public class Util {
 
 	public double round(double num, int toPlaces) {
 		return Double.valueOf(String.format("%." + toPlaces + "f", num));
+	}
+
+
+	public double getAverageFromSkillLevelArray(SkillLevels[] array) {
+		double output = 0;
+		for (int i = 0; i < array.length; i++) {
+			output += array[i].getAvgSkillLevel();
+		}
+		output /= array.length;
+		return output;
+	}
+
+
+	public double getAverageFromSlayerExpArray(SlayerExp[] array) {
+		double output = 0;
+		for (int i = 0; i < array.length; i++) {
+			output += array[i].getTotalExp();
+		}
+		output /= array.length;
+		return output;
 	}
 }

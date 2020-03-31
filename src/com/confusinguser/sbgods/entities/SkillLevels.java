@@ -8,15 +8,15 @@ import com.confusinguser.sbgods.SBGods;
 
 public class SkillLevels {
 
-	double farming;
-	double mining;
-	double combat;
-	double foraging;
-	double fishing;
-	double enchanting;
-	double alchemy;
-	ArrayList<Double> skillList;
-	boolean approximate = false;
+	private double farming;
+	private double mining;
+	private double combat;
+	private double foraging;
+	private double fishing;
+	private double enchanting;
+	private double alchemy;
+	private ArrayList<Double> skillList;
+	private boolean approximate = false;
 
 	SBGods main = SBGods.instance;
 

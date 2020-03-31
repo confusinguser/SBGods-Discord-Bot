@@ -17,11 +17,12 @@ public class KillsCommand extends Command {
 		this.discord = discord;
 		this.name = discord.commandPrefix + "kills";
 		this.usage = this.name + " player <IGN>";
+		this.aliases = new String[] {};
 	}
 
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e) {
-		if (e.getAuthor().isBot() || !e.getMessage().getContentRaw().toLowerCase().startsWith(this.name) || !discord.shouldRun(e)) {
+		if (e.getAuthor().isBot() || !isTheCommand(e) || !discord.shouldRun(e)) {
 			return;
 		}
 
@@ -61,10 +62,24 @@ public class KillsCommand extends Command {
 			for (Entry<String, Integer> kill : totalKills.entrySet()) {
 				totalKillsInt += kill.getValue();
 			}
-			embedBuilder.appendDescription("Total amount of deaths: " + totalKillsInt + "\n\n");
+			embedBuilder.appendDescription("Total amount of kills: " + totalKillsInt + "\n\n");
+			
+			int topX;
+			if (args.length > 3) {
+				if (args[3].contentEquals("all")) {
+					topX = totalKills.size();
+				} else {
+					try {
+						topX = Math.min(totalKills.size(), Integer.parseInt(args[3]));
+					} catch (NumberFormatException exception) {
+						e.getChannel().editMessageById(messageId, "**" + args[3] + "** is not a valid number!").queue();
+						return;
+					}
+				}
+			} else {
+				topX = 10;
+			}
 
-
-			int topX = Math.min(totalKills.size(), 10);
 			for (int i = 0; i < topX; i++) {
 				Entry<String, Integer> currentEntry = main.getUtil().getHighestKeyValuePair(totalKills, i);
 				embedBuilder.appendDescription("**#" + Math.incrementExact(i) + "**\t" + currentEntry.getKey() + ": " + currentEntry.getValue() + "\n");

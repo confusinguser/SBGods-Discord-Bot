@@ -6,9 +6,12 @@ import java.util.Arrays;
 import javax.security.auth.login.LoginException;
 
 import com.confusinguser.sbgods.SBGods;
+import com.confusinguser.sbgods.discord.commands.ApplyCommand;
 import com.confusinguser.sbgods.discord.commands.Command;
 import com.confusinguser.sbgods.discord.commands.DeathsCommand;
 import com.confusinguser.sbgods.discord.commands.HelpCommand;
+import com.confusinguser.sbgods.discord.commands.ImportApplicationCommand;
+import com.confusinguser.sbgods.discord.commands.InviteQueueCommand;
 import com.confusinguser.sbgods.discord.commands.KillsCommand;
 import com.confusinguser.sbgods.discord.commands.PetsCommand;
 import com.confusinguser.sbgods.discord.commands.SbgodsCommand;
@@ -16,6 +19,7 @@ import com.confusinguser.sbgods.discord.commands.SettingsCommand;
 import com.confusinguser.sbgods.discord.commands.SkillCommand;
 import com.confusinguser.sbgods.discord.commands.SlayerCommand;
 import com.confusinguser.sbgods.discord.commands.WhatguildCommand;
+import com.confusinguser.sbgods.entities.DiscordServer;
 
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
@@ -43,6 +47,9 @@ public class DiscordBot {
 	public PetsCommand petsCommand;
 	public KillsCommand killsCommand;
 	public DeathsCommand deathsCommand;
+	public ApplyCommand applyCommand;
+	public ImportApplicationCommand importApplicationCommand;
+	public InviteQueueCommand inviteQueueCommand;
 	public SettingsCommand settingsCommand;
 	public ArrayList<Command> commands;
 
@@ -58,7 +65,10 @@ public class DiscordBot {
 		petsCommand = new PetsCommand(main, this);
 		killsCommand = new KillsCommand(main, this);
 		deathsCommand = new DeathsCommand(main, this);
-		//settingsCommand = new SettingsCommand(main, this);
+		// applyCommand = new ApplyCommand(main, this);
+		// importApplicationCommand = new ImportApplicationCommand(main, this);
+		// inviteQueueCommand = new InviteQueueCommand(main, this);
+		// settingsCommand = new SettingsCommand(main, this);
 
 		commands = new ArrayList<Command>(Arrays.asList(slayerCommand, skillCommand, helpCommand, sbgodsCommand, whatguildCommand, petsCommand, killsCommand, deathsCommand));
 
@@ -74,7 +84,7 @@ public class DiscordBot {
 		creatorUser = jda.getUserById(creatorId);
 		creatorTag = "ConfusingUser#5712";//jda.getUserById(creatorId).getAsTag();
 		jda.getPresence().setActivity(Activity.playing("Use " + commandPrefix + "help to get started. Made by " + creatorTag));
-
+		main.logInfo("Bot ready to take commands");
 	}
 
 	public boolean isValidCommand(String command) {
@@ -91,16 +101,12 @@ public class DiscordBot {
 		return jda;
 	}
 
-	public boolean isLeaderboardChannel(MessageReceivedEvent e) {
-		if (main.getActiveChannel() == null) return true;
-		else if (e.getChannel().getId().contentEquals(main.getActiveChannel())) return true;
-		else return false;
-	}
-
 	public boolean shouldRun(MessageReceivedEvent e) {
-		if (main.getActiveServer() == null) return true;
-		else if (e.getGuild().getId().contentEquals(main.getActiveServer())) return true;
-		else return false;
+		if (main.getActiveServers() == null) return true;
+		for (DiscordServer server : main.getActiveServers()) {
+			if (e.getGuild().getId().contentEquals(server.getServerId())) return true;
+		}
+		return false;
 	}
 
 	public String escapeMarkdown(String text) {
