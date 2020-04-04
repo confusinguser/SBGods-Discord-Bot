@@ -68,13 +68,44 @@ public class SBUtil {
 
 		return level + progress;
 	}
+	
+	public double toSkillLevelRunecrafting(int xp) {
+		ArrayList<Integer> skillExpLevels = new ArrayList<Integer>(Arrays.asList(Constants.runecrafting_exp_levels));
+
+		int xpTotal = 0;
+		int level = 0;
+		double xpForNext = Double.POSITIVE_INFINITY;
+		int maxLevel = skillExpLevels.size() - 1;
+
+		for(int x = 1; x < maxLevel; x++){
+			xpTotal += skillExpLevels.get(x);
+
+			if(xpTotal > xp){
+				xpTotal -= skillExpLevels.get(x);
+				break;
+			} else {
+				level = x;
+			}
+		}
+
+		int xpCurrent = (int) Math.floor(xp - xpTotal);
+		if(level < maxLevel)
+			xpForNext = Math.ceil(skillExpLevels.get(level + 1));
+		double progress = Math.max(0, Math.min(xpCurrent / xpForNext, 1));
+
+		return level + progress;
+	}
 
 	public int toSkillExp(int level) {
-		return Constants.skill_exp_levels_total[level + 1];
+		int exp = 0;
+		for (int i = 0; i < level; i++) {
+			exp += Constants.skill_exp_levels[i];
+		}
+		return exp;
 	}
 
 	public int toSkillExp(double level) {		
-		int exp = Constants.skill_exp_levels_total[((int) Math.floor(level))];
+		int exp = toSkillExp((int) Math.floor(level));
 		exp += exp * (level - Math.floor(level));
 
 		return exp;

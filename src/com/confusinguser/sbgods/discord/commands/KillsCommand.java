@@ -15,9 +15,9 @@ public class KillsCommand extends Command {
 	public KillsCommand(SBGods main, DiscordBot discord) {
 		this.main = main;
 		this.discord = discord;
-		this.name = discord.commandPrefix + "kills";
-		this.usage = this.name + " player <IGN>";
-		this.aliases = new String[] {};
+		this.name = "kills";
+		this.usage = this.getName() + " player <IGN>";
+		this.aliases = new String[] {"k"};
 	}
 
 	@Override

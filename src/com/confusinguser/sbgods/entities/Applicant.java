@@ -14,7 +14,7 @@ public class Applicant {
 	private int rating;
 
 	public Applicant(SkyblockPlayer skyblockPlayer, User discordUser, HypixelGuild guild) {
-		this.main = SBGods.instance;
+		this.main = SBGods.getInstance();
 		this.skyblockPlayer = skyblockPlayer;
 		this.discordUser = discordUser;
 		this.guild = guild;
@@ -35,11 +35,8 @@ public class Applicant {
 	}
 
 	public boolean meetsRequirements() {
-		if (main.getApiUtil().getPlayerSlayerExp(skyblockPlayer.getUUID()).getTotalExp() >= guild.getSlayerExpRec() && 
-				main.getSBUtil().toSkillExp(main.getApiUtil().getBestPlayerSkillLevels(skyblockPlayer.getUUID()).getAvgSkillLevel()) >= guild.getSkillExpRec()) {
-			return true;
-		}
-		return false;
+		return main.getApiUtil().getPlayerSlayerExp(skyblockPlayer.getUUID()).getTotalExp() >= guild.getSlayerExpRec() && 
+				main.getSBUtil().toSkillExp(main.getApiUtil().getBestPlayerSkillLevels(skyblockPlayer.getUUID()).getAvgSkillLevel()) >= guild.getSkillExpRec();
 	}
 	
 	private void updateRating() {

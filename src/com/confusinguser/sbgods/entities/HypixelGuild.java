@@ -10,10 +10,13 @@ public enum HypixelGuild {
 	private int slayerExpRec;
 	private int skillExpRec;
 	private String[] names;
+	private int playerSize = 125;
 	
 	private HashMap<String, SkillLevels> skillExpHashmap = new HashMap<String, SkillLevels>();
 	private HashMap<String, SlayerExp> slayerExpHashmap = new HashMap<String, SlayerExp>();
-
+	private int slayerProgress;
+	private int skillProgress;
+	
 	private HypixelGuild(String guildId, int slayerExpRec, int skillExpReq, String... names) {
 		this.guildId = guildId;
 		this.slayerExpRec = slayerExpRec;
@@ -73,4 +76,29 @@ public enum HypixelGuild {
 		}
 		return null;
 	}
+	
+	public void setPlayerSize(int playerSize) {
+		this.playerSize = playerSize;
+	}
+	
+	public int getPlayerSize() {
+		return playerSize;
+	}
+
+	public int getSlayerProgress() {
+		return slayerProgress;
+	}
+
+	public void setSlayerProgress(int slayerProgress) {
+		this.slayerProgress = slayerProgress;
+	}
+
+	public int getSkillProgress() {
+		return skillProgress;
+	}
+
+	public void setSkillProgress(int skillProgress) {
+		this.skillProgress = skillProgress;
+	}
+	
 }

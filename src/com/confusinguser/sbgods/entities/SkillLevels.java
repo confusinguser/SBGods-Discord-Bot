@@ -2,7 +2,7 @@ package com.confusinguser.sbgods.entities;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Map;
 
 import com.confusinguser.sbgods.SBGods;
 
@@ -15,10 +15,12 @@ public class SkillLevels {
 	private double fishing;
 	private double enchanting;
 	private double alchemy;
-	private ArrayList<Double> skillList;
+	private double carpentry;
+	private double runecrafting;
 	private boolean approximate = false;
+	private ArrayList<Double> skillList;
 
-	SBGods main = SBGods.instance;
+	SBGods main = SBGods.getInstance();
 
 	public SkillLevels() {
 		this.farming = 0.0;
@@ -28,29 +30,9 @@ public class SkillLevels {
 		this.fishing = 0.0;
 		this.enchanting = 0.0;
 		this.alchemy = 0.0;
-		this.skillList = new ArrayList<Double>(Arrays.asList(farming, mining, combat, foraging, fishing, enchanting, alchemy));
-	}
-
-	public SkillLevels(int farming, int mining, int combat, int foraging, int fishing, int enchanting, int alchemy) {
-		this.farming = main.getSBUtil().toSkillLevel(farming);
-		this.mining = main.getSBUtil().toSkillLevel(mining);
-		this.combat = main.getSBUtil().toSkillLevel(combat);
-		this.foraging = main.getSBUtil().toSkillLevel(foraging);
-		this.fishing = main.getSBUtil().toSkillLevel(fishing);
-		this.enchanting = main.getSBUtil().toSkillLevel(enchanting);
-		this.alchemy = main.getSBUtil().toSkillLevel(alchemy);
-		this.skillList = new ArrayList<Double>(Arrays.asList(this.farming, this.mining, this.combat, this.foraging, this.fishing, this.enchanting, this.alchemy));
-	}
-
-	public SkillLevels(HashMap<String, Integer> skillArray) {
-		this.farming = main.getSBUtil().toSkillLevel(skillArray.getOrDefault("farming", 0));
-		this.mining = main.getSBUtil().toSkillLevel(skillArray.getOrDefault("mining", 0));
-		this.combat = main.getSBUtil().toSkillLevel(skillArray.getOrDefault("combat", 0));
-		this.foraging = main.getSBUtil().toSkillLevel(skillArray.getOrDefault("foraging", 0));
-		this.fishing = main.getSBUtil().toSkillLevel(skillArray.getOrDefault("fishing", 0));
-		this.enchanting = main.getSBUtil().toSkillLevel(skillArray.getOrDefault("enchanting", 0));
-		this.alchemy = main.getSBUtil().toSkillLevel(skillArray.getOrDefault("alchemy", 0));
-		this.skillList = new ArrayList<Double>(Arrays.asList(farming, mining, combat, foraging, fishing, enchanting, alchemy));
+		this.carpentry = 0.0;
+		this.runecrafting = 0.0;
+		this.skillList = new ArrayList<>(Arrays.asList(farming, mining, combat, foraging, fishing, enchanting, alchemy));
 	}
 
 	public SkillLevels(boolean approximate) {
@@ -61,31 +43,23 @@ public class SkillLevels {
 		this.fishing = 0.0;
 		this.enchanting = 0.0;
 		this.alchemy = 0.0;
-		this.skillList = new ArrayList<Double>(Arrays.asList(farming, mining, combat, foraging, fishing, enchanting, alchemy));
+		this.carpentry = 0.0;
+		this.runecrafting = 0.0;
+		this.skillList = new ArrayList<>(Arrays.asList(farming, mining, combat, foraging, fishing, enchanting, alchemy));
 		this.approximate = approximate;
 	}
 
-	public SkillLevels(int farming, int mining, int combat, int foraging, int fishing, int enchanting, int alchemy, boolean approximate) {
-		this.farming = main.getSBUtil().toSkillLevel(farming);
-		this.mining = main.getSBUtil().toSkillLevel(mining);
-		this.combat = main.getSBUtil().toSkillLevel(combat);
-		this.foraging = main.getSBUtil().toSkillLevel(foraging);
-		this.fishing = main.getSBUtil().toSkillLevel(fishing);
-		this.enchanting = main.getSBUtil().toSkillLevel(enchanting);
-		this.alchemy = main.getSBUtil().toSkillLevel(alchemy);
-		this.skillList = new ArrayList<Double>(Arrays.asList(this.farming, this.mining, this.combat, this.foraging, this.fishing, this.enchanting, this.alchemy));
-		this.approximate = approximate;
-	}
-
-	public SkillLevels(HashMap<String, Integer> skillArray, boolean approximate) {
-		this.farming = main.getSBUtil().toSkillLevel(skillArray.getOrDefault("farming", 0));
-		this.mining = main.getSBUtil().toSkillLevel(skillArray.getOrDefault("mining", 0));
-		this.combat = main.getSBUtil().toSkillLevel(skillArray.getOrDefault("combat", 0));
-		this.foraging = main.getSBUtil().toSkillLevel(skillArray.getOrDefault("foraging", 0));
-		this.fishing = main.getSBUtil().toSkillLevel(skillArray.getOrDefault("fishing", 0));
-		this.enchanting = main.getSBUtil().toSkillLevel(skillArray.getOrDefault("enchanting", 0));
-		this.alchemy = main.getSBUtil().toSkillLevel(skillArray.getOrDefault("alchemy", 0));
-		this.skillList = new ArrayList<Double>(Arrays.asList(farming, mining, combat, foraging, fishing, enchanting, alchemy));
+	public SkillLevels(Map<String, Integer> skillMap, boolean approximate) {
+		this.farming = main.getSBUtil().toSkillLevel(skillMap.getOrDefault("farming", 0));
+		this.mining = main.getSBUtil().toSkillLevel(skillMap.getOrDefault("mining", 0));
+		this.combat = main.getSBUtil().toSkillLevel(skillMap.getOrDefault("combat", 0));
+		this.foraging = main.getSBUtil().toSkillLevel(skillMap.getOrDefault("foraging", 0));
+		this.fishing = main.getSBUtil().toSkillLevel(skillMap.getOrDefault("fishing", 0));
+		this.enchanting = main.getSBUtil().toSkillLevel(skillMap.getOrDefault("enchanting", 0));
+		this.alchemy = main.getSBUtil().toSkillLevel(skillMap.getOrDefault("alchemy", 0));
+		this.carpentry = main.getSBUtil().toSkillLevel(skillMap.getOrDefault("carpentry", 0));
+		this.runecrafting = main.getSBUtil().toSkillLevelRunecrafting(skillMap.getOrDefault("runecrafting", 0));
+		this.skillList = new ArrayList<>(Arrays.asList(farming, mining, combat, foraging, fishing, enchanting, alchemy));
 		this.approximate = approximate;
 	}
 
@@ -117,9 +91,13 @@ public class SkillLevels {
 	public int getAlchemy() {
 		return (int) Math.floor(alchemy);
 	}
+	
+	public int getCarpentry() {
+		return (int) Math.floor(carpentry);
+	}
 
-	public ArrayList<Double> getSkillList() {
-		return skillList;
+	public int getRunecrafting() {
+		return (int) Math.floor(runecrafting);
 	}
 
 	public boolean isApproximate() {

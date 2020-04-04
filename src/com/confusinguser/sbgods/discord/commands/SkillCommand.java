@@ -19,7 +19,7 @@ public class SkillCommand extends Command implements EventListener {
 	public SkillCommand(SBGods main, DiscordBot discord) {
 		this.main = main;
 		this.discord = discord;
-		this.name = discord.commandPrefix + "skill";
+		this.name = "skill";
 		this.aliases = new String[] {"skills"};
 	}
 
@@ -50,7 +50,11 @@ public class SkillCommand extends Command implements EventListener {
 			HashMap<String, SkillLevels> usernameSkillExpHashMap = currentDiscordServer.getHypixelGuild().getSkillExpHashmap();
 
 			if (usernameSkillExpHashMap.size() == 0) {
-				e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes!").queue();
+				if (currentDiscordServer.getHypixelGuild().getSkillProgress() == 0) {
+					e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards have a higher priority)").queue();
+				} else {
+					e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getSkillProgress() + " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
+				}
 				return;
 			}
 
@@ -74,7 +78,7 @@ public class SkillCommand extends Command implements EventListener {
 			if (args.length > 2) {
 				response.append("\n");
 			} else {
-				response.append("*Tip: " + this.name + " leaderboard [length / all]*\n\n");
+				response.append("*Tip: " + this.getName() + " leaderboard [length / all]*\n\n");
 			}
 
 			for (int i = 0; i < topX; i++) {
@@ -145,12 +149,18 @@ public class SkillCommand extends Command implements EventListener {
 						.append("Enchanting: " + highestSkillLevels.getEnchanting() + "\n")
 						.append("Alchemy: " + highestSkillLevels.getAlchemy() + "\n")
 						.toString());
+				
+				StringBuilder footerBuilder = new StringBuilder();
+				embedBuilder.setFooter(footerBuilder
+						.append("Carpentry: " + highestSkillLevels.getCarpentry() + "\n")
+						.append("Runecrafting: " + highestSkillLevels.getRunecrafting())
+						.toString());
 
 				e.getChannel().sendMessage(embedBuilder.build()).queue();
 				return;
 
 			} else {
-				e.getChannel().sendMessage("Invalid usage! Usage: *" + this.name + " player <IGN>*").queue();
+				e.getChannel().sendMessage("Invalid usage! Usage: *" + this.getName() + " player <IGN>*").queue();
 				return;
 			}
 		}

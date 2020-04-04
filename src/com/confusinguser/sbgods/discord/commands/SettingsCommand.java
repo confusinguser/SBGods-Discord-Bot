@@ -11,7 +11,7 @@ public class SettingsCommand extends Command {
 	public SettingsCommand(SBGods main, DiscordBot discord) {
 		this.main = main;
 		this.discord = discord;
-		this.name = discord.commandPrefix + "settings";
+		this.name = "settings";
 		this.aliases = new String[] {};
 	}
 
@@ -37,7 +37,7 @@ public class SettingsCommand extends Command {
 
 		if (args[1].contentEquals("prefix")) {
 			if (args.length <= 2) {
-				e.getChannel().sendMessage("Invalid usage! Usage: " + this.name + " prefix <New Prefix>").queue();
+				e.getChannel().sendMessage("Invalid usage! Usage: " + this.getName() + " prefix <New Prefix>").queue();
 				return;
 			}
 

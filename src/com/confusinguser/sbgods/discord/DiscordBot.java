@@ -70,26 +70,26 @@ public class DiscordBot {
 		// inviteQueueCommand = new InviteQueueCommand(main, this);
 		// settingsCommand = new SettingsCommand(main, this);
 
-		commands = new ArrayList<Command>(Arrays.asList(slayerCommand, skillCommand, helpCommand, sbgodsCommand, whatguildCommand, petsCommand, killsCommand, deathsCommand));
+		commands = new ArrayList<>(Arrays.asList(slayerCommand, skillCommand, helpCommand, sbgodsCommand, whatguildCommand, petsCommand, killsCommand, deathsCommand));
 
 		JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT)
 				.setToken(token)
 				.setStatus(OnlineStatus.ONLINE)
-				.setActivity(Activity.playing("Use " + helpCommand.name + " to get started"));
+				.setActivity(Activity.playing("Use " + helpCommand.getName() + " to get started"));
 
 		for (Command command : commands) {
 			jdaBuilder.addEventListeners(command);
 		}
 		jda = jdaBuilder.build();
 		creatorUser = jda.getUserById(creatorId);
-		creatorTag = "ConfusingUser#5712";//jda.getUserById(creatorId).getAsTag();
+		creatorTag = jda.getUserById(creatorId).getAsTag();
 		jda.getPresence().setActivity(Activity.playing("Use " + commandPrefix + "help to get started. Made by " + creatorTag));
 		main.logInfo("Bot ready to take commands");
 	}
 
 	public boolean isValidCommand(String command) {
 		for (Command validCommand : commands) {
-			String validCommandString = validCommand.name;
+			String validCommandString = validCommand.getName();
 			if (command.equalsIgnoreCase(validCommandString)) {
 				return true;
 			}
@@ -111,8 +111,7 @@ public class DiscordBot {
 
 	public String escapeMarkdown(String text) {
 		String unescaped = text.replaceAll("/\\\\(\\*|_|`|~|\\\\)/g", "$1"); // unescape any "backslashed" character
-		String escaped = unescaped.replaceAll("/(\\*|_|`|~|\\\\)/g", "\\$1"); // escape *, _, `, ~, \
-		return escaped;
+		return unescaped.replaceAll("/(\\*|_|`|~|\\\\)/g", "\\$1"); // escape *, _, `, ~, \
 
 	}
 }

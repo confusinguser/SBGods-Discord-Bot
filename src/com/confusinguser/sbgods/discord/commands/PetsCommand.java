@@ -18,8 +18,8 @@ public class PetsCommand extends Command implements EventListener {
 	public PetsCommand(SBGods main, DiscordBot discord) {
 		this.main = main;
 		this.discord = discord;
-		this.name = discord.commandPrefix + "pets";
-		this.usage = this.name + " <IGN>";
+		this.name = "pets";
+		this.usage = this.getName() + " <IGN>";
 		this.aliases = new String[] {};
 	}
 	@Override

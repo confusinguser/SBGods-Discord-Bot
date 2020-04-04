@@ -12,8 +12,8 @@ public class WhatguildCommand extends Command implements EventListener{
 	public WhatguildCommand(SBGods main, DiscordBot discord) {
 		this.main = main;
 		this.discord = discord;
-		this.name = discord.commandPrefix + "whatguild";
-		this.usage = this.name + " <IGN>";
+		this.name = "whatguild";
+		this.usage = this.getName() + " <IGN>";
 		this.aliases = new String[] {"wg"};
 	}
 

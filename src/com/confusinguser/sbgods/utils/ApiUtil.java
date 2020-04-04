@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +32,8 @@ public class ApiUtil {
 		this.main = main;
 	}
 
-	private final int REQUEST_RATE = 30; // unit: requests per second
+	private final int REQUEST_RATE = 30; // unit: requests
+	private final int PER = 60; // unit: seconds
 	private long LAST_CHECK = System.currentTimeMillis();
 	int allowance = REQUEST_RATE; // unit: requests
 
@@ -46,16 +48,20 @@ public class ApiUtil {
 		}
 
 		long current = System.currentTimeMillis();
-		int time_passed = (int) ((current - LAST_CHECK) / 1000);
+		int timePassed = (int) ((current - LAST_CHECK) / 1000);
+
 		LAST_CHECK = current;
-		allowance += time_passed * REQUEST_RATE;
+		allowance += timePassed * (REQUEST_RATE / PER);
 		if (allowance > REQUEST_RATE) {
 			allowance = REQUEST_RATE; // throttle
-		} if (allowance < 1) {
+		}
+		if (allowance < 1) {
 			try {
 				Thread.sleep(10000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+				// Restore interrupted state...
+				Thread.currentThread().interrupt();
 			}
 		} else {
 			allowance -= 1;
@@ -87,6 +93,8 @@ public class ApiUtil {
 				Thread.sleep(5000);
 			} catch (InterruptedException e1) {
 				e.printStackTrace();
+				// Restore interrupted state...
+				Thread.currentThread().interrupt();
 			}
 			return getResponse(url_string);
 		}
@@ -99,6 +107,8 @@ public class ApiUtil {
 				Thread.sleep(17000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+				// Restore interrupted state...
+				Thread.currentThread().interrupt();
 			}
 			return getResponse(url_string);
 
@@ -119,7 +129,7 @@ public class ApiUtil {
 		String response = getResponse(url_string.toString());
 		if (response == null) return getGuildMembers(guild);
 
-		ArrayList<SkyblockPlayer> output = new ArrayList<SkyblockPlayer>();
+		ArrayList<SkyblockPlayer> output = new ArrayList<>();
 		JSONObject jsonObject = new JSONObject(response);
 		jsonObject = jsonObject.getJSONObject("guild");
 		JSONArray members = jsonObject.getJSONArray("members");
@@ -159,9 +169,7 @@ public class ApiUtil {
 			discord = null;
 		}
 
-		SkyblockPlayer output = new SkyblockPlayer(uuid, username, discord, new ArrayList<String>(profiles.keySet()));
-
-		return output;
+		return new SkyblockPlayer(uuid, username, discord, new ArrayList<String>(profiles.keySet()));
 	}
 
 	public SkyblockPlayer getSkyblockPlayerFromUsername(String name) {
@@ -197,7 +205,6 @@ public class ApiUtil {
 
 
 	public SlayerExp getPlayerSlayerExp(String playerUUID) {
-
 		HashMap<String, Integer> output = new HashMap<String, Integer>();
 		for (String slayer_type : Constants.slayer_types) {
 			output.put(slayer_type, 0);
@@ -232,12 +239,37 @@ public class ApiUtil {
 		return new SlayerExp(output);
 	}
 
+	public SlayerExp getProfileSlayerExp(String profileUUID, String playerUUID) {
+		HashMap<String, Integer> output = new HashMap<>();
+		for (String slayer_type : Constants.slayer_types) {
+			output.put(slayer_type, 0);
+		}
 
-	public SkillLevels getProfileSkills(String profileUUID, String playerUUID) {
 		StringBuilder url_string = new StringBuilder(BASE_URL);
 		url_string.append("skyblock/profile").append("?key=" + main.getApikey()).append("&profile=" + profileUUID);
 
 		String response = getResponse(url_string.toString());
+		if (response == null) return new SlayerExp();
+
+		JSONObject jsonObject = new JSONObject(response);
+
+		try {
+			jsonObject = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(playerUUID).getJSONObject("slayer_bosses");
+		} catch (JSONException e) {}
+
+		for (String slayer_type : Constants.slayer_types) {
+			try {
+				output.put(slayer_type, output.get(slayer_type) + jsonObject.getJSONObject(slayer_type).getInt("xp"));
+			} catch (JSONException e) {}
+		}
+		return new SlayerExp(output);
+	}
+
+	public SkillLevels getProfileSkills(String profileUUID, String playerUUID) {
+		StringBuilder urlString = new StringBuilder(BASE_URL);
+		urlString.append("skyblock/profile").append("?key=" + main.getApikey()).append("&profile=" + profileUUID);
+
+		String response = getResponse(urlString.toString());
 		if (response == null) return new SkillLevels();
 
 		JSONObject jsonObject = new JSONObject(response);
@@ -248,7 +280,7 @@ public class ApiUtil {
 			return new SkillLevels();
 		}
 
-		HashMap<String, Integer> skillArray = new HashMap<String, Integer>();
+		HashMap<String, Integer> skillArray = new HashMap<>();
 		for (String skill_type : Constants.skill_types) {
 			try {
 				skillArray.put(skill_type, (int) Math.floor(jsonObject.getDouble("experience_skill_" + skill_type)));
@@ -256,7 +288,7 @@ public class ApiUtil {
 				skillArray.put(skill_type, 0);
 			}
 		}
-		return new SkillLevels(skillArray);
+		return new SkillLevels(skillArray, false);
 	}
 
 	public SkillLevels getProfileSkillsAlternate(String playerUUID) {
@@ -307,24 +339,24 @@ public class ApiUtil {
 		url_string.append("skyblock/profile").append("?key=" + main.getApikey()).append("&profile=" + profileUUID);
 
 		String response = getResponse(url_string.toString());
-		if (response == null) return new ArrayList<Pet>();
+		if (response == null) return new ArrayList<>();
 
 		JSONObject jsonObject = new JSONObject(response);
 
 		try {
 			jsonObject = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(playerUUID);
 		} catch (JSONException e) {
-			return new ArrayList<Pet>();
+			return new ArrayList<>();
 		}
 
 		JSONArray pets;
 		try {
 			pets = jsonObject.getJSONArray("pets");
 		} catch (JSONException e) {
-			return new ArrayList<Pet>();
+			return new ArrayList<>();
 		}
 
-		ArrayList<Pet> output = new ArrayList<Pet>();
+		ArrayList<Pet> output = new ArrayList<>();
 		for(int i = 0; i < pets.length(); i++) {
 			String type;
 			Integer xp;
@@ -349,22 +381,22 @@ public class ApiUtil {
 		return output;
 	}
 
-	public HashMap<String, Integer> getProfileKills(String profileUUID, String playerUUID) {
+	public Map<String, Integer> getProfileKills(String profileUUID, String playerUUID) {
 
-		HashMap<String, Integer> output = new HashMap<String, Integer>();
+		HashMap<String, Integer> output = new HashMap<>();
 
 		StringBuilder url_string = new StringBuilder(BASE_URL);
 		url_string.append("skyblock/profile").append("?key=" + main.getApikey()).append("&profile=" + profileUUID);
 
 		String response = getResponse(url_string.toString());
-		if (response == null) return new HashMap<String, Integer>();
+		if (response == null) return new HashMap<>();
 
 		JSONObject jsonObject = new JSONObject(response);
 
 		try {
 			jsonObject = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(playerUUID).getJSONObject("stats");
 		} catch (JSONException e) {
-			return new HashMap<String, Integer>();
+			return new HashMap<>();
 		}
 
 		for (String type : jsonObject.keySet()) {
@@ -377,20 +409,20 @@ public class ApiUtil {
 
 	public HashMap<String, Integer> getProfileDeaths(String profileUUID, String playerUUID) {
 
-		HashMap<String, Integer> output = new HashMap<String, Integer>();
+		HashMap<String, Integer> output = new HashMap<>();
 
 		StringBuilder url_string = new StringBuilder(BASE_URL);
 		url_string.append("skyblock/profile").append("?key=" + main.getApikey()).append("&profile=" + profileUUID);
 
 		String response = getResponse(url_string.toString());
-		if (response == null) return new HashMap<String, Integer>();
+		if (response == null) return new HashMap<>();
 
 		JSONObject jsonObject = new JSONObject(response);
 
 		try {
 			jsonObject = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(playerUUID).getJSONObject("stats");
 		} catch (JSONException e) {
-			return new HashMap<String, Integer>();
+			return new HashMap<>();
 		}
 
 		for (String type : jsonObject.keySet()) {

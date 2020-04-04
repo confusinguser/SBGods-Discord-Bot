@@ -13,7 +13,7 @@ public class SbgodsCommand extends Command implements EventListener {
 	public SbgodsCommand(SBGods main, DiscordBot discord) {
 		this.main = main;
 		this.discord = discord;
-		this.name = discord.commandPrefix + "sbgods";
+		this.name = "sbgods";
 		this.aliases = new String[] {};
 	}
 
@@ -36,8 +36,8 @@ public class SbgodsCommand extends Command implements EventListener {
 			User creatorUserObj = discord.getJDA().getUserById(main.getCreatorId());
 
 			EmbedBuilder embedBuilder = new EmbedBuilder()
-					.setTitle("Version " + SBGods.version)
-					.setDescription(SBGods.versionDescription)
+					.setTitle("Version " + SBGods.VERSION)
+					.setDescription(SBGods.VERSION_DESCRIPTION)
 					.setFooter("Made by " + creatorUserObj.getName() + "#" + creatorUserObj.getDiscriminator());
 			e.getChannel().sendMessage(embedBuilder.build()).queue();
 			return;

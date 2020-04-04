@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public enum DiscordServer {
 	SBGods("602137436490956820", "673619910324387885", HypixelGuild.SBG), // 5cd01bdf77ce84cf1204cd61
 	SBDGods("692302950126846013", "692307247178448967", HypixelGuild.SBDG), // 5e4e6d0d8ea8c9feb3f0e44f
-	Test("385431231975653377", null, null);
+	Test("385431231975653377", "673143091342868481", null);
 
 	private String serverId;
 	private String channelId;

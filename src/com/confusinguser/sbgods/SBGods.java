@@ -1,5 +1,7 @@
 package com.confusinguser.sbgods;
 
+import java.util.logging.Logger;
+
 import javax.security.auth.login.LoginException;
 
 import com.confusinguser.sbgods.discord.DiscordBot;
@@ -22,14 +24,17 @@ public class SBGods {
 	private ApplicationUtil applicationUtil;
 	private CacheUtil cacheUtil;
 
-	private String creatorId = "244786205873405952";
-	private DiscordServer[] servers = {DiscordServer.Test};
-
-	public static final String version = "0.7.4";
-	public static final String versionDescription = "The color update! (also `-kills` & `-deaths` are a thing now)\nApplication update coming soon??";
-
-	public static SBGods instance;
-
+	private final String creatorId = "244786205873405952";
+	private final DiscordServer[] servers = {DiscordServer.Test};
+	private final String[] keys = {"369a1113-f148-4bc3-b8ee-ff5d258ed107", "3963906e-ffb6-45b9-b07b-80ca9838eb20", "71c64bb1-f7f1-46a6-8256-2aa832e99e78"};
+	private int keyIndex = 0;
+	
+	
+	public static final String VERSION = "0.7.4";
+	public static final String VERSION_DESCRIPTION = "The color update! (also `-kills` & `-deaths` are a thing now)\nApplication update coming soon??";
+	private static SBGods instance;
+	private final Logger logger = Logger.getLogger(this.getClass().getName());
+	
 	public SBGods() {
 		this.apiutil = new ApiUtil(this);
 		this.util = new Util(this);
@@ -42,15 +47,14 @@ public class SBGods {
 		try {
 			this.discordBot = new DiscordBot(this);
 		} catch (LoginException e) {
-			e.printStackTrace();
-
+			logInfo("Failed to login");
 		}
 	}
 
 	public String getApikey() {
-		return "369a1113-f148-4bc3-b8ee-ff5d258ed107"; // ConfusingUser
-		// return "3963906e-ffb6-45b9-b07b-80ca9838eb20"; // TheIllegalOrange
-		// return "71c64bb1-f7f1-46a6-8256-2aa832e99e78"; // Cody
+		keyIndex++;
+		if (keyIndex >= keys.length) keyIndex = 0;
+		return keys[keyIndex];
 	}
 
 	public ApiUtil getApiUtil() {
@@ -89,8 +93,8 @@ public class SBGods {
 		return LeaderboardUpdater.instance;
 	}
 
-	public void logInfo(Object message) {
-		System.out.println(message);
+	public void logInfo(String message) {
+		logger.info(message);
 	}
 
 	public DiscordServer[] getActiveServers() {
@@ -99,5 +103,9 @@ public class SBGods {
 
 	public String getCreatorId() {
 		return creatorId;
+	}
+	
+	public static SBGods getInstance() {
+		return instance;
 	}
 }

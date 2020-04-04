@@ -15,7 +15,7 @@ public class HelpCommand extends Command implements EventListener {
 	public HelpCommand(SBGods main, DiscordBot discord) {
 		this.main = main;
 		this.discord = discord;
-		this.name = discord.commandPrefix + "help";
+		this.name = "help";
 		this.aliases = new String[] {};
 	}
 

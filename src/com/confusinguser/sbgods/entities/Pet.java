@@ -14,7 +14,7 @@ public class Pet {
 		this.tier = tier;
 		this.active = active;
 		this.xp = xp;
-		this.level = SBGods.instance.getSBUtil().toPetLevel((int) Math.floor(xp), tier);
+		this.level = SBGods.getInstance().getSBUtil().toPetLevel((int) Math.floor(xp), tier);
 	}
 
 	public String getType() {

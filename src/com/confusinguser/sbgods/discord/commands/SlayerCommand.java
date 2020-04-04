@@ -19,7 +19,7 @@ public class SlayerCommand extends Command implements EventListener {
 	public SlayerCommand(SBGods main, DiscordBot discord) {
 		this.main = main;
 		this.discord = discord;
-		this.name = discord.commandPrefix + "slayer";
+		this.name = "slayer";
 		this.aliases = new String[] {};
 	}
 
@@ -50,7 +50,11 @@ public class SlayerCommand extends Command implements EventListener {
 			HashMap<String, SlayerExp> usernameSlayerExpHashMap = currentDiscordServer.getHypixelGuild().getSlayerExpHashmap();
 			
 			if (usernameSlayerExpHashMap.size() == 0) {
-				e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes!").queue();
+				if (currentDiscordServer.getHypixelGuild().getSkillProgress() == 0) {
+					e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards have a higher priority)").queue();
+				} else {
+					e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getSlayerProgress() + " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
+				}
 				return;
 			}
 
@@ -74,17 +78,14 @@ public class SlayerCommand extends Command implements EventListener {
 			if (args.length > 2) {
 				response.append("\n");
 			} else {
-				response.append("*Tip: " + this.name + " leaderboard [length / all]*\n\n");
+				response.append("*Tip: " + this.getName() + " leaderboard [length / all]*\n\n");
 			}
 
 			for (int i = 0; i < topX; i++) {
 				Entry<String, SlayerExp> currentEntry = main.getUtil().getHighestKeyValuePairForSlayerExp(usernameSlayerExpHashMap, i);
-				response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + currentEntry.getValue().getTotalExp() + "\n");
-				if (i != topX - 1) {
-					response.append("\n");
-				}
+				response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + currentEntry.getValue().getTotalExp() + "\n\n");
 			}
-			response.append("**Average guild slayer exp: " + main.getUtil().getAverageFromSlayerExpArray(usernameSlayerExpHashMap.values().toArray(new SlayerExp[usernameSlayerExpHashMap.size()])) + "**");
+			response.append("**Average guild slayer exp: " + (int) main.getUtil().round(main.getUtil().getAverageFromSlayerExpArray(usernameSlayerExpHashMap.values().toArray(new SlayerExp[usernameSlayerExpHashMap.size()])), 0) + "**");
 
 			String responseString = response.toString();
 			// Split the message every 2000 characters in a nice looking way because of discord limitations
@@ -126,7 +127,7 @@ public class SlayerCommand extends Command implements EventListener {
 				e.getChannel().sendMessage(embedBuilder.build()).queue();
 				return;
 			} else {
-				e.getChannel().editMessageById(messageId, "Invalid usage! Usage: *" + this.name + " player <IGN>*").queue();
+				e.getChannel().editMessageById(messageId, "Invalid usage! Usage: *" + this.getName() + " player <IGN>*").queue();
 				return;
 			}
 		}
