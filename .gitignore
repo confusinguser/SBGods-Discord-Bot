@@ -14,3 +14,7 @@ bin
 
 # Ignore Gradle build output directory
 build
+
+# Intellij Idea data
+.idea
+*.iml

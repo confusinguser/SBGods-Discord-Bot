@@ -6,21 +6,21 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SkyblockPlayer;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-public class SkillCommand extends Command implements EventListener {
+public class SkillExpCommand extends Command implements EventListener {
 
-    public SkillCommand(SBGods main, DiscordBot discord) {
+    public SkillExpCommand(SBGods main, DiscordBot discord) {
         this.main = main;
         this.discord = discord;
-        this.name = "skill";
-        this.aliases = new String[]{"skills"};
+        this.name = "skillxp";
+        this.aliases = new String[]{"skillexp"};
     }
 
     @Override
@@ -28,23 +28,26 @@ public class SkillCommand extends Command implements EventListener {
         if (e.getAuthor().isBot() || !isTheCommand(e) || !discord.shouldRun(e)) {
             return;
         }
-
         DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromEvent(e);
         if (currentDiscordServer == null) {
             return;
         }
+        handleCommand(currentDiscordServer, e.getChannel(), e.getMessage().getContentRaw(), e.getAuthor().getName());
+    }
 
-        if (currentDiscordServer.getChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getChannelId())) {
-            e.getChannel().sendMessage("Skill commands cannot be ran in this channel!").queue();
+    public void handleCommand(DiscordServer currentDiscordServer, MessageChannel channel, String messageRaw, String authorName) {
+
+        if (currentDiscordServer.getChannelId() != null && !channel.getId().contentEquals(currentDiscordServer.getChannelId())) {
+            channel.sendMessage("Skill commands cannot be ran in this channel!").queue();
             return;
         }
 
-        main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
+        main.logger.info(authorName + " ran command: " + messageRaw);
 
-        String[] args = e.getMessage().getContentRaw().split(" ");
+        String[] args = messageRaw.split(" ");
 
         if (args.length <= 1) {
-            e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
+            channel.sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
             return;
         }
 
@@ -59,9 +62,9 @@ public class SkillCommand extends Command implements EventListener {
 
             if (usernameSkillExpHashMap.size() == 0) {
                 if (currentDiscordServer.getHypixelGuild().getSkillProgress() == 0) {
-                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards have a higher priority)").queue();
+                    channel.sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards have a higher priority)").queue();
                 } else {
-                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getSkillProgress() + " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
+                    channel.sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getSkillProgress() + " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
                 }
                 return;
             }
@@ -74,7 +77,7 @@ public class SkillCommand extends Command implements EventListener {
                     try {
                         topX = Math.min(guildMemberUuids.size(), Integer.parseInt(args[2]));
                     } catch (NumberFormatException exception) {
-                        e.getChannel().sendMessage("**" + args[2] + "** is not a valid number!").queue();
+                        channel.sendMessage("**" + args[2] + "** is not a valid number!").queue();
                         return;
                     }
                 }
@@ -82,30 +85,33 @@ public class SkillCommand extends Command implements EventListener {
                 topX = 10;
             }
 
-            StringBuilder response = new StringBuilder("**Average Skill Level Leaderboard:**\n\n");
-            if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
+            StringBuilder response = new StringBuilder();
+
+            // print it like a spreadsheet
+            if (spreadsheet) {
                 for (int i = 0; i < topX; i++) {
-                    Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillExpHashMap, i, true);
+                    Map.Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillExpHashMap, i, true);
                     if (!currentEntry.getValue().isApproximate()) {
-                        response.append(currentEntry.getKey() + "    " + main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2) + "\n");
+                        response.append(currentEntry.getKey() + "    " + main.getSBUtil().toSkillExp(currentEntry.getValue().getAvgSkillLevel()) + "\n");
                     }
                 }
             } else {
-                int totalAvgSkillLvl = 0;
+                response.append("**Average Skill XP leaderboard:**\n\n");
+                int totalAvgSkillExp = 0;
                 for (int i = 0; i < topX; i++) {
-                    Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillExpHashMap, i, true);
-                    response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2));
+                    Map.Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillExpHashMap, i, true);
+                    response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + main.getSBUtil().toSkillExp(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2)));
                     if (currentEntry.getValue().isApproximate()) {
                         response.append(" *(appr.)*");
                     }
                     response.append("\n\n");
-                    totalAvgSkillLvl += currentEntry.getValue().getAvgSkillLevel();
+                    totalAvgSkillExp += currentEntry.getValue().getAvgSkillLevel();
                 }
                 if (topX == guildMemberUuids.size())
-                    response.append("**Average guild skill level: ");
+                    response.append("**Average guild skill xp: ");
                 else
-                    response.append("**Average skill level top #").append(topX).append(": ");
-                response.append(main.getUtil().round((double) totalAvgSkillLvl / topX, 2)).append("**");
+                    response.append("**Average skill xp top #").append(topX).append(": ");
+                response.append(main.getSBUtil().toSkillExp(main.getUtil().round((double) totalAvgSkillExp / topX, 2))).append("**");
             }
 
             String responseString = response.toString();
@@ -114,12 +120,12 @@ public class SkillCommand extends Command implements EventListener {
             for (int j = 0; j < responseList.size(); j++) {
                 String message = responseList.get(j);
                 if (j == 0 && !spreadsheet) {
-                    e.getChannel().sendMessage(message).queue();
+                    channel.sendMessage(message).queue();
                 } else {
                     if (spreadsheet) {
-                        e.getChannel().sendMessage("```arm\n" + message + "```").queue();
+                        channel.sendMessage("```arm\n" + message + "```").queue();
                     } else {
-                        e.getChannel().sendMessage("\u200E" + message).queue();
+                        channel.sendMessage("\u200E" + message).queue();
                     }
                 }
             }
@@ -131,7 +137,7 @@ public class SkillCommand extends Command implements EventListener {
                 SkyblockPlayer thePlayer = main.getApiUtil().getSkyblockPlayerFromUsername(args[2]);
 
                 if (thePlayer.getSkyblockProfiles().isEmpty()) {
-                    e.getChannel().sendMessage("Player **" + args[2] + "** does not exist!").queue();
+                    channel.sendMessage("Player **" + args[2] + "** does not exist!").queue();
                     return;
                 }
 
@@ -152,40 +158,40 @@ public class SkillCommand extends Command implements EventListener {
                     }
                 }
 
-                EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x03731d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " skill levels");
+                EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x03731d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " skill xp");
                 StringBuilder descriptionBuilder = embedBuilder.getDescriptionBuilder();
 
                 if (highestSkillLevels.isApproximate()) {
-                    descriptionBuilder.append("Approximate average skill level: " + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "\n\n");
+                    descriptionBuilder.append("Approximate average skill xp: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getAvgSkillLevel())).append("\n\n");
                 } else {
-                    descriptionBuilder.append("Average skill level: " + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "\n\n");
+                    descriptionBuilder.append("Average skill xp: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getAvgSkillLevel())).append("\n\n");
                 }
 
                 embedBuilder.setDescription(descriptionBuilder
-                        .append("Farming: " + highestSkillLevels.getFarming() + '\n')
-                        .append("Mining: " + highestSkillLevels.getMining() + '\n')
-                        .append("Combat: " + highestSkillLevels.getCombat() + '\n')
-                        .append("Foraging: " + highestSkillLevels.getForaging() + '\n')
-                        .append("Fishing: " + highestSkillLevels.getFishing() + '\n')
-                        .append("Enchanting: " + highestSkillLevels.getEnchanting() + '\n')
-                        .append("Alchemy: " + highestSkillLevels.getAlchemy() + '\n')
+                        .append("Farming: " + main.getSBUtil().toSkillExp(highestSkillLevels.getFarming()) + '\n')
+                        .append("Mining: " + main.getSBUtil().toSkillExp(highestSkillLevels.getMining()) + '\n')
+                        .append("Combat: " + main.getSBUtil().toSkillExp(highestSkillLevels.getCombat()) + '\n')
+                        .append("Foraging: " + main.getSBUtil().toSkillExp(highestSkillLevels.getForaging()) + '\n')
+                        .append("Fishing: " + main.getSBUtil().toSkillExp(highestSkillLevels.getFishing()) + '\n')
+                        .append("Enchanting: " + main.getSBUtil().toSkillExp(highestSkillLevels.getEnchanting()) + '\n')
+                        .append("Alchemy: " + main.getSBUtil().toSkillExp(highestSkillLevels.getAlchemy()) + '\n')
                         .toString());
 
                 StringBuilder footerBuilder = new StringBuilder();
                 embedBuilder.setFooter(footerBuilder
-                        .append("Carpentry: " + highestSkillLevels.getCarpentry() + '\n')
-                        .append("Runecrafting: " + highestSkillLevels.getRunecrafting())
+                        .append("Carpentry: " + main.getSBUtil().toSkillExp(highestSkillLevels.getCarpentry()) + '\n')
+                        .append("Runecrafting: " + main.getSBUtil().toSkillExp(highestSkillLevels.getRunecrafting()))
                         .toString());
 
-                e.getChannel().sendMessage(embedBuilder.build()).queue();
+                channel.sendMessage(embedBuilder.build()).queue();
                 return;
 
             } else {
-                e.getChannel().sendMessage("Invalid usage! Usage: *" + getName() + " player <IGN>*").queue();
+                channel.sendMessage("Invalid usage! Usage: *" + getName() + " player <IGN>*").queue();
                 return;
             }
         }
 
-        e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
+        channel.sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
     }
 }
