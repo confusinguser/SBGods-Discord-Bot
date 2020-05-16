@@ -27,6 +27,11 @@ public class VerifyCommand extends Command implements EventListener {
             return;
         }
 
+        if(!e.getChannel().getName().equalsIgnoreCase("Verify")){
+            e.getChannel().sendMessage("Sorry but this command cant be used here.").queue();
+            return;
+        }
+
         main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
 
         String[] args = e.getMessage().getContentRaw().split(" ");
