@@ -3,17 +3,17 @@ package com.confusinguser.sbgods;
 import java.awt.*;
 import java.io.Console;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.URLDecoder;
 import java.net.UnknownHostException;
 
 class Start {
 
-    private static final int PORT = 65000;  // random large port number
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnsupportedEncodingException {
         try {
-            ServerSocket s = new ServerSocket(PORT, 10, InetAddress.getLocalHost());
+            ServerSocket s = new ServerSocket(65000, 10, InetAddress.getLocalHost());
         } catch (UnknownHostException e) {
             // Shouldn't happen for localhost
         } catch (IOException e) {
@@ -24,7 +24,7 @@ class Start {
 
         Console console = System.console();
         if (console == null && !GraphicsEnvironment.isHeadless()) {
-            String filename = Start.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6);
+            String filename = URLDecoder.decode(Start.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6), "UTF-8");
             if (filename.endsWith(".jar")) {
                 try {
                     Runtime.getRuntime().exec(new String[]{"cmd", "/c", "start", "cmd", "/k", "java -jar \"" + filename + "\""});
