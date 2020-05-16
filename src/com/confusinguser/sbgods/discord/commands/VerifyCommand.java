@@ -3,16 +3,9 @@ package com.confusinguser.sbgods.discord.commands;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
-import com.confusinguser.sbgods.entities.SkillLevels;
-import com.confusinguser.sbgods.entities.SkyblockPlayer;
-import net.dv8tion.jda.api.EmbedBuilder;
+import com.confusinguser.sbgods.entities.Player;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 public class VerifyCommand extends Command implements EventListener {
 
@@ -34,43 +27,38 @@ public class VerifyCommand extends Command implements EventListener {
             return;
         }
 
-//        if (currentDiscordServer.getChannelId() != null && !e.getChannel().getId().equalsIgnoreCase() {
-//            e.getChannel().sendMessage("Verify commands cannot be ran in this channel!").queue();
-//            return;
-//        }
-
         main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
 
         String[] args = e.getMessage().getContentRaw().split(" ");
 
-        if(args.length == 2){
+        if (args.length >= 2) {
 
-            //check if that is actual player ign
-            if(main.getApiUtil().getDiscNameFromMc(args[1]).equalsIgnoreCase(e.getAuthor().getAsTag())){
-                //Verify player with ign: args[2]
+            // Check if that is actual player ign
+            Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
+            if (player.getDiscordTag().equalsIgnoreCase(e.getAuthor().getAsTag())) {
 
-                main.getUtil().verifyPlayer(e.getMember(),main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag().replace("#","*")),e);
+                main.getUtil().verifyPlayer(e.getMember(), player.getDisplayName(), e.getGuild());
+                main.logger.info("Added " + currentDiscordServer.toString() + " verified role to " + e.getAuthor().getAsTag());
+                e.getChannel().sendMessage("Linked " + e.getAuthor().getAsTag() + " with the minecraft account " + player.getDisplayName() + "!").queue();
                 return;
             }
 
-            //send error message saying to link discord account with mc
-
-
+            // Send error message saying to link discord account with mc
             e.getChannel().sendMessage(e.getAuthor().getAsMention() + " You need to link your minecraft account with discord (through hypixel social media settings) then run this command again.").queue();
             return;
         }
 
         String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag().replace("#","*"));
-        if(mcName == ""){
+        if (mcName.equals("")) {
 
 
             e.getChannel().sendMessage("There was a error auto-detecting your minecraft ign... please do -verify {ign}").queue();
-            //send error saying that auto-detect failed and they need to enter their username
+            // Send error saying that auto-detect failed and they need to enter their username
             return;
         }
-        //verify player with mc name mcName
 
-        main.getUtil().verifyPlayer(e.getMember(),mcName, e);
+        // Verify player with mc name mcName
+        main.getUtil().verifyPlayer(e.getMember(),mcName, e.getGuild());
 
     }
 }

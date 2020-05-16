@@ -3,7 +3,7 @@ package com.confusinguser.sbgods.discord.commands;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
-import com.confusinguser.sbgods.entities.SkyblockPlayer;
+import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SlayerExp;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -55,7 +55,7 @@ public class SlayerCommand extends Command implements EventListener {
         }
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
-            ArrayList<SkyblockPlayer> guildMemberUuids = main.getApiUtil().getGuildMembers(Objects.requireNonNull(DiscordServer.getDiscordServerFromEvent(e)).getHypixelGuild());
+            ArrayList<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(Objects.requireNonNull(DiscordServer.getDiscordServerFromEvent(e)).getHypixelGuild());
             Map<String, SlayerExp> usernameSlayerExpHashMap = currentDiscordServer.getHypixelGuild().getSlayerExpMap();
 
             if (usernameSlayerExpHashMap.size() == 0) {
@@ -124,9 +124,9 @@ public class SlayerCommand extends Command implements EventListener {
         if (args[1].equalsIgnoreCase("player")) {
             String messageId = e.getChannel().sendMessage("...").complete().getId();
 
-            SkyblockPlayer thePlayer;
+            Player thePlayer;
             if (args.length >= 3) {
-                thePlayer = main.getApiUtil().getSkyblockPlayerFromUsername(args[2]);
+                thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
                 if (thePlayer.getSkyblockProfiles().isEmpty()) {
                     e.getChannel().editMessageById(messageId, "Player **" + args[2] + "** does not exist!").queue();
                     return;

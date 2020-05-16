@@ -8,10 +8,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.EventListener;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 
 public class AHCommand extends Command implements EventListener {
 
@@ -19,7 +15,7 @@ public class AHCommand extends Command implements EventListener {
         this.main = main;
         this.discord = discord;
         this.name = "ah";
-        this.usage = this.name + "  <IGN>";
+        this.usage = this.name + " <IGN>";
         this.aliases = new String[] {};
     }
 
@@ -57,23 +53,17 @@ public class AHCommand extends Command implements EventListener {
             e.getChannel().sendMessage(args[1] + " (and coop)'s Auctions!").queue();
         }
 
-        for (int i=0;i<playerAuctions.length;i++) {
+        for (int i = 0; i < playerAuctions.length; i++) {
             AHItem item = playerAuctions.getItems()[i];
 
             EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0xb8300b).setTitle(item.getItemTier() + " | " + item.getItemName() + ":");
 
             embedBuilder.appendDescription("**" + item.getBids().toString() + "** bids\n");
-            embedBuilder.appendDescription("Going for: **" + item.getHighestBid() + "** (Starting bid: " + item.getStartingBid() + ")\n");
-            embedBuilder.appendDescription("Category: **" + item.getCategory() + "**\n\n");
+            embedBuilder.appendDescription("Going for: **" + (item.getHighestBid() == 0 ? item.getStartingBid() : item.getHighestBid()) + "** (Starting bid: " + item.getStartingBid() + ")\n");
+            embedBuilder.appendDescription("Category: **" + item.getCategory() + "**");
 
             e.getChannel().sendMessage(embedBuilder.build()).queue();
-
-            //e.getChannel().sendMessage(item.getItemTier() + " | " + item.getItemName()).queue();
-
-            //main.logger.info("loop");
         }
-        //main.logger.info("sending messages... (" + playerAuctions.length + ")");
-
 
     }
 }

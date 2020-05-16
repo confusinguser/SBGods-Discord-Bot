@@ -1,20 +1,23 @@
 package com.confusinguser.sbgods.utils;
 
 import com.confusinguser.sbgods.SBGods;
+import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SlayerExp;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.exceptions.HierarchyException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class Util {
 
-    private SBGods main;
+    private final SBGods main;
 
     public Util(SBGods main) {
         this.main = main;
@@ -108,21 +111,25 @@ public class Util {
         return output;
     }
 
-    public void verifyPlayer(Member discord, String mcName, MessageReceivedEvent e){
-        try {
-            discord.modifyNickname(mcName).complete();
-        }catch (Exception ex){}
-        try {
-            e.getGuild().addRoleToMember(discord, e.getGuild().getRoleById("706081336590598165")).complete();
-            main.logger.info("Added SBG verified role to " + e.getAuthor().getAsTag());
+    public void verifyPlayer(Member member, String mcName, Guild discord) {
+        DiscordServer discordServer = DiscordServer.getDiscordServerFromDiscordGuild(discord);
+        if (discordServer == null) {
+            return;
         }
-        catch(Exception ex){}
+
         try {
-            e.getGuild().addRoleToMember(discord, e.getGuild().getRoleById("711011937109934141")).complete();
-            main.logger.info("Added SBDG verified role to " + e.getAuthor().getAsTag());
+            member.modifyNickname(mcName).complete();
+        } catch (HierarchyException ignored) {} // Don't have perms to change nick
+
+        List<String> roleNames = discord.getRoles().stream().map(Role::getName).collect(Collectors.toList()); // Make a list of all role names in the member
+
+        if (roleNames.contains("Verified")) {
+            for (Role role : discord.getRolesByName("Verified",true)) {
+                try {
+                    discord.addRoleToMember(member, role).complete();
+                } catch (HierarchyException ignored) {}
+            }
         }
-        catch(Exception ex){}
-        e.getChannel().sendMessage("Linked " + discord.getUser().getAsTag() + " with the minecraft account " + mcName + "!").queue();
         //Change nick, ranks ect
     }
 }

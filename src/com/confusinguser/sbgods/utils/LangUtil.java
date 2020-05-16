@@ -12,9 +12,9 @@ public class LangUtil {
 
     public String makePossessiveForm(String text) {
         if (text.endsWith("s")) {
-            return text + "\'";
+            return text + "'";
         }
-        return text + "\'s";
+        return text + "'s";
     }
 
     public String toLowerCaseButFirstLetter(String text) {

@@ -2,21 +2,21 @@ package com.confusinguser.sbgods.entities;
 
 import java.util.ArrayList;
 
-public class SkyblockPlayer {
+public class Player {
 
     private final String UUID;
     private final String displayName;
     private final String discordTag;
     private final ArrayList<String> skyblockProfiles;
 
-    public SkyblockPlayer() {
+    public Player() {
         this.UUID = null;
         this.displayName = null;
         this.discordTag = null;
         this.skyblockProfiles = new ArrayList<>();
     }
 
-    public SkyblockPlayer(String uuid, String displayName, String discordTag, ArrayList<String> skyblockProfiles) {
+    public Player(String uuid, String displayName, String discordTag, ArrayList<String> skyblockProfiles) {
         this.UUID = uuid;
         this.displayName = displayName;
         this.discordTag = discordTag;

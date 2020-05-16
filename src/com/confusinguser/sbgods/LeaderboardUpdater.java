@@ -46,11 +46,11 @@ public class LeaderboardUpdater implements Runnable {
 
     private Map<String, SkillLevels> getAvgSkillLevelHashMap(HypixelGuild guild) {
         Map<String, SkillLevels> usernameSkillLevels = new HashMap<>();
-        ArrayList<SkyblockPlayer> guildMembers = main.getApiUtil().getGuildMembers(guild);
+        ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
         guild.setPlayerSize(guildMembers.size());
 
         for (int i = 0; i < guildMembers.size(); i++) {
-            SkyblockPlayer thePlayer = main.getApiUtil().getSkyblockPlayerFromUUID(guildMembers.get(i).getUUID());
+            Player thePlayer = main.getApiUtil().getSkyblockPlayerFromUUID(guildMembers.get(i).getUUID());
 
             SkillLevels highestSkillLevels = new SkillLevels();
             // Get avg. skill level of the profile that has the highest
@@ -77,12 +77,12 @@ public class LeaderboardUpdater implements Runnable {
 
     private Map<String, SlayerExp> getSlayerXPHashMap(HypixelGuild guild) {
         Map<String, SlayerExp> usernameSlayerXP = new HashMap<>();
-        ArrayList<SkyblockPlayer> guildMembers = main.getApiUtil().getGuildMembers(guild);
+        ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
         guild.setPlayerSize(guildMembers.size());
 
         for (int i = 0; i < guildMembers.size(); i++) {
             String UUID = guildMembers.get(i).getUUID();
-            SkyblockPlayer thePlayer = main.getApiUtil().getSkyblockPlayerFromUUID(UUID);
+            Player thePlayer = main.getApiUtil().getSkyblockPlayerFromUUID(UUID);
             usernameSlayerXP.put(thePlayer.getDisplayName(), main.getApiUtil().getPlayerSlayerExp(UUID));
             guild.setSlayerProgress(i + 1);
         }

@@ -8,11 +8,9 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import javax.security.auth.login.LoginException;
-import java.rmi.activation.ActivationGroup;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -30,13 +28,11 @@ public class DiscordBot {
     private final DeathsCommand deathsCommand;
     private final AHCommand ahCommand;
     private final VerifyCommand verifyCommand;
-    private final VerifyALLCommand verifyALLCommand;
+    private final VerifyAllCommand verifyAllCommand;
     private final ArrayList<Command> commands;
     public String commandPrefix = "-";
     public SettingsCommand settingsCommand;
-    private User creatorUser;
-    private String creatorTag;
-    private JDA jda;
+    private final JDA jda;
 
     public DiscordBot(SBGods main) throws LoginException {
         String token = "NjY0OTAwNzM0NTk2NDE1NDg4.XreLHQ.l2viqcJ-uYvB3rAGcBa3OWhRuf0";
@@ -53,13 +49,13 @@ public class DiscordBot {
         deathsCommand = new DeathsCommand(main, this);
         ahCommand = new AHCommand(main, this);
         verifyCommand = new VerifyCommand(main, this);
-        verifyALLCommand = new VerifyALLCommand(main, this);
+        verifyAllCommand = new VerifyAllCommand(main, this);
         // applyCommand = new ApplyCommand(main, this);
         // importApplicationCommand = new ImportApplicationCommand(main, this);
         // inviteQueueCommand = new InviteQueueCommand(main, this);
         // settingsCommand = new SettingsCommand(main, this);
 
-        commands = new ArrayList<>(Arrays.asList(slayerCommand, skillCommand, skillExpCommand, helpCommand, sbgodsCommand, whatguildCommand, petsCommand, killsCommand, deathsCommand, ahCommand, verifyCommand, verifyALLCommand));
+        commands = new ArrayList<>(Arrays.asList(slayerCommand, skillCommand, skillExpCommand, helpCommand, sbgodsCommand, whatguildCommand, petsCommand, killsCommand, deathsCommand, ahCommand, verifyCommand, verifyAllCommand));
 
         JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT)
                 .setToken(token)
@@ -70,9 +66,7 @@ public class DiscordBot {
             jdaBuilder.addEventListeners(command);
         }
         jda = jdaBuilder.build();
-        creatorUser = jda.getUserById(creatorId);
-        creatorTag = "ConfusingUser#5712";
-        jda.getPresence().setActivity(Activity.playing("Use " + commandPrefix + "help to get started. Made by " + creatorTag));
+        jda.getPresence().setActivity(Activity.playing("Use " + commandPrefix + "help to get started. Made by ConfusingUser#5712"));
         main.logger.info("Bot ready to take commands");
     }
 

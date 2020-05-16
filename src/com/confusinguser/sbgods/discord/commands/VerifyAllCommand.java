@@ -3,23 +3,14 @@ package com.confusinguser.sbgods.discord.commands;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
-import com.confusinguser.sbgods.entities.SkillLevels;
-import com.confusinguser.sbgods.entities.SkyblockPlayer;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+public class VerifyAllCommand extends Command implements EventListener {
 
-public class VerifyALLCommand extends Command implements EventListener {
-
-    public VerifyALLCommand(SBGods main, DiscordBot discord) {
+    public VerifyAllCommand(SBGods main, DiscordBot discord) {
         this.main = main;
         this.discord = discord;
         this.name = "verifyall";
@@ -42,23 +33,22 @@ public class VerifyALLCommand extends Command implements EventListener {
 //            return;
 //        }
 
-        if(!e.getMember().hasPermission(Permission.MANAGE_ROLES)){
-
+        if(e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_ROLES)){
             e.getChannel().sendMessage("You do not have permissions to perform this command").queue();
             return;
         }
 
         main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
 
-
         for(Member member : e.getGuild().getMembers()) {
-            main.logger.info("Attempting to auto-verify " + member.getUser().getAsTag());
+            main.logger.fine("Attempting to auto-verify " + member.getUser().getAsTag());
 
             String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag().replace("#", "*"));
 
-            if (mcName != "") {
-                //verify them automaticly!
-                main.getUtil().verifyPlayer(member, mcName, e);
+            if (!mcName.equals("")) {
+                // Verify them automaticly!
+                main.getUtil().verifyPlayer(member, mcName, e.getGuild());
+                e.getChannel().sendMessage("Linked " + e.getAuthor().getAsTag() + " with the minecraft account " + mcName + "!").queue();
             }
         }
     }

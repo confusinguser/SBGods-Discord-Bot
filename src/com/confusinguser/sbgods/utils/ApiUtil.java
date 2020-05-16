@@ -20,7 +20,7 @@ import java.util.Map;
 public class ApiUtil {
 
     private final String BASE_URL = "https://api.hypixel.net/";
-    private SBGods main;
+    private final SBGods main;
     private int REQUEST_RATE; // unit: requests
     private long LAST_CHECK = System.currentTimeMillis();
     private int allowance = REQUEST_RATE; // unit: requests
@@ -176,11 +176,11 @@ public class ApiUtil {
         return response.toString();
     }
 
-    public ArrayList<SkyblockPlayer> getGuildMembers(HypixelGuild guild) {
+    public ArrayList<Player> getGuildMembers(HypixelGuild guild) {
         String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&id=" + guild.getGuildId());
         if (response == null) return getGuildMembers(guild);
 
-        ArrayList<SkyblockPlayer> output = new ArrayList<>();
+        ArrayList<Player> output = new ArrayList<>();
         JSONObject jsonObject = new JSONObject(response);
         jsonObject = jsonObject.getJSONObject("guild");
         JSONArray members = jsonObject.getJSONArray("members");
@@ -188,15 +188,15 @@ public class ApiUtil {
         for (int i = 0; i < members.length(); i++) {
             JSONObject currentMember = members.getJSONObject(i);
             String uuid = currentMember.getString("uuid");
-            output.add(new SkyblockPlayer(uuid, null, null, null));
+            output.add(new Player(uuid, null, null, null));
         }
 
         return output;
     }
 
-    public SkyblockPlayer getSkyblockPlayerFromUUID(String UUID) {
+    public Player getSkyblockPlayerFromUUID(String UUID) {
         String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&uuid=" + UUID);
-        if (response == null) return new SkyblockPlayer();
+        if (response == null) return new Player();
 
         JSONObject jsonObject = new JSONObject(response);
         String username;
@@ -208,7 +208,7 @@ public class ApiUtil {
             username = jsonObject.getJSONObject("player").getString("displayname");
             profiles = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
         } catch (JSONException e) {
-            return new SkyblockPlayer();
+            return new Player();
         }
         try {
             // Does not necessarily exist while the other things above have to.
@@ -217,12 +217,12 @@ public class ApiUtil {
             discord = null;
         }
 
-        return new SkyblockPlayer(uuid, username, discord, new ArrayList<>(profiles.keySet()));
+        return new Player(uuid, username, discord, new ArrayList<>(profiles.keySet()));
     }
 
-    public SkyblockPlayer getSkyblockPlayerFromUsername(String name) {
+    public Player getPlayerFromUsername(String name) {
         String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&name=" + name);
-        if (response == null) return new SkyblockPlayer();
+        if (response == null) return new Player();
 
         JSONObject jsonObject = new JSONObject(response);
         String username;
@@ -234,7 +234,7 @@ public class ApiUtil {
             username = jsonObject.getJSONObject("player").getString("displayname");
             profiles = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
         } catch (JSONException e) {
-            return new SkyblockPlayer();
+            return new Player();
         }
         try {
             // Does not necessarily exist while the other things above have to.
@@ -243,7 +243,7 @@ public class ApiUtil {
             discord = null;
         }
 
-        return new SkyblockPlayer(uuid, username, discord, new ArrayList<>(profiles.keySet()));
+        return new Player(uuid, username, discord, new ArrayList<>(profiles.keySet()));
     }
 
 
@@ -253,7 +253,7 @@ public class ApiUtil {
             output.put(slayer_type, 0);
         }
 
-        SkyblockPlayer thePlayer = getSkyblockPlayerFromUUID(playerUUID);
+        Player thePlayer = getSkyblockPlayerFromUUID(playerUUID);
 
         for (String profileUUID : thePlayer.getSkyblockProfiles()) {
 
@@ -458,7 +458,7 @@ public class ApiUtil {
     }
 
     public SkillLevels getBestPlayerSkillLevels(String uuid) {
-        SkyblockPlayer thePlayer = getSkyblockPlayerFromUUID(uuid);
+        Player thePlayer = getSkyblockPlayerFromUUID(uuid);
 
         if (thePlayer.getSkyblockProfiles().isEmpty()) {
             return null;
@@ -502,8 +502,8 @@ public class ApiUtil {
 
         e.getChannel().editMessageById(messageId, "Loading...").queue();
 
-        Integer amountLoops = playerData.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles").length();
-        Integer loops = 0;
+        int amountLoops = playerData.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles").length();
+        int loops = 0;
 
         while(playerProfiles.hasNext()) {
             String profileId = playerProfiles.next();
@@ -557,11 +557,9 @@ public class ApiUtil {
             String response = getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getMcNameFromDisc.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace(" ","%20"));
             if (response == null) return "";
 
-            JSONObject jsonObject = new JSONObject(response);
-            JSONObject playerData = jsonObject;
-                return playerData.getJSONObject("data").getString("mc");
+            return new JSONObject(response).getJSONObject("data").getString("mc");
         }
-        catch (Exception err){
+        catch (Exception err) {
             return "";
         }
 

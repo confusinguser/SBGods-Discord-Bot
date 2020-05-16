@@ -4,7 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.SkillLevels;
-import com.confusinguser.sbgods.entities.SkyblockPlayer;
+import com.confusinguser.sbgods.entities.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
@@ -54,7 +54,7 @@ public class SkillCommand extends Command implements EventListener {
         }
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
-            ArrayList<SkyblockPlayer> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
+            ArrayList<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
             Map<String, SkillLevels> usernameSkillExpHashMap = currentDiscordServer.getHypixelGuild().getSkillExpHashmap();
 
             if (usernameSkillExpHashMap.size() == 0) {
@@ -128,7 +128,7 @@ public class SkillCommand extends Command implements EventListener {
 
         if (args[1].equalsIgnoreCase("player")) {
             if (args.length >= 3) {
-                SkyblockPlayer thePlayer = main.getApiUtil().getSkyblockPlayerFromUsername(args[2]);
+                Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
 
                 if (thePlayer.getSkyblockProfiles().isEmpty()) {
                     e.getChannel().sendMessage("Player **" + args[2] + "** does not exist!").queue();
@@ -161,15 +161,18 @@ public class SkillCommand extends Command implements EventListener {
                     descriptionBuilder.append("Average skill level: " + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "\n\n");
                 }
 
-                embedBuilder.setDescription(descriptionBuilder
+                descriptionBuilder
                         .append("Farming: " + highestSkillLevels.getFarming() + '\n')
                         .append("Mining: " + highestSkillLevels.getMining() + '\n')
                         .append("Combat: " + highestSkillLevels.getCombat() + '\n')
                         .append("Foraging: " + highestSkillLevels.getForaging() + '\n')
                         .append("Fishing: " + highestSkillLevels.getFishing() + '\n')
-                        .append("Enchanting: " + highestSkillLevels.getEnchanting() + '\n')
-                        .append("Alchemy: " + highestSkillLevels.getAlchemy() + '\n')
-                        .toString());
+                        .append("Enchanting: " + highestSkillLevels.getEnchanting() + '\n');
+                if (highestSkillLevels.isApproximate())
+                    descriptionBuilder.append("Taming: " + highestSkillLevels.getTaming() + '\n');
+                descriptionBuilder.append("Alchemy: " + highestSkillLevels.getAlchemy() + '\n');
+
+                embedBuilder.setDescription(descriptionBuilder.toString());
 
                 StringBuilder footerBuilder = new StringBuilder();
                 embedBuilder.setFooter(footerBuilder
@@ -178,12 +181,11 @@ public class SkillCommand extends Command implements EventListener {
                         .toString());
 
                 e.getChannel().sendMessage(embedBuilder.build()).queue();
-                return;
 
             } else {
                 e.getChannel().sendMessage("Invalid usage! Usage: *" + getName() + " player <IGN>*").queue();
-                return;
             }
+            return;
         }
 
         e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
