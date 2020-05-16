@@ -58,7 +58,7 @@ public class VerifyAllCommand extends Command implements EventListener {
                 }
                 for (Role role : e.getGuild().getRolesByName("Verified",true)) {
                     try {
-                        e.getGuild().removeRoleFromMember(member, role).queue();
+                        e.getGuild().removeRoleFromMember(member, role).complete();
 
                     } catch (HierarchyException ignored) {}
                 }
@@ -75,6 +75,7 @@ public class VerifyAllCommand extends Command implements EventListener {
             for(Member member : e.getGuild().getMembers()) {
                 for (Role role : e.getGuild().getRolesByName("Verified",true)) {
                     try {
+                        main.logger.info("Removed " + member.getUser().getAsTag() + "'s verified role");
                         e.getGuild().removeRoleFromMember(member, role).queue();
 
                     } catch (HierarchyException ignored) {}
@@ -91,7 +92,7 @@ public class VerifyAllCommand extends Command implements EventListener {
         e.getChannel().sendMessage("Attempting to auto-verify all players!").queue();
 
         for(Member member : e.getGuild().getMembers()) {
-            main.logger.fine("Attempting to auto-verify " + member.getUser().getAsTag());
+            main.logger.info("Attempting to auto-verify " + member.getUser().getAsTag());
 
             String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag().replace("#", "*"));
 
