@@ -9,8 +9,11 @@ gradle
 .project
 
 # Ignore compiled class binaries
-.class
+*.class
 bin
+classes
+out
+*.jar
 
 # Ignore Gradle build output directory
 build
@@ -18,3 +21,4 @@ build
 # Intellij Idea data
 .idea
 *.iml
+
