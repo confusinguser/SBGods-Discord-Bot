@@ -53,6 +53,8 @@ public class SkillCommand extends Command implements EventListener {
             spreadsheet = true;
         }
 
+        e.getChannel().sendTyping().queue();
+
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
             ArrayList<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
             Map<String, SkillLevels> usernameSkillExpHashMap = currentDiscordServer.getHypixelGuild().getSkillExpHashmap();

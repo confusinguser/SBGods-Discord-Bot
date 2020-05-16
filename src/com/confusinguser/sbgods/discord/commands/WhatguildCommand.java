@@ -33,6 +33,7 @@ public class WhatguildCommand extends Command implements EventListener {
 
         String messageId = e.getChannel().sendMessage("...").complete().getId();
 
+        e.getChannel().sendTyping().queue();
         Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[1]);
         if (thePlayer.getSkyblockProfiles().isEmpty()) {
             e.getChannel().editMessageById(messageId, "Player **" + args[1] + "** does not exist").queue();

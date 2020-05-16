@@ -49,6 +49,7 @@ public class SlayerCommand extends Command implements EventListener {
             return;
         }
 
+        e.getChannel().sendTyping().queue();
         boolean spreadsheet = false;
         if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
             spreadsheet = true;
@@ -123,6 +124,7 @@ public class SlayerCommand extends Command implements EventListener {
 
         if (args[1].equalsIgnoreCase("player")) {
             String messageId = e.getChannel().sendMessage("...").complete().getId();
+            e.getChannel().sendTyping().queue();
 
             Player thePlayer;
             if (args.length >= 3) {

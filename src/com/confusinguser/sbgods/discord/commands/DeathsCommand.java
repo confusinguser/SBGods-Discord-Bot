@@ -35,6 +35,7 @@ public class DeathsCommand extends Command {
         }
 
         String messageId = e.getChannel().sendMessage("...").complete().getId();
+        e.getChannel().sendTyping().queue();
 
         if (args[1].equalsIgnoreCase("player")) {
             HashMap<String, Integer> totalDeaths = new HashMap<>();

@@ -115,6 +115,7 @@ public class Util {
 
     public void verifyPlayer(Member member, String mcName, Guild discord, MessageChannel chan) {
         DiscordServer discordServer = DiscordServer.getDiscordServerFromDiscordGuild(discord);
+        chan.sendTyping().queue();
         if (discordServer == null) {
             return;
         }
@@ -137,6 +138,7 @@ public class Util {
         }
         // Add guild roles if they are in one
 
+        chan.sendTyping().queue();
         Player thePlayer = main.getApiUtil().getPlayerFromUsername(mcName);
         if (thePlayer.getSkyblockProfiles().isEmpty()) {
             return;
@@ -148,6 +150,7 @@ public class Util {
         }
 
 
+        chan.sendTyping().queue();
         if(guildName.equalsIgnoreCase("Skyblock Gods")){
             for (Role role : discord.getRolesByName("SBG Guild Member",true)) {
                 try {
@@ -186,6 +189,7 @@ public class Util {
 
         main.logger.info("Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "! (Guild: " + guildName + ")");
 
+        chan.sendTyping().queue();
         if(sendMsg){
             if(guildDis.isEmpty()){
                 chan.sendMessage("Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "!").queue();
