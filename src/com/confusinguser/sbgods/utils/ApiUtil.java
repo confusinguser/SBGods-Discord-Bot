@@ -7,10 +7,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.CacheResponse;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class ApiUtil {
 
@@ -26,15 +32,16 @@ public class ApiUtil {
         REQUEST_RATE = 30 * main.keys.length;
     }
 
-    private String getResponse(String url_string) {
+    private String getResponse(String url_string, Integer cacheTime) {
 
         // See if request already in cache
-        String cacheResponse = main.getCacheUtil().getCachedResponse(main.getCacheUtil().stripUnnecesaryInfo(url_string)).getJson();
-        if (cacheResponse != null) {
-            return cacheResponse;
+        Response cacheResponse = main.getCacheUtil().getCachedResponse(main.getCacheUtil().stripUnnecesaryInfo(url_string));
+        String cacheResponseStr = cacheResponse.getJson();
+        long current = System.currentTimeMillis();
+        if (cacheResponse != null && (current-cacheResponse.getTimeStamp()) < cacheTime) {
+            return cacheResponseStr;
         }
 
-        long current = System.currentTimeMillis();
         int timePassed = (int) ((current - LAST_CHECK) / 1000);
 
         LAST_CHECK = current;
@@ -97,7 +104,7 @@ public class ApiUtil {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
             }
-            return getResponse(url_string);
+            return getResponse(url_string,cacheTime);
 
         } else if (responseCode == 403) {
             main.logger.severe("The API key \"" + main.getCurrentApiKey() + "\" is invalid!");
@@ -107,7 +114,7 @@ public class ApiUtil {
             if (fails % 10 == 0 || fails == 1) {
                 main.logger.warning("Failed to connect to the Hypixel API " + fails + " times, this may be a problem: " + ioException.toString() + '\n' + ioException.fillInStackTrace());
             }
-            return getResponse(url_string);
+            return getResponse(url_string, cacheTime);
         }
         fails = 0;
         return response.toString();
@@ -155,7 +162,7 @@ public class ApiUtil {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
             }
-            return getResponse(url_string);
+            return getNonHypixelResponse(url_string);
 
         } else if (responseCode == 403) {
             main.logger.severe("The API key \"" + main.getCurrentApiKey() + "\" is invalid!");
@@ -165,14 +172,14 @@ public class ApiUtil {
             if (fails % 10 == 0 || fails == 1) {
                 main.logger.warning("Failed to connect to the API " + fails + " times, this may be a problem: " + ioException.toString() + '\n' + ioException.fillInStackTrace());
             }
-            return getResponse(url_string);
+            return getNonHypixelResponse(url_string);
         }
         fails = 0;
         return response.toString();
     }
 
     public ArrayList<Player> getGuildMembers(HypixelGuild guild) {
-        String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&id=" + guild.getGuildId());
+        String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&id=" + guild.getGuildId(), 300000);
         if (response == null) return getGuildMembers(guild);
 
         ArrayList<Player> output = new ArrayList<>();
@@ -183,62 +190,68 @@ public class ApiUtil {
         for (int i = 0; i < members.length(); i++) {
             JSONObject currentMember = members.getJSONObject(i);
             String uuid = currentMember.getString("uuid");
-            output.add(new Player(uuid, null, null, null));
+            output.add(new Player(uuid, null, null, false, null));
         }
 
         return output;
     }
 
     public Player getSkyblockPlayerFromUUID(String UUID) {
-        String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&uuid=" + UUID);
+        String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&uuid=" + UUID, 300000);
         if (response == null) return new Player();
 
         JSONObject jsonObject = new JSONObject(response);
         String username;
         String uuid;
         String discord;
+        Boolean online;
         JSONObject profiles;
         try {
             uuid = jsonObject.getJSONObject("player").getString("uuid");
             username = jsonObject.getJSONObject("player").getString("displayname");
             profiles = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
+            online = jsonObject.getJSONObject("player").getLong("lastLogin") > jsonObject.getJSONObject("player").getLong("lastLogout");
         } catch (JSONException e) {
             return new Player();
         }
         try {
             // Does not necessarily exist while the other things above have to.
             discord = jsonObject.getJSONObject("player").getJSONObject("socialMedia").getJSONObject("links").getString("DISCORD");
+            setDiscNameFromMc(username, discord);
         } catch (JSONException e) {
             discord = null;
         }
 
-        return new Player(uuid, username, discord, new ArrayList<>(profiles.keySet()));
+        return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()));
     }
 
     public Player getPlayerFromUsername(String name) {
-        String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&name=" + name);
+        String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&name=" + name, 300000);
         if (response == null) return new Player();
 
         JSONObject jsonObject = new JSONObject(response);
         String username;
         String uuid;
         String discord;
+        Boolean online;
         JSONObject profiles;
         try {
             uuid = jsonObject.getJSONObject("player").getString("uuid");
             username = jsonObject.getJSONObject("player").getString("displayname");
             profiles = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
+            online = jsonObject.getJSONObject("player").getLong("lastLogin") > jsonObject.getJSONObject("player").getLong("lastLogout");
         } catch (JSONException e) {
             return new Player();
         }
         try {
             // Does not necessarily exist while the other things above have to.
             discord = jsonObject.getJSONObject("player").getJSONObject("socialMedia").getJSONObject("links").getString("DISCORD");
+            setDiscNameFromMc(username, discord);
         } catch (JSONException e) {
             discord = null;
         }
 
-        return new Player(uuid, username, discord, new ArrayList<>(profiles.keySet()));
+        return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()));
     }
 
 
@@ -250,9 +263,15 @@ public class ApiUtil {
 
         Player thePlayer = getSkyblockPlayerFromUUID(playerUUID);
 
+        Integer cacheTime = 60000;
+
+        if(!thePlayer.getIsOnline()){
+            cacheTime = 3600000; //1h
+        }
+
         for (String profileUUID : thePlayer.getSkyblockProfiles()) {
 
-            String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID);
+            String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, cacheTime);
             if (response == null) return new SlayerExp();
 
             JSONObject jsonObject = new JSONObject(response);
@@ -280,7 +299,7 @@ public class ApiUtil {
             output.put(slayer_type, 0);
         }
 
-        String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID);
+        String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 300000);
         if (response == null) return new SlayerExp();
 
         JSONObject jsonObject = new JSONObject(response);
@@ -301,7 +320,7 @@ public class ApiUtil {
 
     public SkillLevels getProfileSkills(String profileUUID, String playerUUID) {
 
-        String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID);
+        String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 300000);
         if (response == null) return new SkillLevels();
 
         JSONObject jsonObject = new JSONObject(response);
@@ -325,7 +344,7 @@ public class ApiUtil {
 
     public SkillLevels getProfileSkillsAlternate(String playerUUID) {
 
-        String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&uuid=" + playerUUID);
+        String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&uuid=" + playerUUID, 300000);
         if (response == null) return new SkillLevels();
 
         JSONObject jsonObject = new JSONObject(response);
@@ -349,7 +368,7 @@ public class ApiUtil {
 
     public String getGuildFromUUID(String UUID) {
 
-        String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&player=" + UUID);
+        String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&player=" + UUID, 300000);
         if (response == null) return null;
 
         JSONObject jsonObject = new JSONObject(response);
@@ -363,7 +382,7 @@ public class ApiUtil {
 
     public ArrayList<Pet> getProfilePets(String profileUUID, String playerUUID) {
 
-        String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID);
+        String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 300000);
         if (response == null) return new ArrayList<>();
 
         JSONObject jsonObject = new JSONObject(response);
@@ -410,7 +429,7 @@ public class ApiUtil {
 
         HashMap<String, Integer> output = new HashMap<>();
 
-        String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID);
+        String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 300000);
         if (response == null) return new HashMap<>();
 
         JSONObject jsonObject = new JSONObject(response);
@@ -433,7 +452,7 @@ public class ApiUtil {
 
         HashMap<String, Integer> output = new HashMap<>();
 
-        String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID);
+        String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 300000);
         if (response == null) return new HashMap<>();
 
         JSONObject jsonObject = new JSONObject(response);
@@ -481,7 +500,7 @@ public class ApiUtil {
     public PlayerAH getPlayerAHFromUsername(String player, String messageId, MessageReceivedEvent e) {
         //main.logger.info("Loading " + player + "'s main data");
         e.getChannel().editMessageById(messageId, "Loading..").queue();
-        String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&name=" + player);
+        String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&name=" + player, 300000);
         if (response == null) return new PlayerAH("There was a error fetching that user's auctions, please try again later.");
 
         JSONObject jsonObject = new JSONObject(response);
@@ -506,7 +525,7 @@ public class ApiUtil {
             //main.logger.info("Loading " + player + "'s " + playerData.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles").getJSONObject(profileId).getString("cute_name") + " data");
 
 
-            response = getResponse(BASE_URL + "skyblock/auction" + "?key=" + main.getNextApiKey() + "&profile=" + profileId + "&uuid=" + playerId);
+            response = getResponse(BASE_URL + "skyblock/auction" + "?key=" + main.getNextApiKey() + "&profile=" + profileId + "&uuid=" + playerId, 60000);
             if (response == null) return new PlayerAH("There was a error fetching that user's auctions, please try again later.");
 
             jsonObject = new JSONObject(response);
@@ -560,89 +579,12 @@ public class ApiUtil {
 
     }
 
-    public String getDiscNameFromMc(String mcName) {
+    public String setDiscNameFromMc(String mcName, String discordName) {
 
-        //main.logger.info("1");
-        String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&name=" + mcName);
-        if (response == null) return "";
-
-        //main.logger.info("2");
-
-        JSONObject jsonObject = new JSONObject(response);
-        String discordName;
-
-        try {
-            discordName = jsonObject.getJSONObject("player").getJSONObject("socialMedia").getJSONObject("links").getString("DISCORD");
-            mcName = jsonObject.getJSONObject("player").getString("displayname");
-        }
-        catch (Exception e){
-            return "";
-        }
-        //main.logger.info("3");
-        response = getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/setDiscordMcName.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace("#","*") + "&mc=" + mcName);
+        String response = getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/setDiscordMcName.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace("#","*") + "&mc=" + mcName);
 
         //main.logger.info("4");
         return discordName;
-    }
-
-    public void downloadFile(String urlStr, String fileLocation) throws IOException {
-        File file = new File(fileLocation);
-        if (!file.createNewFile()) {
-            downloadFile(urlStr, fileLocation + "_new");
-            return;
-        }
-
-        URL url = new URL(urlStr);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("GET");
-        con.setRequestProperty("User-Agent", "Mozilla/5.0");
-        con.setRequestProperty("Authorization", "token f159901613c898cb80cdc39b3d8f89d2eb9f51bb");
-
-        BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
-        FileOutputStream fis = new FileOutputStream(file);
-        byte[] buffer = new byte[1024];
-        int count;
-        while ((count = bis.read(buffer, 0, 1024)) != -1) {
-            fis.write(buffer, 0, count);
-        }
-        fis.close();
-        bis.close();
-    }
-
-    public Map.Entry<String, String> getLatestReleaseUrl() {
-        StringBuffer response = null;
-        HttpURLConnection con;
-        try {
-            URL url = new URL("https://api.github.com/repos/confusinguser/SBGods-Discord-Bot/releases");
-
-            con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-            con.setRequestProperty("User-Agent", "Mozilla/5.0");
-            con.setRequestProperty("Authorization", "token f159901613c898cb80cdc39b3d8f89d2eb9f51bb");
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            response = new StringBuffer();
-
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-        } catch (IOException e) {
-            main.logger.warning("Could not download latest release: " + e.toString() + Arrays.toString(e.getStackTrace()));
-        }
-
-        if (response == null) {
-            return new AbstractMap.SimpleImmutableEntry<>("","");
-        }
-        try {
-            JSONArray output = new JSONArray(response.toString());
-            return new AbstractMap.SimpleImmutableEntry<>(output.getJSONObject(0).getJSONArray("assets").getJSONObject(0).getString("name"),
-                    output.getJSONObject(0).getJSONArray("assets").getJSONObject(0).getString("url")); // TODO - see if index 0 is first or last release
-        } catch (JSONException e) {
-            return new AbstractMap.SimpleImmutableEntry<>("","");
-        }
     }
 }
 
