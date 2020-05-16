@@ -32,7 +32,7 @@ public class ApiUtil {
         Response cacheResponse = main.getCacheUtil().getCachedResponse(main.getCacheUtil().stripUnnecesaryInfo(url_string));
         String cacheResponseStr = cacheResponse.getJson();
         long current = System.currentTimeMillis();
-        if (cacheResponse != null && (current-cacheResponse.getTimeStamp()) < cacheTime) {
+        if (cacheResponseStr != null && (current-cacheResponse.getTimeStamp()) < cacheTime) {
             return cacheResponseStr;
         }
 
@@ -213,7 +213,7 @@ public class ApiUtil {
             discord = jsonObject.getJSONObject("player").getJSONObject("socialMedia").getJSONObject("links").getString("DISCORD");
             setDiscNameFromMc(username, discord);
         } catch (JSONException e) {
-            discord = null;
+            discord = "";
         }
 
         return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()));
@@ -242,7 +242,7 @@ public class ApiUtil {
             discord = jsonObject.getJSONObject("player").getJSONObject("socialMedia").getJSONObject("links").getString("DISCORD");
             setDiscNameFromMc(username, discord);
         } catch (JSONException e) {
-            discord = null;
+            discord = "";
         }
 
         return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()));
