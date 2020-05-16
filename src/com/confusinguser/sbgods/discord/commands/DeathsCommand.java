@@ -2,7 +2,7 @@ package com.confusinguser.sbgods.discord.commands;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
-import com.confusinguser.sbgods.entities.SkyblockPlayer;
+import com.confusinguser.sbgods.entities.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -38,7 +38,7 @@ public class DeathsCommand extends Command {
 
         if (args[1].equalsIgnoreCase("player")) {
             HashMap<String, Integer> totalDeaths = new HashMap<>();
-            SkyblockPlayer thePlayer = main.getApiUtil().getSkyblockPlayerFromUsername(args[2]);
+            Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
 
             if (thePlayer.getSkyblockProfiles().isEmpty()) {
                 e.getChannel().editMessageById(messageId, "Player **" + args[2] + "** does not exist!").queue();

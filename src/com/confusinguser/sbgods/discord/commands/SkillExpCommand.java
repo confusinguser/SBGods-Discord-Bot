@@ -4,7 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.SkillLevels;
-import com.confusinguser.sbgods.entities.SkyblockPlayer;
+import com.confusinguser.sbgods.entities.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -57,7 +57,7 @@ public class SkillExpCommand extends Command implements EventListener {
         }
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
-            ArrayList<SkyblockPlayer> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
+            ArrayList<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
             Map<String, SkillLevels> usernameSkillExpHashMap = currentDiscordServer.getHypixelGuild().getSkillExpHashmap();
 
             if (usernameSkillExpHashMap.size() == 0) {
@@ -134,7 +134,7 @@ public class SkillExpCommand extends Command implements EventListener {
 
         if (args[1].equalsIgnoreCase("player")) {
             if (args.length >= 3) {
-                SkyblockPlayer thePlayer = main.getApiUtil().getSkyblockPlayerFromUsername(args[2]);
+                Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
 
                 if (thePlayer.getSkyblockProfiles().isEmpty()) {
                     channel.sendMessage("Player **" + args[2] + "** does not exist!").queue();
@@ -167,15 +167,19 @@ public class SkillExpCommand extends Command implements EventListener {
                     descriptionBuilder.append("Average skill xp: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getAvgSkillLevel())).append("\n\n");
                 }
 
-                embedBuilder.setDescription(descriptionBuilder
+                descriptionBuilder
                         .append("Farming: " + main.getSBUtil().toSkillExp(highestSkillLevels.getFarming()) + '\n')
                         .append("Mining: " + main.getSBUtil().toSkillExp(highestSkillLevels.getMining()) + '\n')
                         .append("Combat: " + main.getSBUtil().toSkillExp(highestSkillLevels.getCombat()) + '\n')
                         .append("Foraging: " + main.getSBUtil().toSkillExp(highestSkillLevels.getForaging()) + '\n')
                         .append("Fishing: " + main.getSBUtil().toSkillExp(highestSkillLevels.getFishing()) + '\n')
-                        .append("Enchanting: " + main.getSBUtil().toSkillExp(highestSkillLevels.getEnchanting()) + '\n')
-                        .append("Alchemy: " + main.getSBUtil().toSkillExp(highestSkillLevels.getAlchemy()) + '\n')
-                        .toString());
+                        .append("Enchanting: " + main.getSBUtil().toSkillExp(highestSkillLevels.getEnchanting()) + '\n');
+                if (highestSkillLevels.isApproximate())
+                        descriptionBuilder.append("Taming: " + main.getSBUtil().toSkillExp(highestSkillLevels.getTaming()) + '\n');
+                descriptionBuilder.append("Alchemy: " + main.getSBUtil().toSkillExp(highestSkillLevels.getAlchemy()) + '\n');
+
+
+                embedBuilder.setDescription(descriptionBuilder.toString());
 
                 StringBuilder footerBuilder = new StringBuilder();
                 embedBuilder.setFooter(footerBuilder

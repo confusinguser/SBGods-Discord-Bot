@@ -1,16 +1,14 @@
 package com.confusinguser.sbgods.entities;
 
-import com.confusinguser.sbgods.SBGods;
-
 public class AHItem {
 
-    private String itemName;
-    private String itemTier;
-    private Long startingBid;
-    private Long highestBid;
-    private String category;
-    private Long end;
-    private Integer bids; //number of bids on the item
+    private final String itemName;
+    private final String itemTier;
+    private final Long startingBid;
+    private final Long highestBid;
+    private final String category;
+    private final Long end;
+    private final Integer bids; //number of bids on the item
 
     public AHItem(String itemName, String itemTier, Long startingBid, Long highestBid, String category, Long end, Integer bids) {
         this.itemName = itemName;

@@ -7,22 +7,22 @@ public class Applicant {
 
     private final SBGods main;
 
-    private final SkyblockPlayer skyblockPlayer;
+    private final Player player;
     private final User discordUser;
     private final HypixelGuild guild;
     private int rating;
 
-    public Applicant(SkyblockPlayer skyblockPlayer, User discordUser, HypixelGuild guild) {
+    public Applicant(Player player, User discordUser, HypixelGuild guild) {
         this.main = SBGods.getInstance();
-        this.skyblockPlayer = skyblockPlayer;
+        this.player = player;
         this.discordUser = discordUser;
         this.guild = guild;
         updateRating();
         this.rating = getRating();
     }
 
-    public SkyblockPlayer getSkyblockPlayer() {
-        return skyblockPlayer;
+    public Player getPlayer() {
+        return player;
     }
 
     public User getDiscordUser() {
@@ -34,11 +34,11 @@ public class Applicant {
     }
 
     public boolean meetsRequirements() {
-        return main.getApiUtil().getPlayerSlayerExp(skyblockPlayer.getUUID()).getTotalExp() >= guild.getSlayerExpRec() &&
-                main.getSBUtil().toSkillExp(main.getApiUtil().getBestPlayerSkillLevels(skyblockPlayer.getUUID()).getAvgSkillLevel()) >= guild.getSkillExpRec();
+        return main.getApiUtil().getPlayerSlayerExp(player.getUUID()).getTotalExp() >= guild.getSlayerExpRec() &&
+                main.getSBUtil().toSkillExp(main.getApiUtil().getBestPlayerSkillLevels(player.getUUID()).getAvgSkillLevel()) >= guild.getSkillExpRec();
     }
 
     private void updateRating() {
-        this.rating = ((main.getApiUtil().getPlayerSlayerExp(skyblockPlayer.getUUID()).getTotalExp() / guild.getSlayerExpRec()) * (main.getSBUtil().toSkillExp(main.getApiUtil().getBestPlayerSkillLevels(skyblockPlayer.getUUID()).getAvgSkillLevel() / guild.getSkillExpRec()))) / 2;
+        this.rating = ((main.getApiUtil().getPlayerSlayerExp(player.getUUID()).getTotalExp() / guild.getSlayerExpRec()) * (main.getSBUtil().toSkillExp(main.getApiUtil().getBestPlayerSkillLevels(player.getUUID()).getAvgSkillLevel() / guild.getSkillExpRec()))) / 2;
     }
 }
