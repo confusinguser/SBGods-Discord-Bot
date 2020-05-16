@@ -2,6 +2,7 @@ package com.confusinguser.sbgods.utils;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.DiscordServer;
+import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SlayerExp;
 import net.dv8tion.jda.api.entities.Guild;
@@ -124,10 +125,11 @@ public class Util {
 
         List<String> roleNames = discord.getRoles().stream().map(Role::getName).collect(Collectors.toList()); // Make a list of all role names in the member
 
+        Boolean sendMsg = false;
         if(!member.getRoles().stream().map(Role::getName).collect(Collectors.toList()).contains("Verified")){
             //doesent have verifyied role... adding it
 
-            chan.sendMessage("Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "!").queue();
+            sendMsg = true;
 
         }
 
@@ -136,6 +138,64 @@ public class Util {
                 try {
                     discord.addRoleToMember(member, role).complete();
                 } catch (HierarchyException ignored) {}
+            }
+        }
+        //Add guild roles if they are in one
+
+        Player thePlayer = main.getApiUtil().getPlayerFromUsername(mcName);
+        if (thePlayer.getSkyblockProfiles().isEmpty()) {
+            return;
+        }
+        String guildName = main.getApiUtil().getGuildFromUUID(thePlayer.getUUID());
+        String guildDis = "";
+        if (guildName == null) {
+            guildName = "";
+        }
+
+
+        if(guildName.equalsIgnoreCase("Skyblock Gods")){
+            for (Role role : discord.getRolesByName("SBG Guild Member",true)) {
+                try {
+                    discord.addRoleToMember(member, role).complete();
+
+                } catch (HierarchyException ignored) {}
+
+                guildDis = "SkyBlock Gods";
+            }
+        }else{
+            for (Role role : discord.getRolesByName("SBG Guild Member",true)) {
+                try {
+                    discord.removeRoleFromMember(member, role).complete();
+
+                } catch (HierarchyException ignored) {}
+            }
+        }
+
+        if(guildName.equalsIgnoreCase("Skyblock Forceful")){
+            for (Role role : discord.getRolesByName("SBF Guild Member",true)) {
+                try {
+                    discord.addRoleToMember(member, role).complete();
+
+                } catch (HierarchyException ignored) {}
+
+                guildDis = "SkyBlock Forcefull";
+            }
+        }else{
+            for (Role role : discord.getRolesByName("SBF Guild Member",true)) {
+                try {
+                    discord.removeRoleFromMember(member, role).complete();
+
+                } catch (HierarchyException ignored) {}
+            }
+        }
+
+        main.logger.info("Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "! (Guild: " + guildName + ")");
+
+        if(sendMsg){
+            if(guildDis.isEmpty()){
+                chan.sendMessage("Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "!").queue();
+            }else{
+                chan.sendMessage("Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "! (Guild: " + guildDis + ")").queue();
             }
         }
     }

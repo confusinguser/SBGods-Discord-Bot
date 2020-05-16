@@ -5,7 +5,9 @@ import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.hooks.EventListener;
 
 public class VerifyAllCommand extends Command implements EventListener {
@@ -39,10 +41,58 @@ public class VerifyAllCommand extends Command implements EventListener {
         }
 
         main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
+
+        if(e.getMessage().getContentRaw().equalsIgnoreCase("-vall reset")){
+            for(Member member : e.getGuild().getMembers()) {
+                for (Role role : e.getGuild().getRolesByName("SBG Guild Member",true)) {
+                    try {
+                        e.getGuild().removeRoleFromMember(member, role).queue();
+
+                    } catch (HierarchyException ignored) {}
+                }
+                for (Role role : e.getGuild().getRolesByName("SBF Guild Member",true)) {
+                    try {
+                        e.getGuild().removeRoleFromMember(member, role).queue();
+
+                    } catch (HierarchyException ignored) {}
+                }
+                for (Role role : e.getGuild().getRolesByName("Verified",true)) {
+                    try {
+                        e.getGuild().removeRoleFromMember(member, role).complete();
+
+                    } catch (HierarchyException ignored) {}
+                }
+
+            }
+
+
+            e.getChannel().sendMessage("Removed everyones verified and guild roles!").queue();
+
+            return;
+        }
+
+        if(e.getMessage().getContentRaw().equalsIgnoreCase("-vall reset v")){
+            for(Member member : e.getGuild().getMembers()) {
+                for (Role role : e.getGuild().getRolesByName("Verified",true)) {
+                    try {
+                        main.logger.info("Removed " + member.getUser().getAsTag() + "'s verified role");
+                        e.getGuild().removeRoleFromMember(member, role).queue();
+
+                    } catch (HierarchyException ignored) {}
+                }
+
+            }
+
+
+            e.getChannel().sendMessage("Removed everyones verified roles!").queue();
+
+            return;
+        }
+
         e.getChannel().sendMessage("Attempting to auto-verify all players!").queue();
 
         for(Member member : e.getGuild().getMembers()) {
-            main.logger.fine("Attempting to auto-verify " + member.getUser().getAsTag());
+            main.logger.info("Attempting to auto-verify " + member.getUser().getAsTag());
 
             String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag().replace("#", "*"));
 
