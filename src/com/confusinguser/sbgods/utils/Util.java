@@ -3,6 +3,7 @@ package com.confusinguser.sbgods.utils;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SlayerExp;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -13,7 +14,10 @@ import java.util.Map.Entry;
 
 public class Util {
 
+    private SBGods main;
+
     public Util(SBGods main) {
+        this.main = main;
     }
 
 
@@ -104,18 +108,21 @@ public class Util {
         return output;
     }
 
-    public void verifyPlayer(User discord, String mcName, MessageReceivedEvent e){
-
-        e.getMember().modifyNickname(mcName);
+    public void verifyPlayer(Member discord, String mcName, MessageReceivedEvent e){
         try {
-            e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById("706081336590598165"));
+            discord.modifyNickname(mcName).complete();
+        }catch (Exception ex){}
+        try {
+            e.getGuild().addRoleToMember(discord, e.getGuild().getRoleById("706081336590598165")).complete();
+            main.logger.info("Added SBG verified role to " + e.getAuthor().getAsTag());
         }
         catch(Exception ex){}
         try {
-            e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById("711011937109934141"));
+            e.getGuild().addRoleToMember(discord, e.getGuild().getRoleById("711011937109934141")).complete();
+            main.logger.info("Added SBDG verified role to " + e.getAuthor().getAsTag());
         }
         catch(Exception ex){}
-        e.getChannel().sendMessage("Linked " + discord.getAsMention() + " with the minecraft account " + mcName + "!").queue();
+        e.getChannel().sendMessage("Linked " + discord.getUser().getAsTag() + " with the minecraft account " + mcName + "!").queue();
         //Change nick, ranks ect
     }
 }

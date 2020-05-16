@@ -37,30 +37,29 @@ public class VerifyALLCommand extends Command implements EventListener {
             return;
         }
 
-        if (currentDiscordServer.getChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getChannelId())) {
-            e.getChannel().sendMessage("Verify commands cannot be ran in this channel!").queue();
-            return;
-        }
+//        if (currentDiscordServer.getChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getChannelId())) {
+//            e.getChannel().sendMessage("Verify commands cannot be ran in this channel!").queue();
+//            return;
+//        }
 
         if(!e.getMember().hasPermission(Permission.MANAGE_ROLES)){
 
             e.getChannel().sendMessage("You do not have permissions to perform this command").queue();
+            return;
         }
 
         main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
 
-        String[] args = e.getMessage().getContentRaw().split(" ");
 
         for(Member member : e.getGuild().getMembers()) {
-            User user = member.getUser();
+            main.logger.info("Attempting to auto-verify " + member.getUser().getAsTag());
 
-            String mcName = main.getApiUtil().getMcNameFromDisc(user.getAsTag().replace("#", "*"));
-            if (mcName == "") {
-                return;
+            String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag().replace("#", "*"));
+
+            if (mcName != "") {
+                //verify them automaticly!
+                main.getUtil().verifyPlayer(member, mcName, e);
             }
-            //verify player with mc name mcName
-
-            main.getUtil().verifyPlayer(user, mcName, e);
         }
     }
 }

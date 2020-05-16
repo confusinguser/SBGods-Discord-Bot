@@ -553,12 +553,17 @@ public class ApiUtil {
     }
 
     public String getMcNameFromDisc(String discordName) {
-        String response = getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/getMcNameFromDisc.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName);
-        if (response == null) return "";
+        try {
+            String response = getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getMcNameFromDisc.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace(" ","%20"));
+            if (response == null) return "";
 
-        JSONObject jsonObject = new JSONObject(response);
-        JSONObject playerData = jsonObject;
-        return playerData.getJSONObject("data").getString("mc");
+            JSONObject jsonObject = new JSONObject(response);
+            JSONObject playerData = jsonObject;
+                return playerData.getJSONObject("data").getString("mc");
+        }
+        catch (Exception err){
+            return "";
+        }
 
     }
 

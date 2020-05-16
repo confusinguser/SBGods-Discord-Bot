@@ -34,10 +34,10 @@ public class VerifyCommand extends Command implements EventListener {
             return;
         }
 
-        if (currentDiscordServer.getChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getChannelId())) {
-            e.getChannel().sendMessage("Verify commands cannot be ran in this channel!").queue();
-            return;
-        }
+//        if (currentDiscordServer.getChannelId() != null && !e.getChannel().getId().equalsIgnoreCase() {
+//            e.getChannel().sendMessage("Verify commands cannot be ran in this channel!").queue();
+//            return;
+//        }
 
         main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
 
@@ -49,7 +49,7 @@ public class VerifyCommand extends Command implements EventListener {
             if(main.getApiUtil().getDiscNameFromMc(args[1]).equalsIgnoreCase(e.getAuthor().getAsTag())){
                 //Verify player with ign: args[2]
 
-                main.getUtil().verifyPlayer(e.getAuthor(),main.getApiUtil().getDiscNameFromMc(args[1]), e);
+                main.getUtil().verifyPlayer(e.getMember(),main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag().replace("#","*")),e);
                 return;
             }
 
@@ -70,7 +70,7 @@ public class VerifyCommand extends Command implements EventListener {
         }
         //verify player with mc name mcName
 
-        main.getUtil().verifyPlayer(e.getAuthor(),mcName, e);
+        main.getUtil().verifyPlayer(e.getMember(),mcName, e);
 
     }
 }
