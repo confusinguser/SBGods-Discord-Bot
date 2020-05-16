@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class CacheUtil {
 
-    private static final long MAX_CACHE_TIME = 10 * 1000 * 60;
+    private static final long MAX_CACHE_TIME = 86400000 ; //1 day store, probs wont use the full day
 
     // private SBGods main;
 
