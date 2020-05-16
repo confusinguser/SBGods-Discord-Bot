@@ -6,6 +6,7 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SkyblockPlayer;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -39,6 +40,11 @@ public class VerifyALLCommand extends Command implements EventListener {
         if (currentDiscordServer.getChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getChannelId())) {
             e.getChannel().sendMessage("Verify commands cannot be ran in this channel!").queue();
             return;
+        }
+
+        if(!e.getMember().hasPermission(Permission.MANAGE_ROLES)){
+
+            e.getChannel().sendMessage("You do not have permissions to perform this command").queue();
         }
 
         main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
