@@ -33,6 +33,7 @@ public class VerifyCommand extends Command implements EventListener {
         }
 
         main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
+        e.getChannel().sendTyping().queue();
 
         String[] args = e.getMessage().getContentRaw().split(" ");
 

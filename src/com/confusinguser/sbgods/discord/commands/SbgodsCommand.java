@@ -53,6 +53,7 @@ public class SbgodsCommand extends Command implements EventListener {
                 return;
             }
 
+            e.getChannel().sendTyping().queue();
             Map.Entry<String, String> latestReleaseUrl = main.getApiUtil().getLatestReleaseUrl();
             if (latestReleaseUrl.getValue().equals("")) {
                 e.getChannel().sendMessage("There are no releases available!").queue();

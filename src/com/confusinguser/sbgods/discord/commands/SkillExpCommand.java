@@ -50,6 +50,7 @@ public class SkillExpCommand extends Command implements EventListener {
             channel.sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
             return;
         }
+        channel.sendTyping().queue();
 
         boolean spreadsheet = false;
         if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
@@ -143,6 +144,7 @@ public class SkillExpCommand extends Command implements EventListener {
 
                 SkillLevels highestSkillLevels = new SkillLevels();
                 for (String profile : thePlayer.getSkyblockProfiles()) {
+                    channel.sendTyping().queue();
                     SkillLevels skillLevels = main.getApiUtil().getProfileSkills(profile, thePlayer.getUUID());
 
                     if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {

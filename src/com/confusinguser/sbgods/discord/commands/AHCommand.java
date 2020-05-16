@@ -35,6 +35,7 @@ public class AHCommand extends Command implements EventListener {
         }
 
         String messageId = e.getChannel().sendMessage("Loading.").complete().getId();
+        e.getChannel().sendTyping().queue();
 
         PlayerAH playerAuctions = main.getApiUtil().getPlayerAHFromUsername(args[1], messageId, e);
 
@@ -54,6 +55,8 @@ public class AHCommand extends Command implements EventListener {
         }
 
         for (int i = 0; i < playerAuctions.length; i++) {
+
+            e.getChannel().sendTyping().queue();
             AHItem item = playerAuctions.getItems()[i];
 
             EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0xb8300b).setTitle(item.getItemTier() + " | " + item.getItemName() + ":");
@@ -63,6 +66,7 @@ public class AHCommand extends Command implements EventListener {
             embedBuilder.appendDescription("Category: **" + item.getCategory() + "**");
 
             e.getChannel().sendMessage(embedBuilder.build()).queue();
+
         }
 
     }

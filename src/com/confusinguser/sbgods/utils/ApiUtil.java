@@ -213,7 +213,7 @@ public class ApiUtil {
             discord = jsonObject.getJSONObject("player").getJSONObject("socialMedia").getJSONObject("links").getString("DISCORD");
             setDiscNameFromMc(username, discord);
         } catch (JSONException e) {
-            discord = null;
+            discord = "";
         }
 
         return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()));
@@ -242,7 +242,7 @@ public class ApiUtil {
             discord = jsonObject.getJSONObject("player").getJSONObject("socialMedia").getJSONObject("links").getString("DISCORD");
             setDiscNameFromMc(username, discord);
         } catch (JSONException e) {
-            discord = null;
+            discord = "";
         }
 
         return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()));
@@ -492,6 +492,7 @@ public class ApiUtil {
     public PlayerAH getPlayerAHFromUsername(String player, String messageId, MessageReceivedEvent e) {
         //main.logger.info("Loading " + player + "'s main data");
         e.getChannel().editMessageById(messageId, "Loading..").queue();
+        e.getChannel().sendTyping().queue();
         String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&name=" + player, 300000);
         if (response == null) return new PlayerAH("There was a error fetching that user's auctions, please try again later.");
 
@@ -507,6 +508,7 @@ public class ApiUtil {
         //main.logger.info("Loaded " + player + "'s main data");
 
         e.getChannel().editMessageById(messageId, "Loading...").queue();
+        e.getChannel().sendTyping().queue();
 
         int amountLoops = playerData.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles").length();
         int loops = 0;
@@ -528,6 +530,7 @@ public class ApiUtil {
 
             loops++;
             e.getChannel().editMessageById(messageId, "Loading...  (" + loops + "/" + amountLoops + ")").complete();
+            e.getChannel().sendTyping().queue();
 
             try {
                 auctionJSONArray = jsonObject.getJSONArray("auctions");
@@ -639,4 +642,3 @@ public class ApiUtil {
         return new JSONObject(getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getTaxData.json?key=HoVoiuWfpdAjJhfTj0YN"));
     }*/
 }
-
