@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import javax.security.auth.login.LoginException;
+import java.rmi.activation.ActivationGroup;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -27,6 +28,9 @@ public class DiscordBot {
     private final PetsCommand petsCommand;
     private final KillsCommand killsCommand;
     private final DeathsCommand deathsCommand;
+    private final AHCommand ahCommand;
+    private final VerifyCommand verifyCommand;
+    private final VerifyALLCommand verifyALLCommand;
     private final ArrayList<Command> commands;
     public String commandPrefix = "-";
     public SettingsCommand settingsCommand;
@@ -47,12 +51,15 @@ public class DiscordBot {
         petsCommand = new PetsCommand(main, this);
         killsCommand = new KillsCommand(main, this);
         deathsCommand = new DeathsCommand(main, this);
+        ahCommand = new AHCommand(main, this);
+        verifyCommand = new VerifyCommand(main, this);
+        verifyALLCommand = new VerifyALLCommand(main, this);
         // applyCommand = new ApplyCommand(main, this);
         // importApplicationCommand = new ImportApplicationCommand(main, this);
         // inviteQueueCommand = new InviteQueueCommand(main, this);
         // settingsCommand = new SettingsCommand(main, this);
 
-        commands = new ArrayList<>(Arrays.asList(slayerCommand, skillCommand, skillExpCommand, helpCommand, sbgodsCommand, whatguildCommand, petsCommand, killsCommand, deathsCommand));
+        commands = new ArrayList<>(Arrays.asList(slayerCommand, skillCommand, skillExpCommand, helpCommand, sbgodsCommand, whatguildCommand, petsCommand, killsCommand, deathsCommand, ahCommand, verifyCommand, verifyALLCommand));
 
         JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT)
                 .setToken(token)

@@ -3,6 +3,8 @@ package com.confusinguser.sbgods.utils;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SlayerExp;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,5 +102,14 @@ public class Util {
         }
         output /= array.length;
         return output;
+    }
+
+    public void verifyPlayer(User discord, String mcName, MessageReceivedEvent e){
+
+        e.getMember().modifyNickname(mcName);
+        e.getGuild().addRoleToMember(e.getMember(),e.getGuild().getRoleById("706081336590598165"));
+
+        e.getChannel().sendMessage("Linked " + discord.getAsMention() + " with the minecraft account " + mcName + "!").queue();
+        //Change nick, ranks ect
     }
 }
