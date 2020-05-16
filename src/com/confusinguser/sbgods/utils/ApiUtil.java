@@ -7,15 +7,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class ApiUtil {
 
@@ -588,6 +583,66 @@ public class ApiUtil {
 
         //main.logger.info("4");
         return discordName;
+    }
+
+    public void downloadFile(String urlStr, String fileLocation) throws IOException {
+        File file = new File(fileLocation);
+        if (!file.createNewFile()) {
+            downloadFile(urlStr, fileLocation + "_new");
+            return;
+        }
+
+        URL url = new URL(urlStr);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("User-Agent", "Mozilla/5.0");
+        con.setRequestProperty("Authorization", "token f159901613c898cb80cdc39b3d8f89d2eb9f51bb");
+
+        BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
+        FileOutputStream fis = new FileOutputStream(file);
+        byte[] buffer = new byte[1024];
+        int count;
+        while ((count = bis.read(buffer, 0, 1024)) != -1) {
+            fis.write(buffer, 0, count);
+        }
+        fis.close();
+        bis.close();
+    }
+
+    public Map.Entry<String, String> getLatestReleaseUrl() {
+        StringBuffer response = null;
+        HttpURLConnection con;
+        try {
+            URL url = new URL("https://api.github.com/repos/confusinguser/SBGods-Discord-Bot/releases");
+
+            con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("User-Agent", "Mozilla/5.0");
+            con.setRequestProperty("Authorization", "token f159901613c898cb80cdc39b3d8f89d2eb9f51bb");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            response = new StringBuffer();
+
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+        } catch (IOException e) {
+            main.logger.warning("Could not download latest release: " + e.toString() + Arrays.toString(e.getStackTrace()));
+        }
+
+        if (response == null) {
+            return new AbstractMap.SimpleImmutableEntry<>("","");
+        }
+        try {
+            JSONArray output = new JSONArray(response.toString());
+            return new AbstractMap.SimpleImmutableEntry<>(output.getJSONObject(0).getJSONArray("assets").getJSONObject(0).getString("name"),
+                    output.getJSONObject(0).getJSONArray("assets").getJSONObject(0).getString("url")); // TODO - see if index 0 is first or last release
+        } catch (JSONException e) {
+            return new AbstractMap.SimpleImmutableEntry<>("","");
+        }
     }
 }
 

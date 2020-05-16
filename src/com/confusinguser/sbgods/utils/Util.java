@@ -4,10 +4,12 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SlayerExp;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 
-import java.nio.channels.Channel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -133,11 +135,8 @@ public class Util {
             for (Role role : discord.getRolesByName("Verified",true)) {
                 try {
                     discord.addRoleToMember(member, role).complete();
-
                 } catch (HierarchyException ignored) {}
             }
         }
-        //Change nick, ranks ect
-
     }
 }

@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DiscordBot {
-    private final static String creatorId = "244786205873405952";
     private final SBGods main;
     private final SlayerCommand slayerCommand;
     private final SkillCommand skillCommand;
