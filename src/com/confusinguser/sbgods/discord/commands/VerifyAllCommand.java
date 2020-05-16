@@ -39,6 +39,7 @@ public class VerifyAllCommand extends Command implements EventListener {
         }
 
         main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
+        e.getChannel().sendMessage("Attempting to auto-verify all players!").queue();
 
         for(Member member : e.getGuild().getMembers()) {
             main.logger.fine("Attempting to auto-verify " + member.getUser().getAsTag());
@@ -47,9 +48,11 @@ public class VerifyAllCommand extends Command implements EventListener {
 
             if (!mcName.equals("")) {
                 // Verify them automaticly!
-                main.getUtil().verifyPlayer(member, mcName, e.getGuild());
-                e.getChannel().sendMessage("Linked " + e.getAuthor().getAsTag() + " with the minecraft account " + mcName + "!").queue();
+                main.getUtil().verifyPlayer(member, mcName, e.getGuild(), e.getChannel());
             }
         }
+
+
+        e.getChannel().sendMessage("Auto-verify all players complete!").queue();
     }
 }

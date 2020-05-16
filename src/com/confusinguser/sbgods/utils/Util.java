@@ -4,11 +4,10 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SlayerExp;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 
+import java.nio.channels.Channel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +110,7 @@ public class Util {
         return output;
     }
 
-    public void verifyPlayer(Member member, String mcName, Guild discord) {
+    public void verifyPlayer(Member member, String mcName, Guild discord, MessageChannel chan) {
         DiscordServer discordServer = DiscordServer.getDiscordServerFromDiscordGuild(discord);
         if (discordServer == null) {
             return;
@@ -123,13 +122,22 @@ public class Util {
 
         List<String> roleNames = discord.getRoles().stream().map(Role::getName).collect(Collectors.toList()); // Make a list of all role names in the member
 
+        if(!member.getRoles().stream().map(Role::getName).collect(Collectors.toList()).contains("Verified")){
+            //doesent have verifyied role... adding it
+
+            chan.sendMessage("Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "!").queue();
+
+        }
+
         if (roleNames.contains("Verified")) {
             for (Role role : discord.getRolesByName("Verified",true)) {
                 try {
                     discord.addRoleToMember(member, role).complete();
+
                 } catch (HierarchyException ignored) {}
             }
         }
         //Change nick, ranks ect
+
     }
 }
