@@ -125,22 +125,17 @@ public class Util {
 
         List<String> roleNames = discord.getRoles().stream().map(Role::getName).collect(Collectors.toList()); // Make a list of all role names in the member
 
-        Boolean sendMsg = false;
-        if(!member.getRoles().stream().map(Role::getName).collect(Collectors.toList()).contains("Verified")){
-            //doesent have verifyied role... adding it
-
-            sendMsg = true;
-
-        }
+        boolean sendMsg = false;
 
         if (roleNames.contains("Verified")) {
             for (Role role : discord.getRolesByName("Verified",true)) {
                 try {
                     discord.addRoleToMember(member, role).complete();
+                    sendMsg = true;
                 } catch (HierarchyException ignored) {}
             }
         }
-        //Add guild roles if they are in one
+        // Add guild roles if they are in one
 
         Player thePlayer = main.getApiUtil().getPlayerFromUsername(mcName);
         if (thePlayer.getSkyblockProfiles().isEmpty()) {

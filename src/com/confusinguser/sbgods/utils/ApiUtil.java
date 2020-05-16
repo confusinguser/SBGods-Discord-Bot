@@ -26,13 +26,13 @@ public class ApiUtil {
         REQUEST_RATE = 30 * main.keys.length;
     }
 
-    private String getResponse(String url_string, Integer cacheTime) {
+    private String getResponse(String url_string, int cacheTime) {
 
         // See if request already in cache
         Response cacheResponse = main.getCacheUtil().getCachedResponse(main.getCacheUtil().stripUnnecesaryInfo(url_string));
         String cacheResponseStr = cacheResponse.getJson();
         long current = System.currentTimeMillis();
-        if (cacheResponse != null && (current-cacheResponse.getTimeStamp()) < cacheTime) {
+        if (cacheResponseStr != null && current - cacheResponse.getTimeStamp() < cacheTime) {
             return cacheResponseStr;
         }
 
@@ -198,7 +198,7 @@ public class ApiUtil {
         String username;
         String uuid;
         String discord;
-        Boolean online;
+        boolean online;
         JSONObject profiles;
         try {
             uuid = jsonObject.getJSONObject("player").getString("uuid");
@@ -227,7 +227,7 @@ public class ApiUtil {
         String username;
         String uuid;
         String discord;
-        Boolean online;
+        boolean online;
         JSONObject profiles;
         try {
             uuid = jsonObject.getJSONObject("player").getString("uuid");
@@ -257,7 +257,7 @@ public class ApiUtil {
 
         Player thePlayer = getSkyblockPlayerFromUUID(playerUUID);
 
-        Integer cacheTime = 60000;
+        int cacheTime = 60000;
 
         if(!thePlayer.getIsOnline()){
             cacheTime = 3600000; //1h
@@ -279,9 +279,7 @@ public class ApiUtil {
             for (String slayer_type : Constants.slayer_types) {
                 try {
                     output.put(slayer_type, output.get(slayer_type) + jsonObject.getJSONObject(slayer_type).getInt("xp"));
-                } catch (JSONException e) {
-                    continue;
-                }
+                } catch (JSONException ignored) {}
             }
         }
         return new SlayerExp(output);
@@ -573,12 +571,8 @@ public class ApiUtil {
 
     }
 
-    public String setDiscNameFromMc(String mcName, String discordName) {
-
-        String response = getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/setDiscordMcName.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace("#","*") + "&mc=" + mcName);
-
-        //main.logger.info("4");
-        return discordName;
+    public void setDiscNameFromMc(String mcName, String discordName) {
+        String response = getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/setDiscordMcName.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace("#","*").replace(" ","%20") + "&mc=" + mcName);
     }
 
     public void downloadFile(String urlStr, String fileLocation) throws IOException {
@@ -639,6 +633,10 @@ public class ApiUtil {
         } catch (JSONException e) {
             return new AbstractMap.SimpleImmutableEntry<>("","");
         }
+    }
+
+    public void getTaxData() {
+
     }
 }
 
