@@ -50,6 +50,12 @@ public class AHCommand extends Command implements EventListener {
         e.getChannel().deleteMessageById(messageId).queue();
 
         //main.logger.info("Loaded player auctions");
+        if(playerAuctions.length == 0){
+            e.getChannel().sendMessage(args[1] + " has no active auctions!").queue();
+        }else{
+
+            e.getChannel().sendMessage(args[1] + " (and coop)'s Auctions!").queue();
+        }
 
         for (int i=0;i<playerAuctions.length;i++) {
             AHItem item = playerAuctions.getItems()[i];
@@ -68,9 +74,6 @@ public class AHCommand extends Command implements EventListener {
         }
         //main.logger.info("sending messages... (" + playerAuctions.length + ")");
 
-        if(playerAuctions.length == 0){
-            e.getChannel().sendMessage(args[1] + " has no active auctions!").queue();
-        }
 
     }
 }
