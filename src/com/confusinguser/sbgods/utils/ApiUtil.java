@@ -578,7 +578,7 @@ public class ApiUtil {
     public void downloadFile(String urlStr, String fileLocation) throws IOException {
         File file = new File(fileLocation);
         if (!file.createNewFile()) {
-            downloadFile(urlStr, fileLocation + "_new");
+            downloadFile(urlStr, fileLocation.replace(".jar", "") + "_new.jar");
             return;
         }
 
@@ -635,8 +635,8 @@ public class ApiUtil {
         }
     }
 
-    public void getTaxData() {
-
-    }
+/*    public JSONObject getTaxData() {
+        return new JSONObject(getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getTaxData.json?key=HoVoiuWfpdAjJhfTj0YN"));
+    }*/
 }
 

@@ -32,7 +32,7 @@ public class SbgodsCommand extends Command implements EventListener {
         String[] args = e.getMessage().getContentRaw().split(" ");
 
         if (args.length == 1) {
-            e.getChannel().sendMessage("Invalid argument! Valid argument: `version`!").queue();
+            e.getChannel().sendMessage("Invalid argument! Valid arguments: `version`, `update`!").queue();
             return;
         }
 

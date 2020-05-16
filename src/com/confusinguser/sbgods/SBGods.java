@@ -9,11 +9,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SBGods {
-    public static final String VERSION = "0.7.5";
-    public static final String VERSION_DESCRIPTION = "Fixes and Patches";
+    public static final String VERSION = "0.7.6";
+    public static final String VERSION_DESCRIPTION = "Auto updater, -ah (soopy is helping with the bot too now yay!)";
     private static final String CREATOR_ID = "244786205873405952";
-    // private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
-    private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
+    private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
+//    private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
     private static SBGods instance;
     public final String[] keys = {"bc90572a-1547-41a5-8f28-d7664916a28d", "3963906e-ffb6-45b9-b07b-80ca9838eb20"};
     public final Logger logger = Logger.getLogger(this.getClass().getName());
