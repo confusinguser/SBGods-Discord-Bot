@@ -107,8 +107,14 @@ public class Util {
     public void verifyPlayer(User discord, String mcName, MessageReceivedEvent e){
 
         e.getMember().modifyNickname(mcName);
-        e.getGuild().addRoleToMember(e.getMember(),e.getGuild().getRoleById("706081336590598165"));
-
+        try {
+            e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById("706081336590598165"));
+        }
+        catch(Exception ex){}
+        try {
+            e.getGuild().addRoleToMember(e.getMember(), e.getGuild().getRoleById("711011937109934141"));
+        }
+        catch(Exception ex){}
         e.getChannel().sendMessage("Linked " + discord.getAsMention() + " with the minecraft account " + mcName + "!").queue();
         //Change nick, ranks ect
     }
