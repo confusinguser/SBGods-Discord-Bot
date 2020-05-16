@@ -46,19 +46,19 @@ public class VerifyAllCommand extends Command implements EventListener {
             for(Member member : e.getGuild().getMembers()) {
                 for (Role role : e.getGuild().getRolesByName("SBG Guild Member",true)) {
                     try {
-                        e.getGuild().removeRoleFromMember(member, role).complete();
+                        e.getGuild().removeRoleFromMember(member, role).queue();
 
                     } catch (HierarchyException ignored) {}
                 }
                 for (Role role : e.getGuild().getRolesByName("SBF Guild Member",true)) {
                     try {
-                        e.getGuild().removeRoleFromMember(member, role).complete();
+                        e.getGuild().removeRoleFromMember(member, role).queue();
 
                     } catch (HierarchyException ignored) {}
                 }
                 for (Role role : e.getGuild().getRolesByName("Verified",true)) {
                     try {
-                        e.getGuild().removeRoleFromMember(member, role).complete();
+                        e.getGuild().removeRoleFromMember(member, role).queue();
 
                     } catch (HierarchyException ignored) {}
                 }
@@ -75,7 +75,7 @@ public class VerifyAllCommand extends Command implements EventListener {
             for(Member member : e.getGuild().getMembers()) {
                 for (Role role : e.getGuild().getRolesByName("Verified",true)) {
                     try {
-                        e.getGuild().removeRoleFromMember(member, role).complete();
+                        e.getGuild().removeRoleFromMember(member, role).queue();
 
                     } catch (HierarchyException ignored) {}
                 }
