@@ -643,7 +643,7 @@ public class ApiUtil {
     }
 
     public void setTaxData(JSONObject data) {
-        HttpURLConnection con = null;
+        HttpURLConnection con;
         IOException ioException = null;
         try {
             URL url = new URL("https://soopymc.my.to/api/sbgDiscord/updateTaxData.json?key=HoVoiuWfpdAjJhfTj0YN");

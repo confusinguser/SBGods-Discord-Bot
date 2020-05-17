@@ -27,8 +27,8 @@ public class VerifyCommand extends Command implements EventListener {
             return;
         }
 
-        if(!e.getChannel().getName().equalsIgnoreCase("Verify")){
-            e.getChannel().sendMessage("Sorry but this command cant be used here.").queue();
+        if(!e.getChannel().getName().equalsIgnoreCase("verify")){
+            e.getChannel().sendMessage("This command cant be used here.").queue();
             return;
         }
 
@@ -43,27 +43,41 @@ public class VerifyCommand extends Command implements EventListener {
             Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
             if (player.getDiscordTag().equalsIgnoreCase(e.getAuthor().getAsTag())) {
 
-                main.getUtil().verifyPlayer(e.getMember(), player.getDisplayName(), e.getGuild(), e.getChannel());
-                main.logger.info("Added " + currentDiscordServer.toString() + " verified role to " + e.getAuthor().getAsTag());
+                String responseId = main.getUtil().verifyPlayer(e.getMember(), player.getDisplayName(), e.getGuild(), e.getChannel());
+                main.logger.fine("Added " + currentDiscordServer.toString() + " verified role to " + e.getAuthor().getAsTag());
+
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+
+                e.getChannel().deleteMessageById(e.getMessageId());
+                e.getChannel().deleteMessageById(responseId);
                 return;
             }
 
             // Send error message saying to link discord account with mc
-            e.getChannel().sendMessage(e.getAuthor().getAsMention() + " You need to link your minecraft account with discord (through hypixel social media settings) then run this command again.").queue();
+            e.getChannel().sendMessage(e.getAuthor().getAsMention() + " You need to link your minecraft account with discord (see the welcome channel) then run this command again.").queue();
             return;
         }
 
         String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag().replace("#","*"));
         if (mcName.equals("")) {
-
-
             e.getChannel().sendMessage("There was a error auto-detecting your minecraft ign... please do -verify {ign}").queue();
             // Send error saying that auto-detect failed and they need to enter their username
             return;
         }
 
         // Verify player with mc name mcName
-        main.getUtil().verifyPlayer(e.getMember(),mcName, e.getGuild(), e.getChannel());
+        String responseId = main.getUtil().verifyPlayer(e.getMember(), mcName, e.getGuild(), e.getChannel());
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
 
+        e.getChannel().deleteMessageById(e.getMessageId());
+        e.getChannel().deleteMessageById(responseId);
     }
 }

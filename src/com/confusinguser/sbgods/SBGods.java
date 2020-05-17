@@ -46,7 +46,7 @@ public class SBGods {
             handler.setLevel(Level.FINEST); // Make handler send fine events
             logger.setLevel(Level.FINEST); // Show all logging events
         }
-        
+
         this.apiutil = new ApiUtil(this);
         this.util = new Util(this);
         this.sbUtil = new SBUtil(this);
