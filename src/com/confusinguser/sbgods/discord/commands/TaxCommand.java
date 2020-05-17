@@ -68,7 +68,7 @@ public class TaxCommand extends Command implements EventListener {
 		DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromEvent(e);
 
 		if (args.length <= 1) {
-			e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `info`!").queue();
+			e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `info`, `setrole`!").queue();
 			return;
 		}
 		if (args[1].equalsIgnoreCase("paid")) {
@@ -334,7 +334,36 @@ public class TaxCommand extends Command implements EventListener {
 
 			return;
 		}
-		e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `info`!").queue();
+
+		if (args[1].equalsIgnoreCase("setrole")) {
+			if (args.length <= 3) {
+				e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " setrole <IGN> <ROLE>`!").queue();
+				return;
+			}
+
+			String messageId = e.getChannel().sendMessage("...").complete().getId();
+
+			e.getChannel().sendTyping().queue();
+			Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
+
+			e.getChannel().sendTyping().queue();
+			TaxPayer taxPayer = main.getApiUtil().getTaxPayer(thePlayer);
+
+			taxPayer.setRole(args[3]);
+
+			e.getChannel().sendTyping().queue();
+			taxPayer.sendDataToServer();
+
+			e.getChannel().deleteMessageById(messageId).queue();
+
+			e.getChannel().sendMessage("Success, this is the players current tax info:").queue();
+
+			e.getChannel().sendTyping().queue();
+			taxPayer.sendDataToDiscord(e.getChannel());
+
+			return;
+		}
+		e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `info`, `setrole`!").queue();
 
 		return;
 	}
