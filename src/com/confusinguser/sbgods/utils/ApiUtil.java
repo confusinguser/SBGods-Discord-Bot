@@ -10,6 +10,8 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class ApiUtil {
@@ -27,7 +29,7 @@ public class ApiUtil {
         REQUEST_RATE = 30 * main.keys.length;
     }
 
-    private String getResponse(String url_string, int cacheTime) {
+    public String getResponse(String url_string, int cacheTime) {
 
         // See if request already in cache
         Response cacheResponse = main.getCacheUtil().getCachedResponse(main.getCacheUtil().stripUnnecesaryInfo(url_string));
@@ -114,7 +116,7 @@ public class ApiUtil {
         return response.toString();
     }
 
-    private String getNonHypixelResponse(String url_string) {
+    public String getNonHypixelResponse(String url_string) {
 
         StringBuffer response = null;
         HttpURLConnection con = null;
@@ -184,15 +186,15 @@ public class ApiUtil {
         for (int i = 0; i < members.length(); i++) {
             JSONObject currentMember = members.getJSONObject(i);
             String uuid = currentMember.getString("uuid");
-            output.add(new Player(uuid, null, null, false, null));
+            output.add(new Player(uuid, null, null, false, null, main));
         }
 
         return output;
     }
 
-    public Player getSkyblockPlayerFromUUID(String UUID) {
+    public Player getPlayerFromUUID(String UUID) {
         String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&uuid=" + UUID, 300000);
-        if (response == null) return new Player();
+        if (response == null) return new Player(main);
 
         JSONObject jsonObject = new JSONObject(response);
         String username;
@@ -206,7 +208,7 @@ public class ApiUtil {
             profiles = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
             online = jsonObject.getJSONObject("player").getLong("lastLogin") > jsonObject.getJSONObject("player").getLong("lastLogout");
         } catch (JSONException e) {
-            return new Player();
+            return new Player(main);
         }
         try {
             // Does not necessarily exist while the other things above have to.
@@ -216,12 +218,12 @@ public class ApiUtil {
             discord = "";
         }
 
-        return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()));
+        return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()), main);
     }
 
     public Player getPlayerFromUsername(String name) {
         String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&name=" + name, 300000);
-        if (response == null) return new Player();
+        if (response == null) return new Player(main);
 
         JSONObject jsonObject = new JSONObject(response);
         String username;
@@ -235,7 +237,7 @@ public class ApiUtil {
             profiles = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
             online = jsonObject.getJSONObject("player").getLong("lastLogin") > jsonObject.getJSONObject("player").getLong("lastLogout");
         } catch (JSONException e) {
-            return new Player();
+            return new Player(main);
         }
         try {
             // Does not necessarily exist while the other things above have to.
@@ -245,7 +247,7 @@ public class ApiUtil {
             discord = "";
         }
 
-        return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()));
+        return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()), main);
     }
 
 
@@ -255,7 +257,7 @@ public class ApiUtil {
             output.put(slayer_type, 0);
         }
 
-        Player thePlayer = getSkyblockPlayerFromUUID(playerUUID);
+        Player thePlayer = getPlayerFromUUID(playerUUID);
 
         int cacheTime = 60000;
 
@@ -464,7 +466,7 @@ public class ApiUtil {
     }
 
     public SkillLevels getBestPlayerSkillLevels(String uuid) {
-        Player thePlayer = getSkyblockPlayerFromUUID(uuid);
+        Player thePlayer = getPlayerFromUUID(uuid);
 
         if (thePlayer.getSkyblockProfiles().isEmpty()) {
             return null;
@@ -562,6 +564,7 @@ public class ApiUtil {
     }
 
     public String getMcNameFromDisc(String discordName) {
+        discordName = discordName.replace("#","*");
         try {
             String response = getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getMcNameFromDisc.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace(" ","%20"));
             if (response == null) return "";
@@ -642,31 +645,50 @@ public class ApiUtil {
         return new JSONObject(getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getTaxData.json?key=HoVoiuWfpdAjJhfTj0YN")).getJSONObject("tax");
     }
 
-    public TaxPayer getTaxPayer(String uuid) {
-        JSONObject taxData = getTaxData();
-        for (String guildStr : taxData.keySet()) {
-            if (taxData)
-            new TaxPayer(uuid, );
+    public TaxPayer getTaxPayer(Player player) {
 
-        }
+        JSONObject taxData = getTaxData();
+        JSONObject playerJson;
+        try {
+            playerJson = taxData.getJSONObject("guilds").getJSONObject(player.getGuildId()).getJSONObject("members").getJSONObject(player.getUUID());
+        }catch(Exception e){playerJson = null;}
+        return new TaxPayer(player.getUUID(), player.getDisplayName(), player.getGuildId(), playerJson, main);
     }
 
     public void setTaxData(JSONObject data) {
-        HttpURLConnection con;
+        //HttpURLConnection con;
         IOException ioException = null;
+
+        String dataString = data.toString(4);
+
         try {
             URL url = new URL("https://soopymc.my.to/api/sbgDiscord/updateTaxData.json?key=HoVoiuWfpdAjJhfTj0YN");
 
-            con = (HttpURLConnection) url.openConnection();
-            con.setDoOutput(true);
-            con.setRequestMethod("POST");
-            con.setRequestProperty("User-Agent", USER_AGENT);
-            con.setRequestProperty("Content-Type", "application/json");
-            con.setRequestProperty("Content-length", String.valueOf(data.toString().length()));
+//            con = (HttpURLConnection) url.openConnection();
+//            con.setDoOutput(true);
+//            con.setRequestMethod("POST");
+//            con.setRequestProperty("User-Agent", USER_AGENT);
+//            con.setRequestProperty("Content-Type", "application/json");
+//            con.setRequestProperty("Content-length", String.valueOf(dataString.length()));
+//
+//            DataOutputStream output = new DataOutputStream(con.getOutputStream());
+//            output.writeBytes(dataString);
+//            output.close();
 
-            DataOutputStream output = new DataOutputStream(con.getOutputStream());
-            output.writeBytes(data.toString());
-            output.close();
+            URLConnection con = url.openConnection();
+            HttpURLConnection http = (HttpURLConnection)con;
+            http.setRequestMethod("POST"); // PUT is another valid option
+            http.setDoOutput(true);
+
+            byte[] out = dataString.getBytes(StandardCharsets.UTF_8);
+            int length = out.length;
+
+            http.setFixedLengthStreamingMode(length);
+            http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            http.connect();
+            try(OutputStream os = http.getOutputStream()) {
+                os.write(out);
+            }
 
         } catch (IOException e) {
             main.logger.warning("Could not set tax data: " + e.getMessage() + e);

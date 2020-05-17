@@ -99,7 +99,7 @@ public class VerifyAllCommand extends Command implements EventListener {
             e.getChannel().sendTyping().queue();
             main.logger.info("Attempting to auto-verify " + member.getUser().getAsTag());
 
-            String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag().replace("#", "*"));
+            String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag());
 
             if (!mcName.equals("")) {
                 // Verify them automaticly!

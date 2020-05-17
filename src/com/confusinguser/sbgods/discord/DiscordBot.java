@@ -28,6 +28,7 @@ public class DiscordBot {
     private final AHCommand ahCommand;
     private final VerifyCommand verifyCommand;
     private final VerifyAllCommand verifyAllCommand;
+    private final TaxCommand taxCommand;
     private final ArrayList<Command> commands;
     public String commandPrefix = "-";
     public SettingsCommand settingsCommand;
@@ -49,12 +50,13 @@ public class DiscordBot {
         ahCommand = new AHCommand(main, this);
         verifyCommand = new VerifyCommand(main, this);
         verifyAllCommand = new VerifyAllCommand(main, this);
+        taxCommand = new TaxCommand(main, this);
         // applyCommand = new ApplyCommand(main, this);
         // importApplicationCommand = new ImportApplicationCommand(main, this);
         // inviteQueueCommand = new InviteQueueCommand(main, this);
         // settingsCommand = new SettingsCommand(main, this);
 
-        commands = new ArrayList<>(Arrays.asList(slayerCommand, skillCommand, skillExpCommand, helpCommand, sbgodsCommand, whatguildCommand, petsCommand, killsCommand, deathsCommand, ahCommand, verifyCommand, verifyAllCommand));
+        commands = new ArrayList<>(Arrays.asList(slayerCommand, skillCommand, skillExpCommand, helpCommand, sbgodsCommand, whatguildCommand, petsCommand, killsCommand, deathsCommand, ahCommand, verifyCommand, verifyAllCommand, taxCommand));
 
         JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT)
                 .setToken(token)

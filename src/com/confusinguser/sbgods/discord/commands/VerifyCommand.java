@@ -62,7 +62,7 @@ public class VerifyCommand extends Command implements EventListener {
             return;
         }
 
-        String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag().replace("#","*"));
+        String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag());
         if (mcName.equals("")) {
             e.getChannel().sendMessage("There was a error auto-detecting your minecraft ign... please do -verify {ign}").queue();
             // Send error saying that auto-detect failed and they need to enter their username

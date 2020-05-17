@@ -50,7 +50,7 @@ public class LeaderboardUpdater implements Runnable {
         guild.setPlayerSize(guildMembers.size());
 
         for (int i = 0; i < guildMembers.size(); i++) {
-            Player thePlayer = main.getApiUtil().getSkyblockPlayerFromUUID(guildMembers.get(i).getUUID());
+            Player thePlayer = main.getApiUtil().getPlayerFromUUID(guildMembers.get(i).getUUID());
 
             SkillLevels highestSkillLevels = new SkillLevels();
             // Get avg. skill level of the profile that has the highest
@@ -82,7 +82,7 @@ public class LeaderboardUpdater implements Runnable {
 
         for (int i = 0; i < guildMembers.size(); i++) {
             String UUID = guildMembers.get(i).getUUID();
-            Player thePlayer = main.getApiUtil().getSkyblockPlayerFromUUID(UUID);
+            Player thePlayer = main.getApiUtil().getPlayerFromUUID(UUID);
             usernameSlayerXP.put(thePlayer.getDisplayName(), main.getApiUtil().getPlayerSlayerExp(UUID));
             guild.setSlayerProgress(i + 1);
         }
