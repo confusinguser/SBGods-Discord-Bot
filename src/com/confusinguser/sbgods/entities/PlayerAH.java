@@ -16,7 +16,7 @@ public class PlayerAH {
         this.isError = true;
     }
 
-    public boolean getIsError() {
+    public boolean isError() {
         return isError;
     }
 

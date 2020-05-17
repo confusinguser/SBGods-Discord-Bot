@@ -21,7 +21,7 @@ public class KillsCommand extends Command {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().isBot() || !isTheCommand(e) || !discord.shouldRun(e)) {
+        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
             return;
         }
 

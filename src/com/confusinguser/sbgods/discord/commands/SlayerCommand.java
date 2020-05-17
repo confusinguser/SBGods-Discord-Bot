@@ -26,7 +26,7 @@ public class SlayerCommand extends Command implements EventListener {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().isBot() || !isTheCommand(e) || !discord.shouldRun(e)) {
+        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
             return;
         }
 
@@ -146,11 +146,10 @@ public class SlayerCommand extends Command implements EventListener {
 
                 e.getChannel().deleteMessageById(messageId).queue();
                 e.getChannel().sendMessage(embedBuilder.build()).queue();
-                return;
             } else {
                 e.getChannel().editMessageById(messageId, "Invalid usage! Usage: *" + this.getName() + " player <IGN>*").queue();
-                return;
             }
+            return;
         }
 
         e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();

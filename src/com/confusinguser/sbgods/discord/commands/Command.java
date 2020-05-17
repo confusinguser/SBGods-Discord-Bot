@@ -12,14 +12,14 @@ public class Command extends ListenerAdapter {
     String usage;
     String[] aliases;
 
-    boolean isTheCommand(MessageReceivedEvent e) {
+    boolean isNotTheCommand(MessageReceivedEvent e) {
         if (e.getMessage().getContentRaw().toLowerCase().split(" ")[0].contentEquals(discord.commandPrefix + this.getName()))
-            return true;
+            return false;
         for (String alias : aliases) {
             if (e.getMessage().getContentRaw().toLowerCase().split(" ")[0].contentEquals(discord.commandPrefix + alias))
-                return true;
+                return false;
         }
-        return false;
+        return true;
     }
 
     public String getName() {

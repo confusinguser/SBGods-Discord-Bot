@@ -9,17 +9,12 @@ import org.json.JSONObject;
 import java.util.Comparator;
 
 public class TaxPayer {
-    public static Comparator<TaxPayer> owesComparator = new Comparator<TaxPayer>() {
-        @Override
-        public int compare(TaxPayer tp1, TaxPayer tp2) {
-            return (Integer.compare(tp1.getOwes(), tp2.getOwes()));
-        }
-    };
+    public static final Comparator<TaxPayer> owesComparator = (tp1, tp2) -> (Integer.compare(tp1.getOwes(), tp2.getOwes()));
     private final String uuid;
     private final String name;
     private final String guildId;
     private final SBGods main;
-    private JSONObject jsonData;
+    private final JSONObject jsonData;
 
     public TaxPayer(String uuid, String name, String guildId, JSONObject jsonData, SBGods main) {
         this.uuid = uuid;
@@ -28,10 +23,6 @@ public class TaxPayer {
         this.jsonData = jsonData;
         this.main = main;
 
-        init();
-    }
-
-    private void init() {
         if (jsonData == null) {
             jsonData = new JSONObject();
             jsonData.put("owes", 0);
@@ -83,8 +74,7 @@ public class TaxPayer {
 
         try {
             taxData.getJSONObject("guilds").getJSONObject(guildId).getJSONObject("members").remove(uuid);
-        } catch (JSONException ignore) {
-        }
+        } catch (JSONException ignore) {}
 
         taxData.getJSONObject("guilds").getJSONObject(guildId).getJSONObject("members").put(uuid, jsonData);
 

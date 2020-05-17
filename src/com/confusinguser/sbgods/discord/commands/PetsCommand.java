@@ -24,7 +24,7 @@ public class PetsCommand extends Command implements EventListener {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().isBot() || !isTheCommand(e) || !discord.shouldRun(e)) {
+        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
             return;
         }
 
@@ -66,7 +66,7 @@ public class PetsCommand extends Command implements EventListener {
             }
         }
 
-        embedBuilder = embedBuilder.setDescription(descriptionBuilder.toString());
+        embedBuilder.setDescription(descriptionBuilder.toString());
         embedBuilder.setColor(new Color(colorRandom.nextFloat(), colorRandom.nextFloat(), colorRandom.nextFloat()));
 
         e.getChannel().deleteMessageById(messageId).queue();

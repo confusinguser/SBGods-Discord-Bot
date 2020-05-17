@@ -21,7 +21,7 @@ public class AHCommand extends Command implements EventListener {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().isBot() || !isTheCommand(e) || !discord.shouldRun(e)) {
+        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
             return;
         }
 
@@ -39,7 +39,7 @@ public class AHCommand extends Command implements EventListener {
 
         PlayerAH playerAuctions = main.getApiUtil().getPlayerAHFromUsername(args[1], messageId, e);
 
-        if (playerAuctions.getIsError()) {
+        if (playerAuctions.isError()) {
             e.getChannel().editMessageById(messageId, playerAuctions.getError()).queue();
             return;
         }

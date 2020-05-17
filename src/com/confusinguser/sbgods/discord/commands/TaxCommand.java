@@ -13,7 +13,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class TaxCommand extends Command implements EventListener {
@@ -27,7 +26,7 @@ public class TaxCommand extends Command implements EventListener {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().isBot() || !isTheCommand(e) || !discord.shouldRun(e)) {
+        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
             return;
         }
 
@@ -96,16 +95,16 @@ public class TaxCommand extends Command implements EventListener {
             return;
         }
 
-        if (args[1].equalsIgnoreCase("paidall") || args[1].equalsIgnoreCase("paydall")) {
+        if (args[1].equalsIgnoreCase("paidall") || args[1].equalsIgnoreCase("paydall")) { // "paydall"... SERIOUSLY?!
             if (args.length <= 2) {
                 e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " paidall <amount> [role]`!").queue();
                 return;
             }
-            String role = "";
+
             int amount = -Integer.parseInt(args[2]);
+            String role = "";
             if (args.length == 4) {
                 role = args[3];
-                return;
             }
 
             ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
@@ -139,8 +138,7 @@ public class TaxCommand extends Command implements EventListener {
 
                         try {
                             taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").remove(guildMember.getUUID());
-                        } catch (JSONException ignore) {
-                        }
+                        } catch (JSONException ignore) {}
 
                         taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").put(guildMember.getUUID(), taxPayer.getJSON());
 
@@ -203,7 +201,6 @@ public class TaxCommand extends Command implements EventListener {
             int amount = Integer.parseInt(args[2]);
             if (args.length == 4) {
                 role = args[3];
-                return;
             }
 
             ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
@@ -300,9 +297,7 @@ public class TaxCommand extends Command implements EventListener {
 
             ArrayList<TaxPayer> taxPayers = new ArrayList<>();
             for (String playerUuid : playerUuids) {
-                JSONObject taxPayerJson = null;
-                taxPayerJson = taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").getJSONObject(playerUuid);
-
+                JSONObject taxPayerJson = taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").getJSONObject(playerUuid);
 
                 if (taxPayerJson != null) {
                     if (taxPayerJson.getInt("owes") > minToShow) {
@@ -311,22 +306,21 @@ public class TaxCommand extends Command implements EventListener {
                 }
             }
 
-            Collections.sort(taxPayers, TaxPayer.owesComparator);
+            taxPayers.sort(TaxPayer.owesComparator);
 
             e.getChannel().deleteMessageById(messageId);
 
-            String message = "";
+            StringBuilder message = new StringBuilder();
 
             for (TaxPayer taxPayer : taxPayers) {
-                message += taxPayer.getName() + " owes **" + taxPayer.getOwes() + "**\n";
+                message.append(taxPayer.getName()).append(" owes **").append(taxPayer.getOwes()).append("**\n");
             }
 
             e.getChannel().deleteMessageById(messageId);
 
-            List<String> responseList = main.getUtil().processMessageForDiscord(message, 2000);
+            List<String> responseList = main.getUtil().processMessageForDiscord(message.toString(), 2000);
 
-            for (int j = 0; j < responseList.size(); j++) {
-                String messageI = responseList.get(j);
+            for (String messageI : responseList) {
                 e.getChannel().sendMessage(messageI).queue();
             }
 
@@ -363,6 +357,5 @@ public class TaxCommand extends Command implements EventListener {
 		}
 		e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `info`, `setrole`!").queue();
 
-        return;
     }
 }

@@ -85,12 +85,12 @@ public class DiscordBot {
         return jda;
     }
 
-    public boolean shouldRun(MessageReceivedEvent e) {
-        if (main.getActiveServers() == null) return true;
+    public boolean shouldNotRun(MessageReceivedEvent e) {
+        if (main.getActiveServers() == null) return false;
         for (DiscordServer server : main.getActiveServers()) {
-            if (e.getGuild().getId().contentEquals(server.getServerId())) return true;
+            if (e.getGuild().getId().contentEquals(server.getServerId())) return false;
         }
-        return false;
+        return true;
     }
 
     public String escapeMarkdown(String text) {

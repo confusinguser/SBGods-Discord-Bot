@@ -25,7 +25,7 @@ public class SkillExpCommand extends Command implements EventListener {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().isBot() || !isTheCommand(e) || !discord.shouldRun(e)) {
+        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
             return;
         }
         DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromEvent(e);
@@ -190,12 +190,11 @@ public class SkillExpCommand extends Command implements EventListener {
                         .toString());
 
                 channel.sendMessage(embedBuilder.build()).queue();
-                return;
 
             } else {
                 channel.sendMessage("Invalid usage! Usage: *" + getName() + " player <IGN>*").queue();
-                return;
             }
+            return;
         }
 
         channel.sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();

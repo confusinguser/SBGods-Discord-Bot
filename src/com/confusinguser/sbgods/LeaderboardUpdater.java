@@ -5,6 +5,9 @@ import com.confusinguser.sbgods.entities.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class LeaderboardUpdater implements Runnable {
 
@@ -23,7 +26,8 @@ public class LeaderboardUpdater implements Runnable {
     }
 
     public void run() {
-        while (true) {
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        executor.scheduleAtFixedRate(() -> {
             if (System.currentTimeMillis() > 1589014800000L && !alreadyran && System.currentTimeMillis() < 1589018400000L) {
                 // 11am 09-05-2020
                 alreadyran = true;
@@ -31,12 +35,7 @@ public class LeaderboardUpdater implements Runnable {
             }
             updateLeaderboardCacheForGuild(HypixelGuild.SBG);
             updateLeaderboardCacheForGuild(HypixelGuild.SBDG);
-            try {
-                Thread.sleep(9 * 60 * 1000); // 9 Minutes
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        }, 0, 9, TimeUnit.MINUTES);
     }
 
     private void updateLeaderboardCacheForGuild(HypixelGuild guild) {
