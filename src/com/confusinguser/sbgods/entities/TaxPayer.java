@@ -1,4 +1,4 @@
-/*package com.confusinguser.sbgods.entities;
+package com.confusinguser.sbgods.entities;
 
 import org.json.JSONObject;
 
@@ -26,4 +26,4 @@ public class TaxPayer {
 	public String toJson() {
 		return new JSONObject().put("weeksSinceLastPay", weeksSinceLastPay).put("ign", ign).toString();
 	}
-}*/
+}

@@ -3,6 +3,7 @@ package com.confusinguser.sbgods.discord.commands;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
+import com.confusinguser.sbgods.entities.Player;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 import org.json.JSONArray;
@@ -40,13 +41,18 @@ class TaxCommand extends Command implements EventListener {
 				return;
 			}
 
+			Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
+
 			JSONObject taxData = main.getApiUtil().getTaxData();
+			taxData = taxData.getJSONObject("tax");
 
 			for (String guild : taxData.keySet()) {
-				JSONArray guildPlayers = taxData.getJSONArray(guild);
+				JSONObject guildPlayers = taxData.getJSONObject(guild);
 				for (int i = 0; i < guildPlayers.length(); i++) {
 					try {
-						guildPlayers.getJSONObject(i).getJSONObject("name");
+						if (guildPlayers.getJSONObject(i).getString("name").equalsIgnoreCase(args[2])) {
+							taxData = taxData.
+						}
 					} catch (JSONException ignored) {}
 				}
 			}

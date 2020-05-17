@@ -639,7 +639,16 @@ public class ApiUtil {
     }
 
     public JSONObject getTaxData() {
-        return new JSONObject(getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getTaxData.json?key=HoVoiuWfpdAjJhfTj0YN"));
+        return new JSONObject(getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getTaxData.json?key=HoVoiuWfpdAjJhfTj0YN")).getJSONObject("tax");
+    }
+
+    public TaxPayer getTaxPayer(String uuid) {
+        JSONObject taxData = getTaxData();
+        for (String guildStr : taxData.keySet()) {
+            if (taxData)
+            new TaxPayer(uuid, );
+
+        }
     }
 
     public void setTaxData(JSONObject data) {
