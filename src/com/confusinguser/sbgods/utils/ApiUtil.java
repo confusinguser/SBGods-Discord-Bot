@@ -15,6 +15,7 @@ import java.util.*;
 public class ApiUtil {
 
     private final String BASE_URL = "https://api.hypixel.net/";
+    private final String USER_AGENT = "Mozilla/5.0";
     private final SBGods main;
     private int REQUEST_RATE; // unit: requests
     private long LAST_CHECK = System.currentTimeMillis();
@@ -65,7 +66,6 @@ public class ApiUtil {
 
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            String USER_AGENT = "Mozilla/5.0";
             con.setRequestProperty("User-Agent", USER_AGENT);
 
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -113,6 +113,7 @@ public class ApiUtil {
         fails = 0;
         return response.toString();
     }
+
     private String getNonHypixelResponse(String url_string) {
 
         StringBuffer response = null;
@@ -123,7 +124,6 @@ public class ApiUtil {
 
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            String USER_AGENT = "Mozilla/5.0";
             con.setRequestProperty("User-Agent", USER_AGENT);
 
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -623,7 +623,7 @@ public class ApiUtil {
             in.close();
 
         } catch (IOException e) {
-            main.logger.warning("Could not download latest release: " + e.toString() + Arrays.toString(e.getStackTrace()));
+            main.logger.warning("Could not download latest release: " + e.getMessage() + e);
         }
 
         if (response == null) {
@@ -638,7 +638,29 @@ public class ApiUtil {
         }
     }
 
-/*    public JSONObject getTaxData() {
+    public JSONObject getTaxData() {
         return new JSONObject(getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getTaxData.json?key=HoVoiuWfpdAjJhfTj0YN"));
-    }*/
+    }
+
+    public void setTaxData(JSONObject data) {
+        HttpURLConnection con = null;
+        IOException ioException = null;
+        try {
+            URL url = new URL("https://soopymc.my.to/api/sbgDiscord/updateTaxData.json?key=HoVoiuWfpdAjJhfTj0YN");
+
+            con = (HttpURLConnection) url.openConnection();
+            con.setDoOutput(true);
+            con.setRequestMethod("POST");
+            con.setRequestProperty("User-Agent", USER_AGENT);
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setRequestProperty("Content-length", String.valueOf(data.toString().length()));
+
+            DataOutputStream output = new DataOutputStream(con.getOutputStream());
+            output.writeBytes(data.toString());
+            output.close();
+
+        } catch (IOException e) {
+            main.logger.warning("Could not set tax data: " + e.getMessage() + e);
+        }
+    }
 }

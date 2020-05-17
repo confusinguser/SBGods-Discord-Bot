@@ -13,7 +13,6 @@ gradle
 bin
 classes
 out
-*.jar
 
 # Ignore Gradle build output directory
 build
@@ -21,4 +20,3 @@ build
 # Intellij Idea data
 .idea
 *.iml
-

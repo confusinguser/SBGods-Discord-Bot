@@ -1,11 +1,10 @@
-/*package com.confusinguser.sbgods.discord.commands;
+package com.confusinguser.sbgods.discord.commands;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
-import org.json.JSONObject;
 
 class TaxCommand extends Command implements EventListener {
 
@@ -29,18 +28,16 @@ class TaxCommand extends Command implements EventListener {
 		DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromEvent(e);
 		
 		if (args.length <= 1) {
-			e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `unpaid`, `adduser`!").queue();
+			e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `paidall`, `owe`, `oweall`, `owelist`!").queue();
 			return;
 		}
-		if (args[1].equalsIgnoreCase("paid")) {
+		if (args[1].equalsIgnoreCase("add")) {
 			if (args.length <= 2) {
-				e.getChannel().sendMessage("Invalid usage! Usage: *" + discord.commandPrefix + name + " paid <IGN>*!").queue();
+				e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " paid <IGN>`!").queue();
 				return;
 			} else {
-			    main.getJsonApiUtil().updateSettings(new JSONObject(main.getJsonApiUtil().getBotData()).getJSONArray("taxpayers").put(args[2]));
-
 
 			}
 		}
 	}
-}*/
+}

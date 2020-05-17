@@ -25,7 +25,6 @@ public class Util {
         this.main = main;
     }
 
-
     public Entry<String, Integer> getHighestKeyValuePair(Map<String, Integer> map, int position) {
         List<Entry<String, Integer>> list = new ArrayList<>(map.entrySet());
         list.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
