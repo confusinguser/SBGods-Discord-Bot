@@ -121,7 +121,8 @@ public class Util {
 
         try {
             member.modifyNickname(mcName).complete();
-        } catch (HierarchyException ignored) {} // Don't have perms to change nick
+        } catch (HierarchyException ignored) {
+        } // Don't have perms to change nick
 
         List<String> roleNames = discord.getRoles().stream().map(Role::getName).collect(Collectors.toList()); // Make a list of all role names in the member
         List<String> memberRoleNames = member.getRoles().stream().map(Role::getName).collect(Collectors.toList());
@@ -129,11 +130,12 @@ public class Util {
         boolean sendMsg = false;
 
         if (!memberRoleNames.contains("Verified")) {
-            for (Role role : discord.getRolesByName("Verified",true)) {
+            for (Role role : discord.getRolesByName("Verified", true)) {
                 try {
                     sendMsg = true;
                     discord.addRoleToMember(member, role).complete();
-                } catch (HierarchyException ignored) {}
+                } catch (HierarchyException ignored) {
+                }
             }
         }
         // Add guild roles if they are in one
@@ -151,46 +153,50 @@ public class Util {
 
 
         channel.sendTyping().queue();
-        if(guildName.equalsIgnoreCase("Skyblock Gods")){
-            for (Role role : discord.getRolesByName("SBG Guild Member",true)) {
+        if (guildName.equalsIgnoreCase("Skyblock Gods")) {
+            for (Role role : discord.getRolesByName("SBG Guild Member", true)) {
                 try {
                     discord.addRoleToMember(member, role).complete();
 
-                } catch (HierarchyException ignored) {}
+                } catch (HierarchyException ignored) {
+                }
 
                 guildDis = "SkyBlock Gods";
             }
-        }else{
-            for (Role role : discord.getRolesByName("SBG Guild Member",true)) {
+        } else {
+            for (Role role : discord.getRolesByName("SBG Guild Member", true)) {
                 try {
                     discord.removeRoleFromMember(member, role).complete();
-                } catch (HierarchyException ignored) {}
+                } catch (HierarchyException ignored) {
+                }
             }
         }
 
-        if(guildName.equalsIgnoreCase("Skyblock Forceful")){
-            for (Role role : discord.getRolesByName("SBF Guild Member",true)) {
+        if (guildName.equalsIgnoreCase("Skyblock Forceful")) {
+            for (Role role : discord.getRolesByName("SBF Guild Member", true)) {
                 try {
                     discord.addRoleToMember(member, role).complete();
 
-                } catch (HierarchyException ignored) {}
+                } catch (HierarchyException ignored) {
+                }
 
                 guildDis = "SkyBlock Forcefull";
             }
-        }else{
-            for (Role role : discord.getRolesByName("SBF Guild Member",true)) {
+        } else {
+            for (Role role : discord.getRolesByName("SBF Guild Member", true)) {
                 try {
                     discord.removeRoleFromMember(member, role).complete();
 
-                } catch (HierarchyException ignored) {}
+                } catch (HierarchyException ignored) {
+                }
             }
         }
 
         main.logger.info("Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "! (Guild: " + guildName + ")");
 
         channel.sendTyping().queue();
-        if(sendMsg) {
-            if(guildDis.isEmpty()) {
+        if (sendMsg) {
+            if (guildDis.isEmpty()) {
                 return channel.sendMessage("Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "!").complete().getId();
             } else {
                 return channel.sendMessage("Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "! (Guild: " + guildDis + ")").complete().getId();

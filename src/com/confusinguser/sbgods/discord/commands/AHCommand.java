@@ -16,7 +16,7 @@ public class AHCommand extends Command implements EventListener {
         this.discord = discord;
         this.name = "ah";
         this.usage = this.name + " <IGN>";
-        this.aliases = new String[] {};
+        this.aliases = new String[]{};
     }
 
     @Override
@@ -47,9 +47,9 @@ public class AHCommand extends Command implements EventListener {
         e.getChannel().deleteMessageById(messageId).queue();
 
         //main.logger.info("Loaded player auctions");
-        if(playerAuctions.length == 0){
+        if (playerAuctions.length == 0) {
             e.getChannel().sendMessage(args[1] + " has no active auctions!").queue();
-        }else{
+        } else {
 
             e.getChannel().sendMessage(args[1] + " (and coop)'s Auctions!").queue();
         }

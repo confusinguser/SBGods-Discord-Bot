@@ -100,7 +100,7 @@ public class ApiUtil {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
             }
-            return getResponse(url_string,cacheTime);
+            return getResponse(url_string, cacheTime);
 
         } else if (responseCode == 403) {
             main.logger.severe("The API key \"" + main.getCurrentApiKey() + "\" is invalid!");
@@ -261,7 +261,7 @@ public class ApiUtil {
 
         int cacheTime = 60000;
 
-        if(!thePlayer.getIsOnline()){
+        if (!thePlayer.getIsOnline()) {
             cacheTime = 3600000; //1h
         }
 
@@ -281,7 +281,8 @@ public class ApiUtil {
             for (String slayer_type : Constants.slayer_types) {
                 try {
                     output.put(slayer_type, output.get(slayer_type) + jsonObject.getJSONObject(slayer_type).getInt("xp"));
-                } catch (JSONException ignored) {}
+                } catch (JSONException ignored) {
+                }
             }
         }
         return new SlayerExp(output);
@@ -496,7 +497,8 @@ public class ApiUtil {
         e.getChannel().editMessageById(messageId, "Loading..").queue();
         e.getChannel().sendTyping().queue();
         String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&name=" + player, 300000);
-        if (response == null) return new PlayerAH("There was a error fetching that user's auctions, please try again later.");
+        if (response == null)
+            return new PlayerAH("There was a error fetching that user's auctions, please try again later.");
 
         JSONObject jsonObject = new JSONObject(response);
         JSONObject playerData = jsonObject;
@@ -515,14 +517,15 @@ public class ApiUtil {
         int amountLoops = playerData.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles").length();
         int loops = 0;
 
-        while(playerProfiles.hasNext()) {
+        while (playerProfiles.hasNext()) {
             String profileId = playerProfiles.next();
 
             //main.logger.info("Loading " + player + "'s " + playerData.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles").getJSONObject(profileId).getString("cute_name") + " data");
 
 
             response = getResponse(BASE_URL + "skyblock/auction" + "?key=" + main.getNextApiKey() + "&profile=" + profileId + "&uuid=" + playerId, 60000);
-            if (response == null) return new PlayerAH("There was a error fetching that user's auctions, please try again later.");
+            if (response == null)
+                return new PlayerAH("There was a error fetching that user's auctions, please try again later.");
 
             jsonObject = new JSONObject(response);
             JSONArray auctionJSONArray;
@@ -540,10 +543,10 @@ public class ApiUtil {
                 return new PlayerAH("There was a error fetching that user's auctions, please try again later.");
             }
 
-            for (int i = 0 ; i < auctionJSONArray.length(); i++) {
+            for (int i = 0; i < auctionJSONArray.length(); i++) {
                 JSONObject obj = auctionJSONArray.getJSONObject(i);
 
-                if(!obj.getBoolean("claimed")) {
+                if (!obj.getBoolean("claimed")) {
                     String itemName = obj.getString("item_name");
                     String itemTier = obj.getString("tier");
                     Long startingBid = obj.getLong("starting_bid");
@@ -564,21 +567,20 @@ public class ApiUtil {
     }
 
     public String getMcNameFromDisc(String discordName) {
-        discordName = discordName.replace("#","*");
+        discordName = discordName.replace("#", "*");
         try {
-            String response = getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getMcNameFromDisc.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace(" ","%20"));
+            String response = getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getMcNameFromDisc.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace(" ", "%20"));
             if (response == null) return "";
 
             return new JSONObject(response).getJSONObject("data").getString("mc");
-        }
-        catch (Exception err) {
+        } catch (Exception err) {
             return "";
         }
 
     }
 
     public void setDiscNameFromMc(String mcName, String discordName) {
-        String response = getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/setDiscordMcName.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace("#","*").replace(" ","%20") + "&mc=" + mcName);
+        String response = getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/setDiscordMcName.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace("#", "*").replace(" ", "%20") + "&mc=" + mcName);
     }
 
     public void downloadFile(String urlStr, String fileLocation) throws IOException {
@@ -630,29 +632,19 @@ public class ApiUtil {
         }
 
         if (response == null) {
-            return new AbstractMap.SimpleImmutableEntry<>("","");
+            return new AbstractMap.SimpleImmutableEntry<>("", "");
         }
         try {
             JSONArray output = new JSONArray(response.toString());
             return new AbstractMap.SimpleImmutableEntry<>(output.getJSONObject(0).getJSONArray("assets").getJSONObject(0).getString("name"),
                     output.getJSONObject(0).getJSONArray("assets").getJSONObject(0).getString("url")); // TODO - see if index 0 is first or last release
         } catch (JSONException e) {
-            return new AbstractMap.SimpleImmutableEntry<>("","");
+            return new AbstractMap.SimpleImmutableEntry<>("", "");
         }
     }
 
     public JSONObject getTaxData() {
         return new JSONObject(getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getTaxData.json?key=HoVoiuWfpdAjJhfTj0YN")).getJSONObject("tax");
-    }
-
-    public TaxPayer getTaxPayer(Player player) {
-
-        JSONObject taxData = getTaxData();
-        JSONObject playerJson;
-        try {
-            playerJson = taxData.getJSONObject("guilds").getJSONObject(player.getGuildId()).getJSONObject("members").getJSONObject(player.getUUID());
-        }catch(Exception e){playerJson = null;}
-        return new TaxPayer(player.getUUID(), player.getDisplayName(), player.getGuildId(), playerJson, main);
     }
 
     public void setTaxData(JSONObject data) {
@@ -676,7 +668,7 @@ public class ApiUtil {
 //            output.close();
 
             URLConnection con = url.openConnection();
-            HttpURLConnection http = (HttpURLConnection)con;
+            HttpURLConnection http = (HttpURLConnection) con;
             http.setRequestMethod("POST"); // PUT is another valid option
             http.setDoOutput(true);
 
@@ -686,12 +678,24 @@ public class ApiUtil {
             http.setFixedLengthStreamingMode(length);
             http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             http.connect();
-            try(OutputStream os = http.getOutputStream()) {
+            try (OutputStream os = http.getOutputStream()) {
                 os.write(out);
             }
 
         } catch (IOException e) {
             main.logger.warning("Could not set tax data: " + e.getMessage() + e);
         }
+    }
+
+    public TaxPayer getTaxPayer(Player player) {
+
+        JSONObject taxData = getTaxData();
+        JSONObject playerJson;
+        try {
+            playerJson = taxData.getJSONObject("guilds").getJSONObject(player.getGuildId()).getJSONObject("members").getJSONObject(player.getUUID());
+        } catch (Exception e) {
+            playerJson = null;
+        }
+        return new TaxPayer(player.getUUID(), player.getDisplayName(), player.getGuildId(), playerJson, main);
     }
 }

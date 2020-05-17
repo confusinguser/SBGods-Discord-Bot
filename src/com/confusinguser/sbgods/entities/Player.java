@@ -1,7 +1,6 @@
 package com.confusinguser.sbgods.entities;
 
 import com.confusinguser.sbgods.SBGods;
-import net.dv8tion.jda.api.entities.Invite;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -55,7 +54,9 @@ public class Player {
         return discordTag;
     }
 
-    public Boolean getIsOnline(){return online;}
+    public Boolean getIsOnline() {
+        return online;
+    }
 
     public ArrayList<String> getSkyblockProfiles() {
         return skyblockProfiles;

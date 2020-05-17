@@ -3,8 +3,8 @@ package com.confusinguser.sbgods.discord.commands;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
-import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.Player;
+import com.confusinguser.sbgods.entities.SkillLevels;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -177,7 +177,7 @@ public class SkillExpCommand extends Command implements EventListener {
                         .append("Fishing: " + main.getSBUtil().toSkillExp(highestSkillLevels.getFishing()) + '\n')
                         .append("Enchanting: " + main.getSBUtil().toSkillExp(highestSkillLevels.getEnchanting()) + '\n');
                 if (highestSkillLevels.isApproximate())
-                        descriptionBuilder.append("Taming: " + main.getSBUtil().toSkillExp(highestSkillLevels.getTaming()) + '\n');
+                    descriptionBuilder.append("Taming: " + main.getSBUtil().toSkillExp(highestSkillLevels.getTaming()) + '\n');
                 descriptionBuilder.append("Alchemy: " + main.getSBUtil().toSkillExp(highestSkillLevels.getAlchemy()) + '\n');
 
 

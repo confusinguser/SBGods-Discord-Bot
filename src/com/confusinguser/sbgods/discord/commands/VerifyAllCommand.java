@@ -35,34 +35,37 @@ public class VerifyAllCommand extends Command implements EventListener {
 //            return;
 //        }
 
-        if(e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_ROLES)){
+        if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_ROLES)) {
             e.getChannel().sendMessage("You do not have permissions to perform this command").queue();
             return;
         }
 
         main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
 
-        if(e.getMessage().getContentRaw().equalsIgnoreCase("-vall reset")){
-            for(Member member : e.getGuild().getMembers()) {
+        if (e.getMessage().getContentRaw().equalsIgnoreCase("-vall reset")) {
+            for (Member member : e.getGuild().getMembers()) {
 
                 e.getChannel().sendTyping().queue();
-                for (Role role : e.getGuild().getRolesByName("SBG Guild Member",true)) {
+                for (Role role : e.getGuild().getRolesByName("SBG Guild Member", true)) {
                     try {
                         e.getGuild().removeRoleFromMember(member, role).queue();
 
-                    } catch (HierarchyException ignored) {}
+                    } catch (HierarchyException ignored) {
+                    }
                 }
-                for (Role role : e.getGuild().getRolesByName("SBF Guild Member",true)) {
+                for (Role role : e.getGuild().getRolesByName("SBF Guild Member", true)) {
                     try {
                         e.getGuild().removeRoleFromMember(member, role).queue();
 
-                    } catch (HierarchyException ignored) {}
+                    } catch (HierarchyException ignored) {
+                    }
                 }
-                for (Role role : e.getGuild().getRolesByName("Verified",true)) {
+                for (Role role : e.getGuild().getRolesByName("Verified", true)) {
                     try {
                         e.getGuild().removeRoleFromMember(member, role).queue();
 
-                    } catch (HierarchyException ignored) {}
+                    } catch (HierarchyException ignored) {
+                    }
                 }
 
             }
@@ -73,16 +76,17 @@ public class VerifyAllCommand extends Command implements EventListener {
             return;
         }
 
-        if(e.getMessage().getContentRaw().equalsIgnoreCase("-vall reset v")){
-            for(Member member : e.getGuild().getMembers()) {
+        if (e.getMessage().getContentRaw().equalsIgnoreCase("-vall reset v")) {
+            for (Member member : e.getGuild().getMembers()) {
 
                 e.getChannel().sendTyping().queue();
-                for (Role role : e.getGuild().getRolesByName("Verified",true)) {
+                for (Role role : e.getGuild().getRolesByName("Verified", true)) {
                     try {
                         main.logger.info("Removed " + member.getUser().getAsTag() + "'s verified role");
                         e.getGuild().removeRoleFromMember(member, role).queue();
 
-                    } catch (HierarchyException ignored) {}
+                    } catch (HierarchyException ignored) {
+                    }
                 }
 
             }
@@ -95,7 +99,7 @@ public class VerifyAllCommand extends Command implements EventListener {
 
         e.getChannel().sendMessage("Attempting to auto-verify all players!").queue();
 
-        for(Member member : e.getGuild().getMembers()) {
+        for (Member member : e.getGuild().getMembers()) {
             e.getChannel().sendTyping().queue();
             main.logger.info("Attempting to auto-verify " + member.getUser().getAsTag());
 

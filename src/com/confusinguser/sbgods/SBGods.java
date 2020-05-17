@@ -32,7 +32,8 @@ public class SBGods {
 
         ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new SimpleFormatter() {
-            @Override public String format(LogRecord record) {
+            @Override
+            public String format(LogRecord record) {
                 return String.format("[%s] %s: %s%n", new SimpleDateFormat("MMM dd HH:mm:ss").format(new Date(record.getMillis())), record.getLevel(), record.getMessage());
             }
         });

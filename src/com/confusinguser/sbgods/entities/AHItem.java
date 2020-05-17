@@ -19,24 +19,31 @@ public class AHItem {
         this.category = category;
         this.bids = bids;
     }
+
     public String getItemName() {
         return itemName;
     }
+
     public String getItemTier() {
         return itemTier;
     }
+
     public Long getStartingBid() {
         return startingBid;
     }
+
     public Long getHighestBid() {
         return highestBid;
     }
+
     public String getCategory() {
         return category;
     }
+
     public Long getEnd() {
         return end;
     }
+
     public Integer getBids() {
         return bids;
     }

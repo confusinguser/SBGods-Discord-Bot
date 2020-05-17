@@ -15,10 +15,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DiscordBot {
+    public final SkillExpCommand skillExpCommand;
     private final SBGods main;
     private final SlayerCommand slayerCommand;
     private final SkillCommand skillCommand;
-    public final SkillExpCommand skillExpCommand;
     private final HelpCommand helpCommand;
     private final SbgodsCommand sbgodsCommand;
     private final WhatguildCommand whatguildCommand;
@@ -30,9 +30,9 @@ public class DiscordBot {
     private final VerifyAllCommand verifyAllCommand;
     private final TaxCommand taxCommand;
     private final ArrayList<Command> commands;
+    private final JDA jda;
     public String commandPrefix = "-";
     public SettingsCommand settingsCommand;
-    private final JDA jda;
 
     public DiscordBot(SBGods main) throws LoginException {
         String token = "NjY0OTAwNzM0NTk2NDE1NDg4.XreLHQ.l2viqcJ-uYvB3rAGcBa3OWhRuf0";

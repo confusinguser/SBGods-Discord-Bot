@@ -27,7 +27,7 @@ public class VerifyCommand extends Command implements EventListener {
             return;
         }
 
-        if(!e.getChannel().getName().equalsIgnoreCase("verify")){
+        if (!e.getChannel().getName().equalsIgnoreCase("verify")) {
             e.getChannel().sendMessage("This command cant be used here.").queue();
             return;
         }

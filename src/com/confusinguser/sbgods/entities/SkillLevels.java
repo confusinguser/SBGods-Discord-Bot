@@ -117,7 +117,7 @@ public class SkillLevels {
             output += aDouble;
         }
         if (approximate)
-            output /= skillList.size()-1;
+            output /= skillList.size() - 1;
         else
             output /= skillList.size();
         return output;
