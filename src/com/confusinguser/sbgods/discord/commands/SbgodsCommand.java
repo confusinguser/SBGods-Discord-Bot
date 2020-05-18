@@ -3,6 +3,7 @@ package com.confusinguser.sbgods.discord.commands;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
@@ -32,7 +33,7 @@ public class SbgodsCommand extends Command implements EventListener {
         String[] args = e.getMessage().getContentRaw().split(" ");
 
         if (args.length == 1) {
-            e.getChannel().sendMessage("Invalid argument! Valid arguments: `version`, `update`!").queue();
+            e.getChannel().sendMessage("Invalid argument! Valid arguments: `version`, `update`, `stop`!").queue();
             return;
         }
 
@@ -81,6 +82,16 @@ public class SbgodsCommand extends Command implements EventListener {
             }
             return;
         }
-        e.getChannel().sendMessage("Invalid argument! Valid arguments: `version`, `update`!").queue();
+
+        if (args[1].equalsIgnoreCase("stop")) {
+            if (e.getMember() != null && e.getMember().getRoles().stream().noneMatch(role -> role.getName().contains("Bot") || role.getName().contains("bot") || e.getAuthor().getId().equals(main.getCreatorId()))) {
+                e.getChannel().sendMessage("You do not have the permission to stop the bot!").queue();
+                return;
+            }
+
+            Runtime.getRuntime().exit(0);
+            return;
+        }
+        e.getChannel().sendMessage("Invalid argument! Valid arguments: `version`, `update`, `stop`!").queue();
     }
 }
