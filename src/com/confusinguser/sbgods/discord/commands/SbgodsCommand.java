@@ -77,7 +77,9 @@ public class SbgodsCommand extends Command implements EventListener {
                 Runtime.getRuntime().exec(new String[]{"cmd", "/c", "start", "cmd", "/k", "java -jar \"" + SBGods.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6) + "\""});
                 System.exit(0);
             } catch (IOException ex) {
-                e.getChannel().editMessageById(messageId, "Could not start new version").queue();
+                e.getChannel().editMessageById(messageId, "Could not start new version (Attempting to just stop bot and hope it re-starts)").queue();
+
+                System.exit(0);
                 return;
             }
             return;
@@ -92,7 +94,7 @@ public class SbgodsCommand extends Command implements EventListener {
 
             e.getChannel().sendMessage("Stopping bot...").queue();
 
-            Runtime.getRuntime().exit(0);
+            System.exit(0);
             return;
         }
         e.getChannel().sendMessage("Invalid argument! Valid arguments: `version`, `update`, `stop`!").queue();
