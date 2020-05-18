@@ -25,7 +25,6 @@ public class SBGods {
     private final LangUtil langUtil;
     private final JsonApiUtil jsonApiUtil;
     private final CacheUtil cacheUtil;
-    public boolean logWorks = true;
     private DiscordBot discordBot;
     private int keyIndex = 0;
 
@@ -121,9 +120,5 @@ public class SBGods {
 
     public String getCreatorId() {
         return CREATOR_ID;
-    }
-
-    public void log(String message) {
-        if (logWorks) logger.info(message);
     }
 }

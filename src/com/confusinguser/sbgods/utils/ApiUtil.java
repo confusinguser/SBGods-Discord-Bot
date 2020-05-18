@@ -596,13 +596,17 @@ public class ApiUtil {
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", "Mozilla/5.0");
         con.setRequestProperty("Authorization", "token f159901613c898cb80cdc39b3d8f89d2eb9f51bb");
+        con.setRequestProperty("Accept", "application/octet-stream");
+
 
         BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
-        FileOutputStream fos = new FileOutputStream(file);
-        byte[] buffer = bis.readAllBytes();
-        fos.write(buffer, 0, buffer.length);
-        fos.flush();
-        fos.close();
+        FileOutputStream fis = new FileOutputStream(file);
+        byte[] buffer = new byte[1024];
+        int count;
+        while ((count = bis.read(buffer, 0, 1024)) != -1) {
+            fis.write(buffer, 0, count);
+        }
+        fis.close();
         bis.close();
         return Paths.get(fileLocation);
     }

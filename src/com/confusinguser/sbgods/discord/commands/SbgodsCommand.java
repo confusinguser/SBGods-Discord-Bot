@@ -61,6 +61,9 @@ public class SbgodsCommand extends Command implements EventListener {
                 return;
             }
 
+
+            String messageId = e.getChannel().sendMessage("Downloading update...").complete().getId();
+
             Path newFilePath;
             try {
                 newFilePath = main.getApiUtil().downloadFile(latestReleaseUrl.getValue(), latestReleaseUrl.getKey());
@@ -74,13 +77,14 @@ public class SbgodsCommand extends Command implements EventListener {
                 return;
             }
 
-            String messageId = e.getChannel().sendMessage("**Success!** Downloaded new version and going to restart bot!").complete().getId();
+            e.getChannel().editMessageById(messageId, "**Success!** Downloaded new version and going to restart bot!").queue();
             try {
                 Runtime.getRuntime().exec(new String[]{"cmd", "/c", "start", "cmd", "/k", "java -jar \"" + newFilePath.toString() + "\""});
                 System.exit(0);
             } catch (IOException ex) {
-                e.getChannel().editMessageById(messageId, "Could not start new version").queue(); // Dumb to close bot when you know it won't restart
-                return;
+                e.getChannel().editMessageById(messageId, "Could not start new version (Stopping bot and hoping it reboots)").queue(); // Dumb to close bot when you know it won't restart
+                System.exit(0);                                                                       // i Close the bot because on my linux machine it will restart
+                return;                                                                                     // Just on linux u cant use Runtime.getRuntime().exec();
             }
             return;
         }
