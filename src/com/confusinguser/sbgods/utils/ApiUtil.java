@@ -19,7 +19,7 @@ public class ApiUtil {
     private final String BASE_URL = "https://api.hypixel.net/";
     private final String USER_AGENT = "Mozilla/5.0";
     private final SBGods main;
-    private final int REQUEST_RATE; // unit: requests
+    private int REQUEST_RATE = 0; // unit: requests
     private long LAST_CHECK = System.currentTimeMillis();
     private int allowance = REQUEST_RATE; // unit: requests
     private int fails = 0;

@@ -30,7 +30,9 @@ class Start {
                     Runtime.getRuntime().exec(new String[]{"cmd", "/c", "start", "cmd", "/k", "java -jar \"" + filename + "\""});
                     System.exit(0);
                 } catch (IOException e) {
-                    SBGods.getInstance().logger.warning("Could not open terminal");
+                    try {
+                        SBGods.getInstance().logger.warning("Could not open terminal");
+                    } catch (NullPointerException er) {SBGods.getInstance().logWorks = false;}
                 }
             }
         }
