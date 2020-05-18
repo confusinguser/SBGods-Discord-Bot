@@ -89,6 +89,9 @@ public class SbgodsCommand extends Command implements EventListener {
                 return;
             }
 
+
+            e.getChannel().sendMessage("Stopping bot...").queue();
+
             Runtime.getRuntime().exit(0);
             return;
         }
