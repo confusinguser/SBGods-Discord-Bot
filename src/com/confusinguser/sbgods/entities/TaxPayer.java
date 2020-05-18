@@ -26,7 +26,7 @@ public class TaxPayer {
         if (jsonData == null) {
             jsonData = new JSONObject();
             jsonData.put("owes", 0);
-            jsonData.put("role", "default");
+            jsonData.put("role", "Default");
             jsonData.put("name", name);
         }
     }
@@ -74,7 +74,8 @@ public class TaxPayer {
 
         try {
             taxData.getJSONObject("guilds").getJSONObject(guildId).getJSONObject("members").remove(uuid);
-        } catch (JSONException ignore) {}
+        } catch (JSONException ignore) {
+        }
 
         taxData.getJSONObject("guilds").getJSONObject(guildId).getJSONObject("members").put(uuid, jsonData);
 

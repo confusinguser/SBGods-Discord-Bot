@@ -12,6 +12,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class ApiUtil {
@@ -579,32 +581,30 @@ public class ApiUtil {
 
     }
 
-    public void setDiscNameFromMc(String mcName, String discordName) {
+    public void setDiscNameFromMc(String mcName, String discordName) { // For auto verification in the future it will already have data
         String response = getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/setDiscordMcName.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace("#", "*").replace(" ", "%20") + "&mc=" + mcName);
     }
 
-    public void downloadFile(String urlStr, String fileLocation) throws IOException {
+    public Path downloadFile(String urlStr, String fileLocation) throws IOException {
         File file = new File(fileLocation);
         if (!file.createNewFile()) {
-            downloadFile(urlStr, fileLocation.replace(".jar", "") + "_new.jar");
-            return;
+            return downloadFile(urlStr, fileLocation.replace(".jar", "") + "_new.jar");
         }
-
         URL url = new URL(urlStr);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setDoInput(true);
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", "Mozilla/5.0");
         con.setRequestProperty("Authorization", "token f159901613c898cb80cdc39b3d8f89d2eb9f51bb");
 
         BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
-        FileOutputStream fis = new FileOutputStream(file);
-        byte[] buffer = new byte[1024];
-        int count;
-        while ((count = bis.read(buffer, 0, 1024)) != -1) {
-            fis.write(buffer, 0, count);
-        }
-        fis.close();
+        FileOutputStream fos = new FileOutputStream(file);
+        byte[] buffer = bis.readAllBytes();
+        fos.write(buffer, 0, buffer.length);
+        fos.flush();
+        fos.close();
         bis.close();
+        return Paths.get(fileLocation);
     }
 
     public Map.Entry<String, String> getLatestReleaseUrl() {
@@ -637,7 +637,7 @@ public class ApiUtil {
         try {
             JSONArray output = new JSONArray(response.toString());
             return new AbstractMap.SimpleImmutableEntry<>(output.getJSONObject(0).getJSONArray("assets").getJSONObject(0).getString("name"),
-                    output.getJSONObject(0).getJSONArray("assets").getJSONObject(0).getString("url")); // TODO - see if index 0 is first or last release
+                    output.getJSONObject(0).getJSONArray("assets").getJSONObject(0).getString("url"));
         } catch (JSONException e) {
             return new AbstractMap.SimpleImmutableEntry<>("", "");
         }
@@ -648,24 +648,12 @@ public class ApiUtil {
     }
 
     public void setTaxData(JSONObject data) {
-        //HttpURLConnection con;
         IOException ioException = null;
 
         String dataString = data.toString(4);
 
         try {
             URL url = new URL("https://soopymc.my.to/api/sbgDiscord/updateTaxData.json?key=HoVoiuWfpdAjJhfTj0YN");
-
-//            con = (HttpURLConnection) url.openConnection();
-//            con.setDoOutput(true);
-//            con.setRequestMethod("POST");
-//            con.setRequestProperty("User-Agent", USER_AGENT);
-//            con.setRequestProperty("Content-Type", "application/json");
-//            con.setRequestProperty("Content-length", String.valueOf(dataString.length()));
-//
-//            DataOutputStream output = new DataOutputStream(con.getOutputStream());
-//            output.writeBytes(dataString);
-//            output.close();
 
             URLConnection con = url.openConnection();
             HttpURLConnection http = (HttpURLConnection) con;

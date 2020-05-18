@@ -23,7 +23,7 @@ class Start {
         }
 
         Console console = System.console();
-        Boolean logTerminalError = false;
+        boolean logTerminalError = false;
         if (console == null && !GraphicsEnvironment.isHeadless()) {
             String filename = URLDecoder.decode(Start.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6), "UTF-8");
             if (filename.endsWith(".jar")) {
@@ -37,9 +37,7 @@ class Start {
         }
 
         SBGods sbgods = new SBGods();
-        if(logTerminalError){
-            sbgods.logger.info("Could not open terminal");
-        }
+        if (logTerminalError) sbgods.logger.info("Could not open terminal");
         LeaderboardUpdater updater = new LeaderboardUpdater();
         Thread updaterThread = new Thread(updater);
         updaterThread.start();

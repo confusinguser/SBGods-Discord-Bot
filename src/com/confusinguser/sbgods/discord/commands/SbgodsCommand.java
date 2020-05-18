@@ -3,12 +3,12 @@ package com.confusinguser.sbgods.discord.commands;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -49,7 +49,7 @@ public class SbgodsCommand extends Command implements EventListener {
         }
 
         if (args[1].equalsIgnoreCase("update")) {
-            if (e.getMember() != null && e.getMember().getRoles().stream().noneMatch(role -> role.getName().contains("Bot") || role.getName().contains("bot") || e.getAuthor().getId().equals(main.getCreatorId()))) {
+            if (e.getMember() != null && e.getMember().getRoles().stream().noneMatch(role -> role.getName().toLowerCase().contains("bot") || e.getAuthor().getId().equals(main.getCreatorId()))) {
                 e.getChannel().sendMessage("You do not have the permission to update the bot!").queue();
                 return;
             }
@@ -60,8 +60,10 @@ public class SbgodsCommand extends Command implements EventListener {
                 e.getChannel().sendMessage("There are no releases available!").queue();
                 return;
             }
+
+            Path newFilePath;
             try {
-                main.getApiUtil().downloadFile(latestReleaseUrl.getValue(), latestReleaseUrl.getKey());
+                newFilePath = main.getApiUtil().downloadFile(latestReleaseUrl.getValue(), latestReleaseUrl.getKey());
             } catch (IOException ex) {
                 e.getChannel().sendMessage("There was a problem when downloading the latest release").queue();
                 main.logger.severe(ex.toString() + '\n' + Arrays.toString(ex.getStackTrace()));
@@ -74,26 +76,21 @@ public class SbgodsCommand extends Command implements EventListener {
 
             String messageId = e.getChannel().sendMessage("**Success!** Downloaded new version and going to restart bot!").complete().getId();
             try {
-                Runtime.getRuntime().exec(new String[]{"cmd", "/c", "start", "cmd", "/k", "java -jar \"" + SBGods.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6) + "\""});
+                Runtime.getRuntime().exec(new String[]{"cmd", "/c", "start", "cmd", "/k", "java -jar \"" + newFilePath.toString() + "\""});
                 System.exit(0);
             } catch (IOException ex) {
-                e.getChannel().editMessageById(messageId, "Could not start new version (Attempting to just stop bot and hope it re-starts)").queue();
-
-                System.exit(0);
+                e.getChannel().editMessageById(messageId, "Could not start new version").queue(); // Dumb to close bot when you know it won't restart
                 return;
             }
             return;
         }
 
         if (args[1].equalsIgnoreCase("stop")) {
-            if (e.getMember() != null && e.getMember().getRoles().stream().noneMatch(role -> role.getName().contains("Bot") || role.getName().contains("bot") || e.getAuthor().getId().equals(main.getCreatorId()))) {
+            if (e.getMember() != null && e.getMember().getRoles().stream().noneMatch(role -> role.getName().toLowerCase().contains("bot") || e.getAuthor().getId().equals(main.getCreatorId()))) {
                 e.getChannel().sendMessage("You do not have the permission to stop the bot!").queue();
                 return;
             }
-
-
             e.getChannel().sendMessage("Stopping bot...").queue();
-
             System.exit(0);
             return;
         }

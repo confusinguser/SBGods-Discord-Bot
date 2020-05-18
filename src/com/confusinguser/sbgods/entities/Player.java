@@ -1,7 +1,6 @@
 package com.confusinguser.sbgods.entities;
 
 import com.confusinguser.sbgods.SBGods;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -10,7 +9,7 @@ public class Player {
     private final String UUID;
     private final String displayName;
     private final String discordTag;
-    private final Boolean online;
+    private final boolean online;
     private final SBGods main;
     private final ArrayList<String> skyblockProfiles;
 
@@ -23,7 +22,7 @@ public class Player {
         this.skyblockProfiles = new ArrayList<>();
     }
 
-    public Player(String uuid, String displayName, String discordTag, Boolean online, ArrayList<String> skyblockProfiles, SBGods main) {
+    public Player(String uuid, String displayName, String discordTag, boolean online, ArrayList<String> skyblockProfiles, SBGods main) {
         this.UUID = uuid;
         this.displayName = displayName;
         this.discordTag = discordTag;
@@ -37,13 +36,7 @@ public class Player {
     }
 
     public String getGuildId() {
-
-        String response = main.getApiUtil().getResponse("https://api.hypixel.net/" + "findGuild" + "?key=" + main.getNextApiKey() + "&byUuid=" + UUID, 300000);
-        if (response == null) return null;
-
-        JSONObject jsonObject = new JSONObject(response);
-
-        return jsonObject.getString("guild");
+        return main.getApiUtil().getGuildFromUUID(getUUID());
     }
 
     public String getDisplayName() {
@@ -54,7 +47,7 @@ public class Player {
         return discordTag;
     }
 
-    public Boolean getIsOnline() {
+    public boolean getIsOnline() {
         return online;
     }
 

@@ -62,15 +62,15 @@ public class TaxCommand extends Command implements EventListener {
 
         DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromEvent(e);
 
-		if (args.length <= 1) {
-			e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `info`, `setrole`!").queue();
-			return;
-		}
-		if (args[1].equalsIgnoreCase("paid")) {
-			if (args.length <= 3) {
-				e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " paid <IGN> <AMOUNT>`!").queue();
-				return;
-			}
+        if (args.length <= 1) {
+            e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `info`, `setrole`!").queue();
+            return;
+        }
+        if (args[1].equalsIgnoreCase("paid")) {
+            if (args.length <= 3) {
+                e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " paid <IGN> <AMOUNT>`!").queue();
+                return;
+            }
 
             String messageId = e.getChannel().sendMessage("...").complete().getId();
 
@@ -118,8 +118,8 @@ public class TaxCommand extends Command implements EventListener {
                 i++;
 
                 e.getChannel().editMessageById(messageId, "... (This may take a while  " + i + "/" + guildMembers.size() + ")").queue();
-//                                                                     \/ sbg guild id
-                if (!taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").has(guildMember.getUUID())) {
+
+                if (!taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").has(guildMember.getUUID())) {
                     e.getChannel().sendTyping().queue();
                     Player player = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
 
@@ -138,7 +138,8 @@ public class TaxCommand extends Command implements EventListener {
 
                         try {
                             taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").remove(guildMember.getUUID());
-                        } catch (JSONException ignore) {}
+                        } catch (JSONException ignore) {
+                        }
 
                         taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").put(guildMember.getUUID(), taxPayer.getJSON());
 
@@ -324,38 +325,38 @@ public class TaxCommand extends Command implements EventListener {
                 e.getChannel().sendMessage(messageI).queue();
             }
 
-			return;
-		}
+            return;
+        }
 
-		if (args[1].equalsIgnoreCase("setrole")) {
-			if (args.length <= 3) {
-				e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " setrole <IGN> <ROLE>`!").queue();
-				return;
-			}
+        if (args[1].equalsIgnoreCase("setrole")) {
+            if (args.length <= 3) {
+                e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " setrole <IGN> <ROLE>`!").queue();
+                return;
+            }
 
-			String messageId = e.getChannel().sendMessage("...").complete().getId();
+            String messageId = e.getChannel().sendMessage("...").complete().getId();
 
-			e.getChannel().sendTyping().queue();
-			Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
+            e.getChannel().sendTyping().queue();
+            Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
 
-			e.getChannel().sendTyping().queue();
-			TaxPayer taxPayer = main.getApiUtil().getTaxPayer(thePlayer);
+            e.getChannel().sendTyping().queue();
+            TaxPayer taxPayer = main.getApiUtil().getTaxPayer(thePlayer);
 
-			taxPayer.setRole(args[3]);
+            taxPayer.setRole(args[3]);
 
-			e.getChannel().sendTyping().queue();
-			taxPayer.sendDataToServer();
+            e.getChannel().sendTyping().queue();
+            taxPayer.sendDataToServer();
 
-			e.getChannel().deleteMessageById(messageId).queue();
+            e.getChannel().deleteMessageById(messageId).queue();
 
-			e.getChannel().sendMessage("Success, this is the players current tax info:").queue();
+            e.getChannel().sendMessage("Success, this is the players current tax info:").queue();
 
-			e.getChannel().sendTyping().queue();
-			taxPayer.sendDataToDiscord(e.getChannel());
+            e.getChannel().sendTyping().queue();
+            taxPayer.sendDataToDiscord(e.getChannel());
 
-			return;
-		}
-		e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `info`, `setrole`!").queue();
+            return;
+        }
+        e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `info`, `setrole`!").queue();
 
     }
 }
