@@ -23,6 +23,7 @@ class Start {
         }
 
         Console console = System.console();
+        Boolean logTerminalError = false;
         if (console == null && !GraphicsEnvironment.isHeadless()) {
             String filename = URLDecoder.decode(Start.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6), "UTF-8");
             if (filename.endsWith(".jar")) {
@@ -30,14 +31,15 @@ class Start {
                     Runtime.getRuntime().exec(new String[]{"cmd", "/c", "start", "cmd", "/k", "java -jar \"" + filename + "\""});
                     System.exit(0);
                 } catch (IOException e) {
-                    try {
-                        SBGods.getInstance().logger.warning("Could not open terminal");
-                    } catch (NullPointerException er) {SBGods.getInstance().logWorks = false;}
+                    logTerminalError = true;
                 }
             }
         }
 
         SBGods sbgods = new SBGods();
+        if(logTerminalError){
+            sbgods.logger.info("Could not open terminal");
+        }
         LeaderboardUpdater updater = new LeaderboardUpdater();
         Thread updaterThread = new Thread(updater);
         updaterThread.start();
