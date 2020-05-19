@@ -14,20 +14,21 @@ public class TaxPayer {
     private final String name;
     private final String guildId;
     private final SBGods main;
-    private final JSONObject jsonData;
+    private JSONObject jsonData;
 
     public TaxPayer(String uuid, String name, String guildId, JSONObject jsonData, SBGods main) {
         this.uuid = uuid;
         this.name = name;
         this.guildId = guildId;
-        this.jsonData = jsonData;
         this.main = main;
 
         if (jsonData == null) {
-            jsonData = new JSONObject();
-            jsonData.put("owes", 0);
-            jsonData.put("role", "Default");
-            jsonData.put("name", name);
+            this.jsonData = new JSONObject();
+            this.jsonData.put("owes", 0);
+            this.jsonData.put("role", "Default");
+            this.jsonData.put("name", name);
+        }else{
+            this.jsonData = jsonData;
         }
     }
 

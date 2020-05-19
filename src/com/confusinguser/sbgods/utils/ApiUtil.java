@@ -28,7 +28,7 @@ public class ApiUtil {
 
     public ApiUtil(SBGods main) {
         this.main = main;
-        REQUEST_RATE = 30 * main.keys.length;
+        REQUEST_RATE = 110 * main.keys.length; //caps at 120 actually
     }
 
     public String getResponse(String url_string, int cacheTime) {

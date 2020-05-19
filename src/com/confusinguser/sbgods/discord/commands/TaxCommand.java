@@ -32,6 +32,11 @@ public class TaxCommand extends Command implements EventListener {
 
         main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
 
+        if(DiscordServer.getDiscordServerFromEvent(e) == DiscordServer.SBDGods){
+            e.getChannel().sendMessage("You cannot run tax commands in this server").queue();
+            return;
+        }
+
         if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
             String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag());
 
