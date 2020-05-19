@@ -120,6 +120,7 @@ public class PlayerCommand extends Command implements EventListener {
 
         embedBuilder.addField("Discord",main.getDiscord().getJDA().getUserByTag(player.getDiscordTag()).getAsMention(),false);
         embedBuilder.addField("Status", player.getIsOnline() ? "Online" : "Offline", false);
+        embedBuilder.addField("Guild", main.getApiUtil().getGuildFromUUID(player.getUUID()), false);
         embedBuilder.addField("Average skill level", String.valueOf(((double) Math.round(skillLevels.getAvgSkillLevel() * 100)) /100) + (skillLevels.isApproximate() ? " (Approx)" : ""),true);
         embedBuilder.addField("Slayer EXP", main.getLangUtil().prettifyInt(slayerExp.getTotalExp()),true);
         embedBuilder.addField("Total money (All coops)", main.getLangUtil().prettifyLong(totalMoney),true);

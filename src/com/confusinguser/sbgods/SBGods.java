@@ -10,8 +10,8 @@ import java.util.Date;
 import java.util.logging.*;
 
 public class SBGods {
-    public static final String VERSION = "0.8.4";
-    public static final String VERSION_DESCRIPTION = "Improvements to -player";
+    public static final String VERSION = "0.8.5";
+    public static final String VERSION_DESCRIPTION = "Shows guild in -player";
     private static final String CREATOR_ID = "244786205873405952";
     //private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
     private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
