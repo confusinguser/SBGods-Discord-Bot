@@ -36,7 +36,7 @@ public class Player {
     }
 
     public String getGuildId() {
-        return main.getApiUtil().getGuildFromUUID(getUUID());
+        return main.getApiUtil().getGuildIDFromUUID(getUUID());
     }
 
     public String getDisplayName() {

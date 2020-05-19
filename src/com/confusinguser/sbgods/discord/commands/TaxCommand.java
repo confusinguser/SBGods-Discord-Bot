@@ -32,14 +32,22 @@ public class TaxCommand extends Command implements EventListener {
 
         main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
 
-        if(DiscordServer.getDiscordServerFromEvent(e) == DiscordServer.SBDGods){
+        String[] args = e.getMessage().getContentRaw().split(" ");
+
+        DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromEvent(e);
+
+        if (currentDiscordServer == DiscordServer.SBDGods) {
             e.getChannel().sendMessage("You cannot run tax commands in this server").queue();
             return;
         }
 
         if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-            String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag());
+            e.getChannel().sendMessage("You do not have permission to use this command!").queue();
+            return;
+        }
 
+        if (args.length <= 1) {
+            String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag());
             if (mcName.equalsIgnoreCase("")) {
                 e.getChannel().sendMessage("You must verify your minecraft account to use this command!").queue();
                 return;
@@ -48,6 +56,7 @@ public class TaxCommand extends Command implements EventListener {
             String messageId = e.getChannel().sendMessage("...").complete().getId();
 
             e.getChannel().sendTyping().queue();
+
             Player thePlayer = main.getApiUtil().getPlayerFromUsername(mcName);
 
             e.getChannel().sendTyping().queue();
@@ -56,21 +65,11 @@ public class TaxCommand extends Command implements EventListener {
             e.getChannel().deleteMessageById(messageId).queue();
 
             e.getChannel().sendMessage("Your tax info:").queue();
-
-            e.getChannel().sendTyping().queue();
-            taxPayer.sendDataToDiscord(e.getChannel());
-
+            e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
+            e.getChannel().sendMessage("Other arguments you can use are: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `info` and `setrole`!").queue();
             return;
         }
 
-        String[] args = e.getMessage().getContentRaw().split(" ");
-
-        DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromEvent(e);
-
-        if (args.length <= 1) {
-            e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `info`, `setrole`!").queue();
-            return;
-        }
         if (args[1].equalsIgnoreCase("paid")) {
             if (args.length <= 3) {
                 e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " paid <IGN> <AMOUNT>`!").queue();
@@ -92,15 +91,15 @@ public class TaxCommand extends Command implements EventListener {
 
             e.getChannel().deleteMessageById(messageId).queue();
 
-            e.getChannel().sendMessage("Success, this is the players current tax info:").queue();
+            e.getChannel().sendMessage("Success! The player's current tax info:").queue();
 
             e.getChannel().sendTyping().queue();
-            taxPayer.sendDataToDiscord(e.getChannel());
+            e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
 
             return;
         }
 
-        if (args[1].equalsIgnoreCase("paidall") || args[1].equalsIgnoreCase("paydall")) { // "paydall"... SERIOUSLY?!
+        if (args[1].equalsIgnoreCase("paidall")) {
             if (args.length <= 2) {
                 e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " paidall <amount> [role]`!").queue();
                 return;
@@ -113,7 +112,7 @@ public class TaxCommand extends Command implements EventListener {
             }
 
             ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
-            String messageId = e.getChannel().sendMessage("... (This may take a while  0/" + guildMembers.size() + ")").complete().getId();
+            String messageId = e.getChannel().sendMessage("... (This may take a while 0/" + guildMembers.size() + ")").complete().getId();
 
             int i = 0;
 
@@ -122,18 +121,18 @@ public class TaxCommand extends Command implements EventListener {
             for (Player guildMember : guildMembers) {
                 i++;
 
-                e.getChannel().editMessageById(messageId, "... (This may take a while  " + i + "/" + guildMembers.size() + ")").queue();
+                e.getChannel().editMessageById(messageId, "... (This may take a while " + i + "/" + guildMembers.size() + ")").queue();
 
                 if (!taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").has(guildMember.getUUID())) {
                     e.getChannel().sendTyping().queue();
                     Player player = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
 
-                    e.getChannel().editMessageById(messageId, "... (This may take a while  " + i + ".30/" + guildMembers.size() + ")").queue();
+                    e.getChannel().editMessageById(messageId, "... (This may take a while " + i + ".30/" + guildMembers.size() + ")").queue();
 
                     e.getChannel().sendTyping().queue();
                     TaxPayer taxPayer = main.getApiUtil().getTaxPayer(player);
 
-                    e.getChannel().editMessageById(messageId, "... (This may take a while  " + i + ".60/" + guildMembers.size() + ")").queue();
+                    e.getChannel().editMessageById(messageId, "... (This may take a while " + i + ".60/" + guildMembers.size() + ")").queue();
 
                     if (role.equalsIgnoreCase("") || taxPayer.getRole().equalsIgnoreCase(role)) {
                         taxPayer.addOwes(amount);
@@ -193,7 +192,7 @@ public class TaxCommand extends Command implements EventListener {
             e.getChannel().sendMessage("Success, this is the players current tax info:").queue();
 
             e.getChannel().sendTyping().queue();
-            taxPayer.sendDataToDiscord(e.getChannel());
+            e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
 
             return;
         }
@@ -210,7 +209,7 @@ public class TaxCommand extends Command implements EventListener {
             }
 
             ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
-            String messageId = e.getChannel().sendMessage("... (This may take a while  0/" + guildMembers.size() + ")").complete().getId();
+            String messageId = e.getChannel().sendMessage("... (This may take a while 0/" + guildMembers.size() + ")").complete().getId();
 
             int i = 0;
 
@@ -219,24 +218,23 @@ public class TaxCommand extends Command implements EventListener {
             for (Player guildMember : guildMembers) {
                 i++;
 
-                e.getChannel().editMessageById(messageId, "... (This may take a while  " + i + "/" + guildMembers.size() + ")").queue();
-//                                                                     \/ sbg guild id
-                if (!taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").has(guildMember.getUUID())) {
+                e.getChannel().editMessageById(messageId, "... (This may take a while " + i + "/" + guildMembers.size() + ")").queue();
+
+                if (!taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").has(guildMember.getUUID())) {
                     e.getChannel().sendTyping().queue();
                     Player player = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
 
-                    e.getChannel().editMessageById(messageId, "... (This may take a while  " + i + ".30/" + guildMembers.size() + ")").queue();
+                    e.getChannel().editMessageById(messageId, "... (This may take a while " + i + ".30/" + guildMembers.size() + ")").queue();
 
                     e.getChannel().sendTyping().queue();
                     TaxPayer taxPayer = main.getApiUtil().getTaxPayer(player);
 
-                    e.getChannel().editMessageById(messageId, "... (This may take a while  " + i + ".60/" + guildMembers.size() + ")").queue();
+                    e.getChannel().editMessageById(messageId, "... (This may take a while " + i + ".60/" + guildMembers.size() + ")").queue();
 
                     if (role.equalsIgnoreCase("") || taxPayer.getRole().equalsIgnoreCase(role)) {
                         taxPayer.addOwes(amount);
 
                         e.getChannel().sendTyping().queue();
-
 
                         try {
                             taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").remove(guildMember.getUUID());
@@ -283,9 +281,7 @@ public class TaxCommand extends Command implements EventListener {
             e.getChannel().sendMessage("This is the players current tax info:").queue();
 
             e.getChannel().sendTyping().queue();
-            taxPayer.sendDataToDiscord(e.getChannel());
-
-
+            e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
             return;
         }
         if (args[1].equalsIgnoreCase("owelist") || args[1].equalsIgnoreCase("list")) {
@@ -357,7 +353,7 @@ public class TaxCommand extends Command implements EventListener {
             e.getChannel().sendMessage("Success, this is the players current tax info:").queue();
 
             e.getChannel().sendTyping().queue();
-            taxPayer.sendDataToDiscord(e.getChannel());
+            e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
 
             return;
         }

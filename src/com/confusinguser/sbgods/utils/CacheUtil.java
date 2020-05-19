@@ -32,7 +32,7 @@ public class CacheUtil {
         long currentTime = new Date().getTime();
         for (Response response : cache) {
             if (response.getURL().contentEquals(url)) {
-                if ((response.getTimeStamp() - currentTime) > Math.min(cacheTime,MAX_CACHE_TIME)) {
+                if ((response.getTimeStamp() - currentTime) > Math.min(cacheTime, MAX_CACHE_TIME)) {
                     cache.remove(response);
                     return false;
                 } else {
@@ -50,7 +50,7 @@ public class CacheUtil {
                 cache.remove(response);
             }
             if (response.getURL().contentEquals(url)) {
-                if ((response.getTimeStamp() - currentTime) < Math.min(MAX_CACHE_TIME,cacheTime)) {
+                if ((response.getTimeStamp() - currentTime) < Math.min(MAX_CACHE_TIME, cacheTime)) {
                     return response;
                 } else {
                     cache.remove(response);

@@ -194,6 +194,24 @@ public class ApiUtil {
         return output;
     }
 
+    public ArrayList<Player> getGuildMembersDeep(HypixelGuild guild) { // Might be used in the future
+        String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&id=" + guild.getGuildId(), 300000);
+        if (response == null) return getGuildMembersDeep(guild);
+
+        ArrayList<Player> output = new ArrayList<>();
+        JSONObject jsonObject = new JSONObject(response);
+        jsonObject = jsonObject.getJSONObject("guild");
+        JSONArray members = jsonObject.getJSONArray("members");
+
+        for (int i = 0; i < members.length(); i++) {
+            JSONObject currentMember = members.getJSONObject(i);
+            String uuid = currentMember.getString("uuid");
+            output.add(getPlayerFromUUID(uuid));
+        }
+
+        return output;
+    }
+
     public Player getPlayerFromUUID(String UUID) {
         String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&uuid=" + UUID, 300000);
         if (response == null) return new Player(main);
@@ -372,6 +390,20 @@ public class ApiUtil {
 
         try {
             return jsonObject.getJSONObject("guild").getString("name");
+        } catch (JSONException e) {
+            return null;
+        }
+    }
+
+    public String getGuildIDFromUUID(String UUID) {
+
+        String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&player=" + UUID, 300000);
+        if (response == null) return null;
+
+        JSONObject jsonObject = new JSONObject(response);
+
+        try {
+            return jsonObject.getJSONObject("guild").getString("_id");
         } catch (JSONException e) {
             return null;
         }
@@ -679,7 +711,6 @@ public class ApiUtil {
     }
 
     public TaxPayer getTaxPayer(Player player) {
-
         JSONObject taxData = getTaxData();
         JSONObject playerJson;
         try {

@@ -2,7 +2,6 @@ package com.confusinguser.sbgods.entities;
 
 import com.confusinguser.sbgods.SBGods;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -14,7 +13,7 @@ public class TaxPayer {
     private final String name;
     private final String guildId;
     private final SBGods main;
-    private JSONObject jsonData;
+    private final JSONObject jsonData;
 
     public TaxPayer(String uuid, String name, String guildId, JSONObject jsonData, SBGods main) {
         this.uuid = uuid;
@@ -27,7 +26,7 @@ public class TaxPayer {
             this.jsonData.put("owes", 0);
             this.jsonData.put("role", "Default");
             this.jsonData.put("name", name);
-        }else{
+        } else {
             this.jsonData = jsonData;
         }
     }
@@ -83,14 +82,12 @@ public class TaxPayer {
         main.getApiUtil().setTaxData(taxData);
     }
 
-    public void sendDataToDiscord(MessageChannel chan) {
-
+    public EmbedBuilder getDiscordEmbed() {
         EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0xb8300b).setTitle(getName() + "'s Tax Status");
 
         embedBuilder.appendDescription("Role: **" + getRole() + "**\n");
         embedBuilder.appendDescription("Owes: **" + getOwes() + "**");
 
-        chan.sendMessage(embedBuilder.build()).queue();
-
+        return embedBuilder;
     }
 }
