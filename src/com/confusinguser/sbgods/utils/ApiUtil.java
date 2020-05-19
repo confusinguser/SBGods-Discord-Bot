@@ -18,7 +18,7 @@ import java.util.*;
 
 public class ApiUtil {
 
-    private final String BASE_URL = "https://api.hypixel.net/";
+    public final String BASE_URL = "https://api.hypixel.net/";
     private final String USER_AGENT = "Mozilla/5.0";
     private final SBGods main;
     private int REQUEST_RATE = 0; // unit: requests
@@ -34,10 +34,10 @@ public class ApiUtil {
     public String getResponse(String url_string, int cacheTime) {
 
         // See if request already in cache
-        Response cacheResponse = main.getCacheUtil().getCachedResponse(main.getCacheUtil().stripUnnecesaryInfo(url_string));
+        Response cacheResponse = main.getCacheUtil().getCachedResponse(main.getCacheUtil().stripUnnecesaryInfo(url_string), cacheTime);
         String cacheResponseStr = cacheResponse.getJson();
         long current = System.currentTimeMillis();
-        if (cacheResponseStr != null && current - cacheResponse.getTimeStamp() < cacheTime) {
+        if (cacheResponseStr != null) {
             return cacheResponseStr;
         }
 

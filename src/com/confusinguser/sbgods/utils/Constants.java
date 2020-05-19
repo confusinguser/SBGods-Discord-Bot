@@ -1,6 +1,6 @@
 package com.confusinguser.sbgods.utils;
 
-class Constants {
+public class Constants {
 
     public static final Integer[] pet_levels = {
             100,

@@ -3,11 +3,16 @@ package com.confusinguser.sbgods.discord.commands;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.*;
+import com.confusinguser.sbgods.utils.Constants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.EventListener;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PlayerCommand extends Command implements EventListener {
 
@@ -34,7 +39,7 @@ public class PlayerCommand extends Command implements EventListener {
             return;
         }
 
-        String messageId = e.getChannel().sendMessage("Loading (0/4)").complete().getId();
+        String messageId = e.getChannel().sendMessage("Loading (0/2)").complete().getId();
         e.getChannel().sendTyping().queue();
 
         Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
@@ -44,51 +49,80 @@ public class PlayerCommand extends Command implements EventListener {
             return;
         }
 
-        e.getChannel().editMessageById(messageId,"Loading (1/4)").queue();
-
-        TaxPayer taxPayer = new TaxPayer(null,null, null, null, main);
-
-        if(DiscordServer.getDiscordServerFromEvent(e).getServerId() != DiscordServer.SBDGods.getServerId()){
-            e.getChannel().sendTyping().queue();
-            taxPayer = main.getApiUtil().getTaxPayer(player);
-        }
-
         e.getChannel().sendTyping().queue();
-        e.getChannel().editMessageById(messageId,"Loading (2/4)").queue();
-        SlayerExp slayerExp = main.getApiUtil().getPlayerSlayerExp(player.getUUID());
-
-        e.getChannel().sendTyping().queue();
-        e.getChannel().editMessageById(messageId,"Loading (3/4)").queue();
+        e.getChannel().editMessageById(messageId,"Loading (1/2)").queue();
         SkillLevels skillLevels = main.getApiUtil().getProfileSkillsAlternate(player.getUUID());;
         ArrayList<Pet> totalPets = new ArrayList<>();
+
+
+        SlayerExp slayerExp = new SlayerExp();
+        long totalMoney = 0;
+
+        Map<String, Integer> slayerOutput = new HashMap<>();
+        for (String slayer_type : Constants.slayer_types) {
+            slayerOutput.put(slayer_type, 0);
+        }
 
         int index = 0;
         for(String profileId : player.getSkyblockProfiles()){
             index++;
             e.getChannel().sendTyping().queue();
-            e.getChannel().editMessageById(messageId,"Loading (3/4) [Profile " + index + "/" + player.getSkyblockProfiles().size() + "]").queue();
+            e.getChannel().editMessageById(messageId,"Loading (1/2) [Profile " + (index-1) + ".33/" + player.getSkyblockProfiles().size() + "]").queue();
             SkillLevels profSkillLevels = main.getApiUtil().getProfileSkills(profileId,player.getUUID());
 
-            if(profSkillLevels.getAvgSkillLevel() > skillLevels.getAvgSkillLevel()){
+            if(profSkillLevels.getAvgSkillLevel() > (skillLevels.isApproximate() ? skillLevels.getAvgSkillLevel() -2 : skillLevels.getAvgSkillLevel())){ //if approx remove 2 levels in calc due to bug idk but i think this fix
                 skillLevels = profSkillLevels;
             }
 
             e.getChannel().sendTyping().queue();
-            e.getChannel().editMessageById(messageId,"Loading (3/4) [Profile " + index + ".5/" + player.getSkyblockProfiles().size() + "]").queue();
+            e.getChannel().editMessageById(messageId,"Loading (1/2) [Profile " + (index-1) + ".66/" + player.getSkyblockProfiles().size() + "]").queue();
             ArrayList<Pet> pets = main.getApiUtil().getProfilePets(profileId, player.getUUID()); // Pets in profile
             totalPets.addAll(pets);
+
+            //Putting slayer here to make the loading animation smoother (can animate for every profile)
+
+
+            e.getChannel().sendTyping().queue();
+            e.getChannel().editMessageById(messageId,"Loading (1/2) [Profile " + index + "/" + player.getSkyblockProfiles().size() + "]").queue();
+
+            String response = main.getApiUtil().getResponse(main.getApiUtil().BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileId, 600000);
+            if (response == null) continue;
+
+            JSONObject jsonObject = new JSONObject(response);
+
+            JSONObject jsonObjectSlayer = new JSONObject();
+            try {
+                jsonObjectSlayer = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(player.getUUID()).getJSONObject("slayer_bosses");
+            } catch (JSONException er) {}
+
+            for (String slayer_type : Constants.slayer_types) {
+                try {
+                    slayerOutput.put(slayer_type, slayerOutput.get(slayer_type) + jsonObjectSlayer.getJSONObject(slayer_type).getInt("xp"));
+                } catch (JSONException ignored) {
+                }
+            }
+
+            try {
+                totalMoney += jsonObject.getJSONObject("profile").getJSONObject("banking").getLong("balance");
+            }catch(Exception ignore){}
+
+            for(String profMemberUuid : jsonObject.getJSONObject("profile").getJSONObject("members").keySet()){
+                try {
+                    totalMoney += jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(profMemberUuid).getLong("coin_purse");
+                }catch(Exception ignore){}
+            }
         }
+
+        slayerExp = new SlayerExp(slayerOutput);
 
 
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(player.getDisplayName()).setColor(0xb8300b).setThumbnail("https://visage.surgeplay.com/bust/" + player.getUUID()).setFooter("SBGods");
 
         embedBuilder.addField("Discord",main.getDiscord().getJDA().getUserByTag(player.getDiscordTag()).getAsMention(),false);
-        if(!taxPayer.getUuid().equals(null)) {
-            embedBuilder.addField("Tax owed", Integer.toString(taxPayer.getOwes()), false);
-        }
         embedBuilder.addField("Status", player.getIsOnline() ? "Online" : "Offline", false);
-        embedBuilder.addField("Average skill level", String.valueOf(Math.round(skillLevels.getAvgSkillLevel()*100)/100) + (skillLevels.isApproximate() ? " (Approx)" : ""),true);
-        embedBuilder.addField("Slayer EXP", String.valueOf(slayerExp.getTotalExp()),true);
+        embedBuilder.addField("Average skill level", String.valueOf(((double) Math.round(skillLevels.getAvgSkillLevel() * 100)) /100) + (skillLevels.isApproximate() ? " (Approx)" : ""),true);
+        embedBuilder.addField("Slayer EXP", main.getLangUtil().prettifyInt(slayerExp.getTotalExp()),true);
+        embedBuilder.addField("Total money (All coops)", main.getLangUtil().prettifyLong(totalMoney),true);
 
         String petStr = "";
 
