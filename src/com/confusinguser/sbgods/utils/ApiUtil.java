@@ -21,18 +21,18 @@ public class ApiUtil {
     public final String BASE_URL = "https://api.hypixel.net/";
     private final String USER_AGENT = "Mozilla/5.0";
     private final SBGods main;
-    private int REQUEST_RATE = 0; // unit: requests
+    private final int REQUEST_RATE; // unit: requests
     private long LAST_CHECK = System.currentTimeMillis();
-    private int allowance = REQUEST_RATE; // unit: requests
+    private int allowance; // unit: requests
     private int fails = 0;
 
     public ApiUtil(SBGods main) {
         this.main = main;
         REQUEST_RATE = 110 * main.keys.length; //caps at 120 actually
+        allowance = REQUEST_RATE;
     }
 
     public String getResponse(String url_string, int cacheTime) {
-
         // See if request already in cache
         Response cacheResponse = main.getCacheUtil().getCachedResponse(main.getCacheUtil().stripUnnecesaryInfo(url_string), cacheTime);
         String cacheResponseStr = cacheResponse.getJson();
@@ -91,7 +91,7 @@ public class ApiUtil {
         } catch (IOException ex) {
             fails++;
             if (fails % 10 == 0 || fails == 1) {
-                main.logger.warning("Failed to connect to the Hypixel API " + fails + " times, this may be a problem: " + ex.toString() + '\n' + ex.fillInStackTrace());
+                main.logger.warning("Failed to connect to the Hypixel API " + fails + " times, this may be a problem: " + ex.toString());
             }
         }
 
@@ -279,15 +279,9 @@ public class ApiUtil {
 
         Player thePlayer = getPlayerFromUUID(playerUUID);
 
-        int cacheTime = 60000;
-
-        if (!thePlayer.getIsOnline()) {
-            cacheTime = 3600000; //1h
-        }
-
         for (String profileUUID : thePlayer.getSkyblockProfiles()) {
 
-            String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, cacheTime);
+            String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, thePlayer.isOnline() ? 60000 /* 1 min */ : 3600000 /* 1h */);
             if (response == null) return new SlayerExp();
 
             JSONObject jsonObject = new JSONObject(response);

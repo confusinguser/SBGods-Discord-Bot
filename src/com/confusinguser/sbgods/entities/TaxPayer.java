@@ -8,7 +8,7 @@ import org.json.JSONObject;
 import java.util.Comparator;
 
 public class TaxPayer {
-    public static final Comparator<TaxPayer> owesComparator = (tp1, tp2) -> (Integer.compare(tp1.getOwes(), tp2.getOwes()));
+    public static final Comparator<TaxPayer> owesComparator = Comparator.comparingInt(TaxPayer::getOwes);
     private final String uuid;
     private final String name;
     private final String guildId;

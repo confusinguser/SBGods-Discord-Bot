@@ -141,18 +141,18 @@ public class TaxCommand extends Command implements EventListener {
 
 
                         try {
-                            taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").remove(guildMember.getUUID());
+                            taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").remove(guildMember.getUUID());
                         } catch (JSONException ignore) {
                         }
 
-                        taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").put(guildMember.getUUID(), taxPayer.getJSON());
+                        taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").put(guildMember.getUUID(), taxPayer.getJSON());
 
                         main.getApiUtil().setTaxData(taxData);
                     }
                 } else {
-                    String memberRole = taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").getJSONObject(guildMember.getUUID()).getString("role");
+                    String memberRole = taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(guildMember.getUUID()).getString("role");
                     if (role.equalsIgnoreCase("") || memberRole.equalsIgnoreCase(role)) {
-                        taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").getJSONObject(guildMember.getUUID()).put("owes", taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").getJSONObject(guildMember.getUUID()).getInt("owes") + amount);
+                        taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(guildMember.getUUID()).put("owes", taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(guildMember.getUUID()).getInt("owes") + amount);
                     }
                 }
 
@@ -178,6 +178,10 @@ public class TaxCommand extends Command implements EventListener {
 
             e.getChannel().sendTyping().queue();
             Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
+            if (thePlayer.getUUID() == null) {
+                e.getChannel().sendMessage("**" + args[2] + "** is not a Hypixel player!").queue();
+                return;
+            }
 
             e.getChannel().sendTyping().queue();
             TaxPayer taxPayer = main.getApiUtil().getTaxPayer(thePlayer);
@@ -237,18 +241,18 @@ public class TaxCommand extends Command implements EventListener {
                         e.getChannel().sendTyping().queue();
 
                         try {
-                            taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").remove(guildMember.getUUID());
+                            taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").remove(guildMember.getUUID());
                         } catch (JSONException ignore) {
                         }
 
-                        taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").put(guildMember.getUUID(), taxPayer.getJSON());
+                        taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").put(guildMember.getUUID(), taxPayer.getJSON());
 
                         main.getApiUtil().setTaxData(taxData);
                     }
                 } else {
-                    String memberRole = taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").getJSONObject(guildMember.getUUID()).getString("role");
+                    String memberRole = taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(guildMember.getUUID()).getString("role");
                     if (role.equalsIgnoreCase("") || memberRole.equalsIgnoreCase(role)) {
-                        taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").getJSONObject(guildMember.getUUID()).put("owes", taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").getJSONObject(guildMember.getUUID()).getInt("owes") + amount);
+                        taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(guildMember.getUUID()).put("owes", taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(guildMember.getUUID()).getInt("owes") + amount);
                     }
                 }
 
@@ -278,8 +282,6 @@ public class TaxCommand extends Command implements EventListener {
 
             e.getChannel().deleteMessageById(messageId).queue();
 
-            e.getChannel().sendMessage("This is the players current tax info:").queue();
-
             e.getChannel().sendTyping().queue();
             e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
             return;
@@ -287,7 +289,7 @@ public class TaxCommand extends Command implements EventListener {
         if (args[1].equalsIgnoreCase("owelist") || args[1].equalsIgnoreCase("list")) {
             int minToShow = 0;
             if (args.length == 3) {
-                minToShow = -1000000000;
+                minToShow = Integer.MIN_VALUE;
             }
 
             String messageId = e.getChannel().sendMessage("...").complete().getId();
@@ -295,15 +297,15 @@ public class TaxCommand extends Command implements EventListener {
 
             JSONObject taxData = main.getApiUtil().getTaxData();
 
-            ArrayList<String> playerUuids = new ArrayList<>(taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").keySet());
+            ArrayList<String> playerUuids = new ArrayList<>(taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").keySet());
 
             ArrayList<TaxPayer> taxPayers = new ArrayList<>();
             for (String playerUuid : playerUuids) {
-                JSONObject taxPayerJson = taxData.getJSONObject("guilds").getJSONObject("5cd01bdf77ce84cf1204cd61").getJSONObject("members").getJSONObject(playerUuid);
+                JSONObject taxPayerJson = taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(playerUuid);
 
                 if (taxPayerJson != null) {
                     if (taxPayerJson.getInt("owes") > minToShow) {
-                        taxPayers.add(new TaxPayer(playerUuid, taxPayerJson.getString("name"), "5cd01bdf77ce84cf1204cd61", taxPayerJson, main));
+                        taxPayers.add(new TaxPayer(playerUuid, taxPayerJson.getString("name"), HypixelGuild.SBG.getGuildId(), taxPayerJson, main));
                     }
                 }
             }
@@ -349,8 +351,6 @@ public class TaxCommand extends Command implements EventListener {
             taxPayer.sendDataToServer();
 
             e.getChannel().deleteMessageById(messageId).queue();
-
-            e.getChannel().sendMessage("Success, this is the players current tax info:").queue();
 
             e.getChannel().sendTyping().queue();
             e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();

@@ -8,6 +8,7 @@ import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SlayerExp;
 import com.confusinguser.sbgods.utils.Constants;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,7 +48,7 @@ public class PlayerCommand extends Command implements EventListener {
 
         Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
 
-        if (player.getDisplayName().equalsIgnoreCase(null)) {
+        if (player.getDisplayName() == null) {
             e.getChannel().editMessageById(messageId, "Invalid player " + args[1]).queue();
             return;
         }
@@ -58,7 +59,7 @@ public class PlayerCommand extends Command implements EventListener {
         ArrayList<Pet> totalPets = new ArrayList<>();
 
 
-        SlayerExp slayerExp = new SlayerExp();
+        SlayerExp slayerExp;
         long totalMoney = 0;
 
         Map<String, Integer> slayerOutput = new HashMap<>();
@@ -96,7 +97,7 @@ public class PlayerCommand extends Command implements EventListener {
             JSONObject jsonObjectSlayer = new JSONObject();
             try {
                 jsonObjectSlayer = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(player.getUUID()).getJSONObject("slayer_bosses");
-            } catch (JSONException er) {
+            } catch (JSONException ignored) {
             }
 
             for (String slayer_type : Constants.slayer_types) {
@@ -121,25 +122,26 @@ public class PlayerCommand extends Command implements EventListener {
 
         slayerExp = new SlayerExp(slayerOutput);
 
-
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(player.getDisplayName()).setColor(0xb8300b).setThumbnail("https://visage.surgeplay.com/bust/" + player.getUUID()).setFooter("SBGods");
+        User discordUser = main.getDiscord().getJDA().getUserByTag(player.getDiscordTag());
 
-        embedBuilder.addField("Discord", main.getDiscord().getJDA().getUserByTag(player.getDiscordTag()).getAsMention(), false);
-        embedBuilder.addField("Status", player.getIsOnline() ? "Online" : "Offline", false);
+        if (player.getDiscordTag() != null && discordUser != null)
+            embedBuilder.addField("Discord", discordUser.getAsMention(), false);
+        embedBuilder.addField("Status", player.isOnline() ? "Online" : "Offline", false);
         embedBuilder.addField("Guild", main.getApiUtil().getGuildFromUUID(player.getUUID()), false);
         embedBuilder.addField("Average skill level", ((double) Math.round(skillLevels.getAvgSkillLevel() * 100)) / 100 + (skillLevels.isApproximate() ? " (Approx)" : ""), true);
         embedBuilder.addField("Slayer EXP", main.getLangUtil().prettifyInt(slayerExp.getTotalExp()), true);
         embedBuilder.addField("Total money (All coops)", main.getLangUtil().prettifyLong(totalMoney), true);
 
-        String petStr = "";
+        StringBuilder petStr = new StringBuilder();
 
         for (Pet pet : totalPets) {
             if (pet.isActive()) {
-                petStr += "\n" + main.getLangUtil().toLowerCaseButFirstLetter(pet.getTier().toString()) + " " + pet.getType() + " (" + pet.getLevel() + ")";
+                petStr.append("\n").append(main.getLangUtil().toLowerCaseButFirstLetter(pet.getTier().toString())).append(" ").append(pet.getType()).append(" (").append(pet.getLevel()).append(")");
             }
         }
 
-        embedBuilder.addField("Active pets (One per profile)", petStr, false);
+        embedBuilder.addField("Active pets (One per profile)", petStr.toString(), false);
 
         e.getChannel().deleteMessageById(messageId).queue();
 

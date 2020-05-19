@@ -36,6 +36,9 @@ public class Player {
     }
 
     public String getGuildId() {
+        if (getUUID() == null) {
+            return null;
+        }
         return main.getApiUtil().getGuildIDFromUUID(getUUID());
     }
 
@@ -47,7 +50,7 @@ public class Player {
         return discordTag;
     }
 
-    public boolean getIsOnline() {
+    public boolean isOnline() {
         return online;
     }
 
