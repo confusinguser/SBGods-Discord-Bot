@@ -598,7 +598,6 @@ public class ApiUtil {
         con.setRequestProperty("Authorization", "token f159901613c898cb80cdc39b3d8f89d2eb9f51bb");
         con.setRequestProperty("Accept", "application/octet-stream");
 
-
         BufferedInputStream bis = new BufferedInputStream(con.getInputStream());
         FileOutputStream fis = new FileOutputStream(file);
         byte[] buffer = new byte[1024];

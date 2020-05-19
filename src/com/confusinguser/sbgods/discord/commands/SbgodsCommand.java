@@ -77,14 +77,14 @@ public class SbgodsCommand extends Command implements EventListener {
                 return;
             }
 
-            e.getChannel().editMessageById(messageId, "**Success!** Downloaded new version and going to restart bot!").queue();
+            e.getChannel().editMessageById(messageId, "**Success!** Downloaded new version and going to restart bot!").complete();
             try {
-                Runtime.getRuntime().exec(new String[]{"cmd", "/c", "start", "cmd", "/k", "java -jar \"" + newFilePath.toString() + "\""});
+                new ProcessBuilder("cmd /c exit").inheritIO().start().waitFor();
+                new ProcessBuilder("cmd /c start cmd /k java -jar \"" + newFilePath.toString() + "\"").start().waitFor();
                 System.exit(0);
-            } catch (IOException ex) {
-                e.getChannel().editMessageById(messageId, "Could not start new version (Stopping bot and hoping it reboots)").queue(); // Dumb to close bot when you know it won't restart
-                System.exit(0);                                                                       // i Close the bot because on my linux machine it will restart
-                return;                                                                                     // Just on linux u cant use Runtime.getRuntime().exec();
+            } catch (IOException | InterruptedException ex) {
+                e.getChannel().editMessageById(messageId, "Could not start new version, try stopping the bot").queue();
+                return;
             }
             return;
         }
@@ -94,7 +94,7 @@ public class SbgodsCommand extends Command implements EventListener {
                 e.getChannel().sendMessage("You do not have the permission to stop the bot!").queue();
                 return;
             }
-            e.getChannel().sendMessage("Stopping bot...").queue();
+            e.getChannel().sendMessage("Stopping bot...").complete(); // Bot is going to shut down so we have to complete this before
             System.exit(0);
             return;
         }
