@@ -42,7 +42,8 @@ public class DeathsCommand extends Command {
             Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
 
             if (thePlayer.getSkyblockProfiles().isEmpty()) {
-                e.getChannel().editMessageById(messageId, "Player **" + args[2] + "** does not exist!").queue();
+                e.getChannel().deleteMessageById(messageId).queue();
+                e.getChannel().sendMessage("Player **" + args[2] + "** does not exist!").queue();
                 return;
             }
 

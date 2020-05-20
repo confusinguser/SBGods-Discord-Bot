@@ -36,16 +36,19 @@ public class WhatguildCommand extends Command implements EventListener {
         e.getChannel().sendTyping().queue();
         Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[1]);
         if (thePlayer.getSkyblockProfiles().isEmpty()) {
-            e.getChannel().editMessageById(messageId, "Player **" + args[1] + "** does not exist").queue();
+            e.getChannel().deleteMessageById(messageId).queue();
+            e.getChannel().sendMessage("Player **" + args[1] + "** does not exist").queue();
             return;
         }
         String guildName = main.getApiUtil().getGuildFromUUID(thePlayer.getUUID());
 
         if (guildName == null) {
-            e.getChannel().editMessageById(messageId, "**" + thePlayer.getDisplayName() + "** is not in a guild").queue();
+            e.getChannel().deleteMessageById(messageId).queue();
+            e.getChannel().sendMessage("**" + thePlayer.getDisplayName() + "** is not in a guild").queue();
             return;
         }
 
-        e.getChannel().editMessageById(messageId, "**" + thePlayer.getDisplayName() + "** is in **" + guildName + "**").queue();
+        e.getChannel().deleteMessageById(messageId).queue();
+        e.getChannel().sendMessage("**" + thePlayer.getDisplayName() + "** is in **" + guildName + "**").queue();
     }
 }

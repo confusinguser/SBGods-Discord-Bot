@@ -1,11 +1,9 @@
 package com.confusinguser.sbgods.entities;
 
 public class PlayerAH {
-
-    public int length = 0;
-    private AHItem[] items = new AHItem[10];
+    private AHItem[] items;
     private String error;
-    private Boolean isError = false;
+    private boolean isError = false;
 
     public PlayerAH(AHItem[] items) {
         this.items = items;
@@ -27,10 +25,4 @@ public class PlayerAH {
     public AHItem[] getItems() {
         return items;
     }
-
-    public PlayerAH setLength(int length) {
-        this.length = length;
-        return this;
-    }
-
 }

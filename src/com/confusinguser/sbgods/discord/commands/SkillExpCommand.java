@@ -59,7 +59,7 @@ public class SkillExpCommand extends Command implements EventListener {
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
             ArrayList<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
-            Map<String, SkillLevels> usernameSkillExpHashMap = currentDiscordServer.getHypixelGuild().getSkillExpHashmap();
+            Map<String, SkillLevels> usernameSkillExpHashMap = currentDiscordServer.getHypixelGuild().getSkillExpMap();
 
             if (usernameSkillExpHashMap.size() == 0) {
                 if (currentDiscordServer.getHypixelGuild().getSkillProgress() == 0) {

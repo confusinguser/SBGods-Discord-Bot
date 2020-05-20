@@ -53,7 +53,7 @@ public enum HypixelGuild {
         return skillExpRec;
     }
 
-    public Map<String, SkillLevels> getSkillExpHashmap() {
+    public Map<String, SkillLevels> getSkillExpMap() {
         return skillExpMap;
     }
 

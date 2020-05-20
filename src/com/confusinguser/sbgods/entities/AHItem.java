@@ -28,6 +28,23 @@ public class AHItem {
         return itemTier;
     }
 
+    public int getItemTierColor() {
+        switch (itemTier) {
+            case "COMMON":
+                return 0xFFFFFF;
+            case "UNCOMMON":
+                return 0x00AA00;
+            case "RARE":
+                return 0x0000AA;
+            case "EPIC":
+                return 0xAA00AA;
+            case "LEGENDARY":
+                return 0xFFAA00;
+            default:
+                return 0xFF55FF;
+        }
+    }
+
     public Long getStartingBid() {
         return startingBid;
     }

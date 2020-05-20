@@ -2,7 +2,6 @@ package com.confusinguser.sbgods.utils;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.*;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ApiUtil {
 
@@ -90,7 +90,7 @@ public class ApiUtil {
             if (con != null) responseCode = con.getResponseCode();
         } catch (IOException ex) {
             fails++;
-            if (fails % 10 == 0 || fails == 1) {
+            if (fails % 10 == 0) {
                 main.logger.warning("Failed to connect to the Hypixel API " + fails + " times, this may be a problem: " + ex.toString());
             }
         }
@@ -109,7 +109,7 @@ public class ApiUtil {
             System.exit(-1);
         } else if (ioException != null) {
             fails++;
-            if (fails % 10 == 0 || fails == 1) {
+            if (fails % 10 == 0) {
                 main.logger.warning("Failed to connect to the Hypixel API " + fails + " times, this may be a problem: " + ioException.toString() + '\n' + ioException.fillInStackTrace());
             }
             return getResponse(url_string, cacheTime);
@@ -148,7 +148,7 @@ public class ApiUtil {
             if (con != null) responseCode = con.getResponseCode();
         } catch (IOException ex) {
             fails++;
-            if (fails % 10 == 0 || fails == 1) {
+            if (fails % 10 == 0) {
                 main.logger.warning("Failed to connect to the API " + fails + " times, this may be a problem: " + ex.toString() + '\n' + ex.fillInStackTrace());
             }
         }
@@ -167,7 +167,7 @@ public class ApiUtil {
             System.exit(-1);
         } else if (ioException != null) {
             fails++;
-            if (fails % 10 == 0 || fails == 1) {
+            if (fails % 10 == 0) {
                 main.logger.warning("Failed to connect to the API " + fails + " times, this may be a problem: " + ioException.toString() + '\n' + ioException.fillInStackTrace());
             }
             return getNonHypixelResponse(url_string);
@@ -520,78 +520,34 @@ public class ApiUtil {
         return highestSkillLevels;
     }
 
-    public PlayerAH getPlayerAHFromUsername(String player, String messageId, MessageReceivedEvent e) {
-        //main.logger.info("Loading " + player + "'s main data");
-        e.getChannel().editMessageById(messageId, "Loading..").queue();
-        e.getChannel().sendTyping().queue();
-        String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&name=" + player, 300000);
-        if (response == null)
-            return new PlayerAH("There was a error fetching that user's auctions, please try again later.");
-
-        JSONObject jsonObject = new JSONObject(response);
-        JSONObject playerData = jsonObject;
-        String playerId = playerData.getJSONObject("player").getString("_id");
-
-        Iterator<String> playerProfiles = playerData.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles").keys();
-
-        int len = 0;
-        AHItem[] items = new AHItem[14];
-
-        //main.logger.info("Loaded " + player + "'s main data");
-
-        e.getChannel().editMessageById(messageId, "Loading...").queue();
-        e.getChannel().sendTyping().queue();
-
-        int amountLoops = playerData.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles").length();
-        int loops = 0;
-
-        while (playerProfiles.hasNext()) {
-            String profileId = playerProfiles.next();
-
-            //main.logger.info("Loading " + player + "'s " + playerData.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles").getJSONObject(profileId).getString("cute_name") + " data");
-
-
-            response = getResponse(BASE_URL + "skyblock/auction" + "?key=" + main.getNextApiKey() + "&profile=" + profileId + "&uuid=" + playerId, 60000);
+    public PlayerAH getPlayerAHFromUsername(Player player) {
+        List<AHItem> items = new ArrayList<>();
+        for (String profile : player.getSkyblockProfiles()) {
+            String response = getResponse(BASE_URL + "skyblock/auction" + "?key=" + main.getNextApiKey() + "&profile=" + profile, 60000);
             if (response == null)
                 return new PlayerAH("There was a error fetching that user's auctions, please try again later.");
 
-            jsonObject = new JSONObject(response);
             JSONArray auctionJSONArray;
-
-
-            //main.logger.info("Loaded " + player + "'s " + playerData.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles").getJSONObject(profileId).getString("cute_name") + " data");
-
-            loops++;
-            e.getChannel().editMessageById(messageId, "Loading...  (" + loops + "/" + amountLoops + ")").complete();
-            e.getChannel().sendTyping().queue();
-
             try {
-                auctionJSONArray = jsonObject.getJSONArray("auctions");
+                auctionJSONArray = new JSONObject(response).getJSONArray("auctions");
             } catch (JSONException error) {
-                return new PlayerAH("There was a error fetching that user's auctions, please try again later.");
+                return new PlayerAH("There was an error fetching the player's auctions, please try again later.");
             }
 
-            for (int i = 0; i < auctionJSONArray.length(); i++) {
-                JSONObject obj = auctionJSONArray.getJSONObject(i);
+            List<JSONObject> unclaimedAuctionsJson = main.getUtil().getJSONObjectListByJSONArray(auctionJSONArray).stream().filter((auction) -> !auction.getBoolean("claimed")).collect(Collectors.toList());
+            for (JSONObject unclaimedAuction : unclaimedAuctionsJson) {
+                String itemName = unclaimedAuction.getString("item_name");
+                String itemTier = unclaimedAuction.getString("tier");
+                Long startingBid = unclaimedAuction.getLong("starting_bid");
+                Long highestBid = unclaimedAuction.getLong("highest_bid_amount");
+                String category = unclaimedAuction.getString("category");
+                Long end = unclaimedAuction.getLong("end");
+                Integer bids = unclaimedAuction.getJSONArray("bids").length(); // Number of bids on the item
 
-                if (!obj.getBoolean("claimed")) {
-                    String itemName = obj.getString("item_name");
-                    String itemTier = obj.getString("tier");
-                    Long startingBid = obj.getLong("starting_bid");
-                    Long highestBid = obj.getLong("highest_bid_amount");
-                    String category = obj.getString("category");
-                    Long end = obj.getLong("end");
-                    Integer bids = obj.getJSONArray("bids").length(); //number of bids on the item
-
-                    items[len] = new AHItem(itemName, itemTier, startingBid, highestBid, category, end, bids);
-
-                    len++;
-                }
+                items.add(new AHItem(itemName, itemTier, startingBid, highestBid, category, end, bids));
             }
-
         }
-        //main.logger.info("Done! (" + len + " items found)");
-        return new PlayerAH(items).setLength(len);
+        return new PlayerAH(items.toArray(new AHItem[0]));
     }
 
     public String getMcNameFromDisc(String discordName) {

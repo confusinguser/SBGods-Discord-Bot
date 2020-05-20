@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -203,5 +205,13 @@ public class Util {
             }
         }
         return null;
+    }
+
+    public List<JSONObject> getJSONObjectListByJSONArray(JSONArray jsonArray) {
+        List<JSONObject> output = new ArrayList<>();
+        jsonArray.forEach((object) -> {
+            if (object instanceof JSONObject) output.add((JSONObject) object);
+        });
+        return output;
     }
 }

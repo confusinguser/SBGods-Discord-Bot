@@ -42,7 +42,8 @@ public class KillsCommand extends Command {
             Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
 
             if (thePlayer.getSkyblockProfiles().isEmpty()) {
-                e.getChannel().editMessageById(messageId, "Player **" + args[2] + "** does not exist!").queue();
+                e.getChannel().deleteMessageById(messageId).queue();
+                e.getChannel().sendMessage("Player **" + args[2] + "** does not exist!").queue();
                 return;
             }
 
@@ -89,6 +90,7 @@ public class KillsCommand extends Command {
             e.getChannel().sendMessage(embedBuilder.build()).queue();
             return;
         }
-        e.getChannel().editMessageById(messageId, "Invalid usage! Usage: `" + this.usage + "`").queue();
+        e.getChannel().deleteMessageById(messageId).queue();
+        e.getChannel().sendMessage("Invalid usage! Usage: `" + this.usage + "`").queue();
     }
 }

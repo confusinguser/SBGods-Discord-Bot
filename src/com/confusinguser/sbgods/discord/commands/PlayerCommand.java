@@ -82,12 +82,17 @@ public class PlayerCommand extends Command implements EventListener {
         User discordUser = main.getDiscord().getJDA().getUserByTag(player.getDiscordTag());
 
         if (player.getDiscordTag() != null && discordUser != null)
-            embedBuilder.addField("Discord", discordUser.getAsMention(), false);
-        embedBuilder.addField("Status", player.isOnline() ? "Online" : "Offline", false);
+            embedBuilder.addField("Discord", discordUser.getAsMention(), true);
+        embedBuilder.addField("Status", player.isOnline() ? "Online" : "Offline", true);
+
         embedBuilder.addField("Guild", main.getApiUtil().getGuildFromUUID(player.getUUID()), false);
+
         embedBuilder.addField("Average skill level", main.getUtil().round(skillLevels.getAvgSkillLevel(), 2) + (skillLevels.isApproximate() ? " (Approx)" : ""), true);
         embedBuilder.addField("Slayer EXP", main.getLangUtil().addNotation(slayerExp.getTotalExp()), true);
         embedBuilder.addField("Total money (All coops)", totalMoney == 0 ? "Banking API off" : main.getLangUtil().addNotation(totalMoney), true);
+
+        embedBuilder.addField("Skill LB Position", player.getSkillPos() == -1 ? "Not in Guild" : player.getSkillPos() == -2 ? "Bot is loading..." : "#" + (player.getSkillPos() + 1), true);
+        embedBuilder.addField("Slayer LB Position", player.getSlayerPos() == -1 ? "Not in Guild" : player.getSkillPos() == -2 ? "Bot is loading..." : "#" + (player.getSlayerPos() + 1), true);
 
         StringBuilder petStr = new StringBuilder();
         for (Pet pet : totalPets) {
