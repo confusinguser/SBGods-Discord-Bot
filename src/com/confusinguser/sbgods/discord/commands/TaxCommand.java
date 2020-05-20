@@ -6,6 +6,7 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.TaxPayer;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
@@ -41,11 +42,6 @@ public class TaxCommand extends Command implements EventListener {
             return;
         }
 
-        if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
-            e.getChannel().sendMessage("You do not have permission to use this command!").queue();
-            return;
-        }
-
         if (args.length <= 1) {
             String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag());
             if (mcName.equalsIgnoreCase("")) {
@@ -71,6 +67,11 @@ public class TaxCommand extends Command implements EventListener {
         }
 
         if (args[1].equalsIgnoreCase("paid")) {
+            if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+                e.getChannel().sendMessage("You do not have permission to use this command!").queue();
+                return;
+            }
+
             if (args.length <= 3) {
                 e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " paid <IGN> <AMOUNT>`!").queue();
                 return;
@@ -100,6 +101,11 @@ public class TaxCommand extends Command implements EventListener {
         }
 
         if (args[1].equalsIgnoreCase("paidall")) {
+            if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+                e.getChannel().sendMessage("You do not have permission to use this command!").queue();
+                return;
+            }
+
             if (args.length <= 2) {
                 e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " paidall <amount> [role]`!").queue();
                 return;
@@ -164,7 +170,6 @@ public class TaxCommand extends Command implements EventListener {
 
             e.getChannel().sendMessage("Successfully set everyone as paid!").queue();
 
-
             return;
         }
 
@@ -179,6 +184,7 @@ public class TaxCommand extends Command implements EventListener {
             e.getChannel().sendTyping().queue();
             Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
             if (thePlayer.getUUID() == null) {
+                e.getChannel().deleteMessageById(messageId).queue();
                 e.getChannel().sendMessage("**" + args[2] + "** is not a Hypixel player!").queue();
                 return;
             }
@@ -202,6 +208,11 @@ public class TaxCommand extends Command implements EventListener {
         }
 
         if (args[1].equalsIgnoreCase("oweall")) {
+            if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+                e.getChannel().sendMessage("You do not have permission to use this command!").queue();
+                return;
+            }
+
             if (args.length <= 2) {
                 e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " oweall <AMOUNT> [group]`!").queue();
                 return;
@@ -286,12 +297,8 @@ public class TaxCommand extends Command implements EventListener {
             e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
             return;
         }
-        if (args[1].equalsIgnoreCase("owelist") || args[1].equalsIgnoreCase("list")) {
-            int minToShow = 0;
-            if (args.length == 3) {
-                minToShow = Integer.MIN_VALUE;
-            }
 
+        if (args[1].equalsIgnoreCase("owelist") || args[1].equalsIgnoreCase("list")) {
             String messageId = e.getChannel().sendMessage("...").complete().getId();
             e.getChannel().sendTyping().queue();
 
@@ -304,28 +311,30 @@ public class TaxCommand extends Command implements EventListener {
                 JSONObject taxPayerJson = taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(playerUuid);
 
                 if (taxPayerJson != null) {
-                    if (taxPayerJson.getInt("owes") > minToShow) {
+                    if (taxPayerJson.getInt("owes") > 0 || args.length >= 3) {
                         taxPayers.add(new TaxPayer(playerUuid, taxPayerJson.getString("name"), HypixelGuild.SBG.getGuildId(), taxPayerJson, main));
                     }
                 }
             }
 
-            taxPayers.sort(TaxPayer.owesComparator);
+            taxPayers.sort((taxPayer, taxPayerOther) -> Integer.compare(taxPayerOther.getOwes(), taxPayer.getOwes()));
 
-            e.getChannel().deleteMessageById(messageId);
+            e.getChannel().deleteMessageById(messageId).queue();
 
             StringBuilder message = new StringBuilder();
-
             for (TaxPayer taxPayer : taxPayers) {
-                message.append(taxPayer.getName()).append(" owes **").append(taxPayer.getOwes()).append("**\n");
+                message.append(main.getDiscord().escapeMarkdown(taxPayer.getName())).append(" owes **").append(taxPayer.getOwes()).append("**\n");
             }
 
-            e.getChannel().deleteMessageById(messageId);
+            e.getChannel().deleteMessageById(messageId).queue();
+            if (message.toString().equals("")) {
+                e.getChannel().sendMessage("No one in the guild owes any tax!").queue();
+                return;
+            }
 
             List<String> responseList = main.getUtil().processMessageForDiscord(message.toString(), 2000);
-
             for (String messageI : responseList) {
-                e.getChannel().sendMessage(messageI).queue();
+                e.getChannel().sendMessage(new EmbedBuilder().appendDescription(messageI).build()).queue();
             }
 
             return;

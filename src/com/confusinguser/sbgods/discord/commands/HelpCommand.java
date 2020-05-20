@@ -15,7 +15,7 @@ public class HelpCommand extends Command implements EventListener {
         this.main = main;
         this.discord = discord;
         this.name = "help";
-        this.aliases = new String[]{};
+        this.aliases = new String[]{"h"};
     }
 
     @Override
@@ -34,7 +34,11 @@ public class HelpCommand extends Command implements EventListener {
                 .append("skill leaderboard [length / all]:  \t**Shows average skill level leaderboard**\n")
                 .append("skill player <IGN>: \t**Shows a specific player's average skill level**\n\n")
                 .append("pets <IGN>: \t**Shows a specific player's pets**\n\n")
+                .append("player <IGN>: \t**Shows stats of a specific player**\n\n")
                 .append("whatguild <IGN>: \t**Shows a specific player's guild**\n\n")
+                .append("tax: \t**Check how much tax a player owes**\n")
+                .append("tax info <IGN>: \t**Check how much tax a player owes**\n")
+                .append("tax owelist: \t**Shows a leaderboard with who owes the most**\n\n")
                 .toString())
                 .setColor(new Color(colorRandom.nextFloat(), colorRandom.nextFloat(), colorRandom.nextFloat()));
 

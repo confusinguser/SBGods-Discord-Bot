@@ -5,10 +5,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Comparator;
-
 public class TaxPayer {
-    public static final Comparator<TaxPayer> owesComparator = Comparator.comparingInt(TaxPayer::getOwes);
     private final String uuid;
     private final String name;
     private final String guildId;
