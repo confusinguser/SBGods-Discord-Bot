@@ -494,7 +494,7 @@ public class ApiUtil {
         return output;
     }
 
-    public SkillLevels getBestPlayerSkillLevels(String uuid) {
+    public SkillLevels getBestProfileSkillLevels(String uuid) {
         Player thePlayer = getPlayerFromUUID(uuid);
 
         if (thePlayer.getSkyblockProfiles().isEmpty()) {
@@ -713,5 +713,24 @@ public class ApiUtil {
             playerJson = null;
         }
         return new TaxPayer(player.getUUID(), player.getDisplayName(), player.getGuildId(), playerJson, main);
+    }
+
+    public double getTotalMoneyInProfile(String profileUUID) {
+        String response = main.getApiUtil().getResponse(main.getApiUtil().BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 600000);
+        if (response == null) return 0;
+        JSONObject jsonObject = new JSONObject(response);
+
+        double totalMoney = 0;
+        try {
+            totalMoney += jsonObject.getJSONObject("profile").getJSONObject("banking").getLong("balance");
+        } catch (JSONException ignore) {
+        }
+        for (String profMemberUuid : jsonObject.getJSONObject("profile").getJSONObject("members").keySet()) {
+            try {
+                totalMoney += jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(profMemberUuid).getLong("coin_purse");
+            } catch (JSONException ignore) {
+            }
+        }
+        return totalMoney;
     }
 }

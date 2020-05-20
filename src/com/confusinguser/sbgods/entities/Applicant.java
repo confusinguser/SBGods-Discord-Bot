@@ -35,10 +35,10 @@ public class Applicant {
 
     public boolean meetsRequirements() {
         return main.getApiUtil().getPlayerSlayerExp(player.getUUID()).getTotalExp() >= guild.getSlayerExpRec() &&
-                main.getSBUtil().toSkillExp(main.getApiUtil().getBestPlayerSkillLevels(player.getUUID()).getAvgSkillLevel()) >= guild.getSkillExpRec();
+                main.getSBUtil().toSkillExp(main.getApiUtil().getBestProfileSkillLevels(player.getUUID()).getAvgSkillLevel()) >= guild.getSkillExpRec();
     }
 
     private void updateRating() {
-        this.rating = ((main.getApiUtil().getPlayerSlayerExp(player.getUUID()).getTotalExp() / guild.getSlayerExpRec()) * (main.getSBUtil().toSkillExp(main.getApiUtil().getBestPlayerSkillLevels(player.getUUID()).getAvgSkillLevel() / guild.getSkillExpRec()))) / 2;
+        this.rating = ((main.getApiUtil().getPlayerSlayerExp(player.getUUID()).getTotalExp() / guild.getSlayerExpRec()) * (main.getSBUtil().toSkillExp(main.getApiUtil().getBestProfileSkillLevels(player.getUUID()).getAvgSkillLevel() / guild.getSkillExpRec()))) / 2;
     }
 }

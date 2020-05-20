@@ -6,17 +6,12 @@ import com.confusinguser.sbgods.entities.Pet;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SlayerExp;
-import com.confusinguser.sbgods.utils.Constants;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.EventListener;
-import java.util.HashMap;
-import java.util.Map;
 
 public class PlayerCommand extends Command implements EventListener {
 
@@ -43,7 +38,7 @@ public class PlayerCommand extends Command implements EventListener {
             return;
         }
 
-        String messageId = e.getChannel().sendMessage("Loading (0/2)").complete().getId();
+        String messageId = e.getChannel().sendMessage("Loading (0/4)").complete().getId();
         e.getChannel().sendTyping().queue();
 
         Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
@@ -53,74 +48,35 @@ public class PlayerCommand extends Command implements EventListener {
             return;
         }
 
-        e.getChannel().sendTyping().queue();
-        e.getChannel().editMessageById(messageId, "Loading (1/2)").queue();
-        SkillLevels skillLevels = main.getApiUtil().getProfileSkillsAlternate(player.getUUID());
+        SkillLevels skillLevels = new SkillLevels();
         ArrayList<Pet> totalPets = new ArrayList<>();
+        SlayerExp slayerExp = new SlayerExp();
+        double totalMoney = 0.0;
 
-
-        SlayerExp slayerExp;
-        Double totalMoney = 0.0;
-
-        Map<String, Integer> slayerOutput = new HashMap<>();
-        for (String slayer_type : Constants.slayer_types) {
-            slayerOutput.put(slayer_type, 0);
-        }
-
-        int index = 0;
-        for (String profileId : player.getSkyblockProfiles()) {
-            index++;
+        for (int i = 0; i < player.getSkyblockProfiles().size(); i++) { // Good Code > Smooth loading animation (also it "Profile 1.33" doesnt rly make sense)
+            // Sometimes you have to make sacrifices to the functionality, and users dont wanna see all the data becuase it makes them confused like, "wdym profile 1.5?? i dont have half a profile!"
+            String profileId = player.getSkyblockProfiles().get(i);
             e.getChannel().sendTyping().queue();
-            e.getChannel().editMessageById(messageId, "Loading (1/2) [Profile " + (index - 1) + ".33/" + player.getSkyblockProfiles().size() + "]").queue();
-            SkillLevels profSkillLevels = main.getApiUtil().getProfileSkills(profileId, player.getUUID());
+            e.getChannel().editMessageById(messageId, "Loading (1/4) [Profile " + (i + 1) + "/" + player.getSkyblockProfiles().size() + "]").queue();
 
-            if (profSkillLevels.getAvgSkillLevel() > (skillLevels.isApproximate() ? skillLevels.getAvgSkillLevel() - 2 : skillLevels.getAvgSkillLevel())) { //if approx remove 2 levels in calc due to bug idk but i think this fix
-                skillLevels = profSkillLevels;
-            }
-
-            e.getChannel().sendTyping().queue();
-            e.getChannel().editMessageById(messageId, "Loading (1/2) [Profile " + (index - 1) + ".66/" + player.getSkyblockProfiles().size() + "]").queue();
             ArrayList<Pet> pets = main.getApiUtil().getProfilePets(profileId, player.getUUID()); // Pets in profile
             totalPets.addAll(pets);
 
-            //Putting slayer here to make the loading animation smoother (can animate for every profile)
+            e.getChannel().sendTyping().queue();
+            e.getChannel().editMessageById(messageId, "Loading (2/4) [Profile " + (i + 1) + "/" + player.getSkyblockProfiles().size() + "]").queue();
 
+            skillLevels = main.getApiUtil().getBestProfileSkillLevels(player.getUUID());
 
             e.getChannel().sendTyping().queue();
-            e.getChannel().editMessageById(messageId, "Loading (1/2) [Profile " + index + "/" + player.getSkyblockProfiles().size() + "]").queue();
+            e.getChannel().editMessageById(messageId, "Loading (3/4) [Profile " + (i + 1) + "/" + player.getSkyblockProfiles().size() + "]").queue();
 
-            String response = main.getApiUtil().getResponse(main.getApiUtil().BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileId, 600000);
-            if (response == null) continue;
+            totalMoney += main.getApiUtil().getTotalMoneyInProfile(profileId);
 
-            JSONObject jsonObject = new JSONObject(response);
+            e.getChannel().sendTyping().queue();
+            e.getChannel().editMessageById(messageId, "Loading (4/4) [Profile " + (i + 1) + "/" + player.getSkyblockProfiles().size() + "]").queue();
 
-            JSONObject jsonObjectSlayer = new JSONObject();
-            try {
-                jsonObjectSlayer = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(player.getUUID()).getJSONObject("slayer_bosses");
-            } catch (JSONException ignored) {
-            }
-
-            for (String slayer_type : Constants.slayer_types) {
-                try {
-                    slayerOutput.put(slayer_type, slayerOutput.get(slayer_type) + jsonObjectSlayer.getJSONObject(slayer_type).getInt("xp"));
-                } catch (JSONException ignored) {
-                }
-            }
-
-            try {
-                totalMoney += jsonObject.getJSONObject("profile").getJSONObject("banking").getLong("balance");
-            } catch (Exception ignore) {
-            }
-
-            for (String profMemberUuid : jsonObject.getJSONObject("profile").getJSONObject("members").keySet()) {
-                try {
-                    totalMoney += jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(profMemberUuid).getLong("coin_purse");
-                } catch (Exception ignore) {
-                }
-            }
+            slayerExp = SlayerExp.addExps(slayerExp, main.getApiUtil().getProfileSlayerExp(profileId, player.getUUID()));
         }
-
-        slayerExp = new SlayerExp(slayerOutput);
 
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(player.getDisplayName()).setColor(0xb8300b).setThumbnail("https://visage.surgeplay.com/bust/" + player.getUUID()).setFooter("SBGods");
         User discordUser = main.getDiscord().getJDA().getUserByTag(player.getDiscordTag());
@@ -129,22 +85,19 @@ public class PlayerCommand extends Command implements EventListener {
             embedBuilder.addField("Discord", discordUser.getAsMention(), false);
         embedBuilder.addField("Status", player.isOnline() ? "Online" : "Offline", false);
         embedBuilder.addField("Guild", main.getApiUtil().getGuildFromUUID(player.getUUID()), false);
-        embedBuilder.addField("Average skill level", ((double) Math.round(skillLevels.getAvgSkillLevel() * 100)) / 100 + (skillLevels.isApproximate() ? " (Approx)" : ""), true);
-        embedBuilder.addField("Slayer EXP", main.getLangUtil().prettifyInt(slayerExp.getTotalExp()), true);
+        embedBuilder.addField("Average skill level", main.getUtil().round(skillLevels.getAvgSkillLevel(), 2) + (skillLevels.isApproximate() ? " (Approx)" : ""), true);
+        embedBuilder.addField("Slayer EXP", main.getLangUtil().addNotation(slayerExp.getTotalExp()), true);
         embedBuilder.addField("Total money (All coops)", totalMoney == 0 ? "Banking API off" : main.getLangUtil().addNotation(totalMoney), true);
 
         StringBuilder petStr = new StringBuilder();
-
         for (Pet pet : totalPets) {
             if (pet.isActive()) {
                 petStr.append("\n").append(main.getLangUtil().toLowerCaseButFirstLetter(pet.getTier().toString())).append(" ").append(pet.getType()).append(" (").append(pet.getLevel()).append(")");
             }
         }
-
         embedBuilder.addField("Active pets (One per profile)", petStr.toString(), false);
 
         e.getChannel().deleteMessageById(messageId).queue();
-
         e.getChannel().sendMessage(embedBuilder.build()).queue();
     }
 }

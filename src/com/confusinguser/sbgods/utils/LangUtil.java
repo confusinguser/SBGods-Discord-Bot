@@ -2,10 +2,6 @@ package com.confusinguser.sbgods.utils;
 
 import com.confusinguser.sbgods.SBGods;
 
-import javax.swing.*;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-
 public class LangUtil {
 
     private final SBGods main;
@@ -72,58 +68,27 @@ public class LangUtil {
         return String.valueOf(input);
     }
 
-    public String addNotation(double numb) {
-        double retNum = 0.0;
-        main.logger.info("1");
-        String ret = "";
-        main.logger.info("2");
-        String prefix = "";
-        main.logger.info("3");
-        double checkVal = 1000;
-        main.logger.info("4");
-        if (numb < 0) {
-            main.logger.info("5");
-            prefix = "-";
-            main.logger.info("6");
-            numb *= -1;
-            main.logger.info("7");
-        }
-        main.logger.info("8");
-        ArrayList<String> notationNames = new ArrayList<>();
-        main.logger.info("9");
+    public String addNotation(double num) {
+        double returnVal;
+        String[] notList = new String[]{"K", "M", "B"};
+        String returnValStr = String.valueOf(num);
+        long checkNum = 1000;
 
-        notationNames.add("K");
-        main.logger.info("10");
-        notationNames.add("M");
-        main.logger.info("11");
-        notationNames.add("B");
-        main.logger.info("12");
-        notationNames.add("T");
-        main.logger.info("13");
-
-        for (String notationName : notationNames) {
-            main.logger.info("14");
-            for (int i = 3; i >= 1; i--) {
-                main.logger.info("15");
-                if (checkVal >= numb) {
-                    main.logger.info("16");
-                    retNum = numb / (checkVal / 100);
-                    main.logger.info("17");
-                    retNum = Math.floor(retNum);
-                    main.logger.info("18");
-                    retNum = (retNum / Math.pow(10, i)) * 10;
-                    main.logger.info("19");
-                    ret = main.getUtil().round(retNum, i - 1) + notationName;
-                    main.logger.info("20");
+        String notValue;
+        int i = 0;
+        for (int u = notList.length; u > 0; u--) {
+            notValue = notList[i];
+            i++;
+            for (int o = 3; o >= 1; o--) {
+                if (num >= checkNum) {
+                    returnVal = num / checkNum * 100;
+                    returnVal = Math.floor(returnVal);
+                    returnVal = (returnVal / Math.pow(10, o)) * 10;
+                    returnValStr = +main.getUtil().round(returnVal, o - 1) + notValue;
                 }
-                main.logger.info("21");
-                checkVal *= 10;
-                main.logger.info("22");
+                checkNum *= 10;
             }
-            main.logger.info("23");
         }
-
-        main.logger.info("24");
-        return prefix + ret;
+        return returnValStr;
     }
 }

@@ -46,4 +46,12 @@ public class SlayerExp {
     public int getTotalExp() {
         return totalExp;
     }
+
+    public static SlayerExp addExps(SlayerExp slayerExp, SlayerExp otherSlayerExp) {
+        return new SlayerExp(
+                slayerExp.getZombie() + otherSlayerExp.getZombie(),
+                slayerExp.getSpider() + otherSlayerExp.getSpider(),
+                slayerExp.getWolf() + otherSlayerExp.getWolf()
+        );
+    }
 }
