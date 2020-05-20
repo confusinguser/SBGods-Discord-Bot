@@ -60,7 +60,7 @@ public class PlayerCommand extends Command implements EventListener {
 
 
         SlayerExp slayerExp;
-        long totalMoney = 0;
+        Double totalMoney = 0.0;
 
         Map<String, Integer> slayerOutput = new HashMap<>();
         for (String slayer_type : Constants.slayer_types) {
@@ -130,8 +130,8 @@ public class PlayerCommand extends Command implements EventListener {
         embedBuilder.addField("Status", player.isOnline() ? "Online" : "Offline", false);
         embedBuilder.addField("Guild", main.getApiUtil().getGuildFromUUID(player.getUUID()), false);
         embedBuilder.addField("Average skill level", ((double) Math.round(skillLevels.getAvgSkillLevel() * 100)) / 100 + (skillLevels.isApproximate() ? " (Approx)" : ""), true);
-        embedBuilder.addField("Slayer EXP", main.getLangUtil().prettifyInt(slayerExp.getTotalExp()), true);
-        embedBuilder.addField("Total money (All coops)", main.getLangUtil().prettifyLong(totalMoney), true);
+        embedBuilder.addField("Slayer EXP", main.getLangUtil().addNotation((slayerExp.getTotalExp())), true);
+        embedBuilder.addField("Total money (All coops)", main.getLangUtil().addNotation(totalMoney), true);
 
         StringBuilder petStr = new StringBuilder();
 

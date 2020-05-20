@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
