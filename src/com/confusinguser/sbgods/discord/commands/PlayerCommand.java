@@ -131,7 +131,7 @@ public class PlayerCommand extends Command implements EventListener {
         embedBuilder.addField("Guild", main.getApiUtil().getGuildFromUUID(player.getUUID()), false);
         embedBuilder.addField("Average skill level", ((double) Math.round(skillLevels.getAvgSkillLevel() * 100)) / 100 + (skillLevels.isApproximate() ? " (Approx)" : ""), true);
         embedBuilder.addField("Slayer EXP", main.getLangUtil().prettifyInt(slayerExp.getTotalExp()), true);
-        embedBuilder.addField("Total money (All coops)", main.getLangUtil().prettifyLong(totalMoney), true);
+        embedBuilder.addField("Total money (All coops)", totalMoney == 0 ? "Banking API off" : main.getLangUtil().prettifyLong(totalMoney), true);
 
         StringBuilder petStr = new StringBuilder();
 

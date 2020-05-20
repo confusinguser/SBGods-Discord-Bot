@@ -96,7 +96,7 @@ public class DiscordBot {
     }
 
     public String escapeMarkdown(String text) {
-        String unescaped = text.replaceAll("/\\\\([*_`~\\\\])/g", "$1"); // unescape any "backslashed" character
-        return unescaped.replaceAll("/([*_`~\\\\])/g", "\\$1"); // escape *, _, `, ~, \
+        String unescaped = text.replaceAll("\\\\([*_`~\\\\])", "$1"); // unescape any "backslashed" character
+        return unescaped.replaceAll("([*_`~\\\\])", "\\\\$1"); // escape *, _, `, ~, \
     }
 }
