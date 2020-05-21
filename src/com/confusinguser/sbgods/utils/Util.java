@@ -164,7 +164,7 @@ public class Util {
             }
         }
         // Remove all roles that are for other guilds
-        for (Role role : member.getRoles().stream().filter(role -> HypixelGuild.getGuildByName(role.getName()) != guild).collect(Collectors.toList())) {
+        for (Role role : member.getRoles().stream().filter(role -> HypixelGuild.getGuildByName(role.getName()) != guild && HypixelGuild.getGuildByName(role.getName()) != null).collect(Collectors.toList())) {
             try {
                 discord.removeRoleFromMember(member, role).queue();
             } catch (HierarchyException ignored) {
