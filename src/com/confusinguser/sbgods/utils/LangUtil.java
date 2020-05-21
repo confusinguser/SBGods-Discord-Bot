@@ -84,7 +84,7 @@ public class LangUtil {
                     returnVal = num / checkNum * 100;
                     returnVal = Math.floor(returnVal);
                     returnVal = (returnVal / Math.pow(10, o)) * 10;
-                    returnValStr = String.valueOf(+main.getUtil().round(returnVal, o - 1)) + notValue;
+                    returnValStr = +main.getUtil().round(returnVal, o - 1) + notValue;
                     if(o == 1){
                         returnValStr = returnValStr.replace(".0","");
                     }

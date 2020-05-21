@@ -76,14 +76,14 @@ public class SkillCommand extends Command implements EventListener {
                 for (int i = 0; i < topX; i++) {
                     Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillExpHashMap, i, true);
                     if (!currentEntry.getValue().isApproximate()) {
-                        response.append(currentEntry.getKey() + "    " + main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2) + "\n");
+                        response.append(currentEntry.getKey()).append("    ").append(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2)).append("\n");
                     }
                 }
             } else {
                 int totalAvgSkillLvl = 0;
                 for (int i = 0; i < topX; i++) {
                     Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillExpHashMap, i, true);
-                    response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2));
+                    response.append("**#").append(Math.incrementExact(i)).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2));
                     if (currentEntry.getValue().isApproximate()) {
                         response.append(" *(appr.)*");
                     }
@@ -145,28 +145,28 @@ public class SkillCommand extends Command implements EventListener {
                 StringBuilder descriptionBuilder = embedBuilder.getDescriptionBuilder();
 
                 if (highestSkillLevels.isApproximate()) {
-                    descriptionBuilder.append("Approximate average skill level: " + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "\n\n");
+                    descriptionBuilder.append("Approximate average skill level: ").append(main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3)).append("\n\n");
                 } else {
-                    descriptionBuilder.append("Average skill level: " + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "\n\n");
+                    descriptionBuilder.append("Average skill level: ").append(main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3)).append("\n\n");
                 }
 
                 descriptionBuilder
-                        .append("Farming: " + highestSkillLevels.getFarming() + '\n')
-                        .append("Mining: " + highestSkillLevels.getMining() + '\n')
-                        .append("Combat: " + highestSkillLevels.getCombat() + '\n')
-                        .append("Foraging: " + highestSkillLevels.getForaging() + '\n')
-                        .append("Fishing: " + highestSkillLevels.getFishing() + '\n')
-                        .append("Enchanting: " + highestSkillLevels.getEnchanting() + '\n');
+                        .append("Farming: ").append(highestSkillLevels.getFarming()).append('\n')
+                        .append("Mining: ").append(highestSkillLevels.getMining() + '\n')
+                        .append("Combat: ").append(highestSkillLevels.getCombat() + '\n')
+                        .append("Foraging: ").append(highestSkillLevels.getForaging() + '\n')
+                        .append("Fishing: ").append(highestSkillLevels.getFishing() + '\n')
+                        .append("Enchanting: ").append(highestSkillLevels.getEnchanting() + '\n');
                 if (highestSkillLevels.isApproximate())
-                    descriptionBuilder.append("Taming: " + highestSkillLevels.getTaming() + '\n');
-                descriptionBuilder.append("Alchemy: " + highestSkillLevels.getAlchemy() + '\n');
+                    descriptionBuilder.append("Taming: ").append(highestSkillLevels.getTaming()).append('\n');
+                descriptionBuilder.append("Alchemy: ").append(highestSkillLevels.getAlchemy()).append('\n');
 
                 embedBuilder.setDescription(descriptionBuilder.toString());
 
                 StringBuilder footerBuilder = new StringBuilder();
                 embedBuilder.setFooter(footerBuilder
-                        .append("Carpentry: " + highestSkillLevels.getCarpentry() + '\n')
-                        .append("Runecrafting: " + highestSkillLevels.getRunecrafting())
+                        .append("Carpentry: ").append(highestSkillLevels.getCarpentry() + '\n')
+                        .append("Runecrafting: ").append(highestSkillLevels.getRunecrafting())
                         .toString());
 
                 e.getChannel().sendMessage(embedBuilder.build()).queue();

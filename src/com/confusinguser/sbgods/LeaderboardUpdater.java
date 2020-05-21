@@ -13,7 +13,7 @@ public class LeaderboardUpdater implements Runnable {
 
     private static LeaderboardUpdater instance;
     private final SBGods main;
-    
+
     LeaderboardUpdater() {
         this.main = SBGods.getInstance();
         LeaderboardUpdater.instance = this;

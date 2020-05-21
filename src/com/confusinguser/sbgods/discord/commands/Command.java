@@ -49,5 +49,5 @@ public abstract class Command extends ListenerAdapter {
         return name;
     }
 
-    public abstract void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer) throws InterruptedException;
+    public abstract void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer);
 }

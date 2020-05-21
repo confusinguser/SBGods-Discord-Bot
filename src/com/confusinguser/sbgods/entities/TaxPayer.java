@@ -7,14 +7,12 @@ import org.json.JSONObject;
 
 public class TaxPayer {
     private final String uuid;
-    private final String name;
     private final String guildId;
     private final SBGods main;
     private final JSONObject jsonData;
 
     public TaxPayer(String uuid, String name, String guildId, JSONObject jsonData, SBGods main) {
         this.uuid = uuid;
-        this.name = name;
         this.guildId = guildId;
         this.main = main;
 
