@@ -14,8 +14,8 @@ public class SBGods {
     public static final String VERSION_DESCRIPTION = "Better loading 'animations'";
     private static final String CREATOR_ID = "244786205873405952";
     private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
-    private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
-    //private static SBGods instance;
+    //private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
+    private static SBGods instance;
     public final String[] keys = {"bc90572a-1547-41a5-8f28-d7664916a28d", "3963906e-ffb6-45b9-b07b-80ca9838eb20"};
     public final Logger logger = Logger.getLogger(this.getClass().getName());
     private final ApiUtil apiutil;
