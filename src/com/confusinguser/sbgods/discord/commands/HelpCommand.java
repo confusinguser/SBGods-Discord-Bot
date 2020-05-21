@@ -3,7 +3,9 @@ package com.confusinguser.sbgods.discord.commands;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
+import com.confusinguser.sbgods.entities.HelpMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 
@@ -21,6 +23,12 @@ public class HelpCommand extends Command implements EventListener {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
+        if(args.length>1){
+            MessageEmbed message = HelpMessage.getHelpFromCommand(e.getMessage().getContentRaw().replace("-help ", "")).getEmbed();
+
+            e.getChannel().sendMessage(message);
+            return;
+        }
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("SBGods Discord Bot Help Page");
         Random colorRandom = new Random();
         embedBuilder = embedBuilder.setDescription(embedBuilder.getDescriptionBuilder()
