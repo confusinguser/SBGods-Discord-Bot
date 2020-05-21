@@ -77,7 +77,7 @@ public class SkillExpCommand extends Command implements EventListener {
                 for (int i = 0; i < topX; i++) {
                     Map.Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillExpHashMap, i, true);
                     if (!currentEntry.getValue().isApproximate()) {
-                        response.append(currentEntry.getKey() + "    " + main.getSBUtil().toSkillExp(currentEntry.getValue().getAvgSkillLevel()) + "\n");
+                        response.append(currentEntry.getKey()).append("    ").append(main.getSBUtil().toSkillExp(currentEntry.getValue().getAvgSkillLevel())).append("\n");
                     }
                 }
             } else {
@@ -85,7 +85,7 @@ public class SkillExpCommand extends Command implements EventListener {
                 int totalAvgSkillExp = 0;
                 for (int i = 0; i < topX; i++) {
                     Map.Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillExpHashMap, i, true);
-                    response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + main.getSBUtil().toSkillExp(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2)));
+                    response.append("**#").append(Math.incrementExact(i)).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getSBUtil().toSkillExp(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2)));
                     if (currentEntry.getValue().isApproximate()) {
                         response.append(" *(appr.)*");
                     }
@@ -153,23 +153,23 @@ public class SkillExpCommand extends Command implements EventListener {
                 }
 
                 descriptionBuilder
-                        .append("Farming: " + main.getSBUtil().toSkillExp(highestSkillLevels.getFarming()) + '\n')
-                        .append("Mining: " + main.getSBUtil().toSkillExp(highestSkillLevels.getMining()) + '\n')
-                        .append("Combat: " + main.getSBUtil().toSkillExp(highestSkillLevels.getCombat()) + '\n')
-                        .append("Foraging: " + main.getSBUtil().toSkillExp(highestSkillLevels.getForaging()) + '\n')
-                        .append("Fishing: " + main.getSBUtil().toSkillExp(highestSkillLevels.getFishing()) + '\n')
-                        .append("Enchanting: " + main.getSBUtil().toSkillExp(highestSkillLevels.getEnchanting()) + '\n');
+                        .append("Farming: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getFarming()) + '\n')
+                        .append("Mining: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getMining()) + '\n')
+                        .append("Combat: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getCombat()) + '\n')
+                        .append("Foraging: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getForaging()) + '\n')
+                        .append("Fishing: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getFishing()) + '\n')
+                        .append("Enchanting: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getEnchanting()) + '\n');
                 if (highestSkillLevels.isApproximate())
-                    descriptionBuilder.append("Taming: " + main.getSBUtil().toSkillExp(highestSkillLevels.getTaming()) + '\n');
-                descriptionBuilder.append("Alchemy: " + main.getSBUtil().toSkillExp(highestSkillLevels.getAlchemy()) + '\n');
+                    descriptionBuilder.append("Taming: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getTaming())).append('\n');
+                descriptionBuilder.append("Alchemy: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getAlchemy())).append('\n');
 
 
                 embedBuilder.setDescription(descriptionBuilder.toString());
 
                 StringBuilder footerBuilder = new StringBuilder();
                 embedBuilder.setFooter(footerBuilder
-                        .append("Carpentry: " + main.getSBUtil().toSkillExp(highestSkillLevels.getCarpentry()) + '\n')
-                        .append("Runecrafting: " + main.getSBUtil().toSkillExp(highestSkillLevels.getRunecrafting()))
+                        .append("Carpentry: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getCarpentry()) + '\n')
+                        .append("Runecrafting: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getRunecrafting()))
                         .toString());
 
                 e.getChannel().sendMessage(embedBuilder.build()).queue();

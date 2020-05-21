@@ -54,9 +54,9 @@ public class PetsCommand extends Command implements EventListener {
 
         for (Pet pet : totalPets) {
             if (pet.isActive()) {
-                descriptionBuilder.append("**" + main.getLangUtil().toLowerCaseButFirstLetter(pet.getTier().toString()) + " " + pet.getType() + " (" + pet.getLevel() + ")" + "**\n");
+                descriptionBuilder.append("**").append(main.getLangUtil().toLowerCaseButFirstLetter(pet.getTier().toString())).append(" ").append(pet.getType()).append(" (").append(pet.getLevel()).append(")").append("**\n");
             } else {
-                descriptionBuilder.append(main.getLangUtil().toLowerCaseButFirstLetter(pet.getTier().toString()) + " " + pet.getType() + " (" + pet.getLevel() + ")\n");
+                descriptionBuilder.append(main.getLangUtil().toLowerCaseButFirstLetter(pet.getTier().toString())).append(" ").append(pet.getType()).append(" (").append(pet.getLevel()).append(")\n");
             }
         }
 

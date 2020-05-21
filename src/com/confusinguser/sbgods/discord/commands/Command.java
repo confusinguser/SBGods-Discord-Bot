@@ -6,7 +6,7 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-public class Command extends ListenerAdapter {
+public abstract class Command extends ListenerAdapter {
     SBGods main = SBGods.getInstance();
     DiscordBot discord = main.getDiscord();
     String name;
@@ -27,7 +27,11 @@ public class Command extends ListenerAdapter {
         } // Only allowed servers may use commands
 
         main.getUtil().setTyping(true, e.getChannel());
-        handleCommand(e, discordServer);
+        try {
+            handleCommand(e, discordServer);
+        } catch (Throwable t) {
+            main.logger.severe("Exception when handling command '" + e.getMessage().getContentRaw() + "': " + t.getMessage() + "\n" + t);
+        }
         main.getUtil().setTyping(false, e.getChannel());
     }
 
@@ -45,5 +49,5 @@ public class Command extends ListenerAdapter {
         return name;
     }
 
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer) {}
+    public abstract void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer);
 }

@@ -77,13 +77,13 @@ public class SlayerCommand extends Command implements EventListener {
             if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
                 for (int i = 0; i < topX; i++) {
                     Entry<String, SlayerExp> currentEntry = main.getUtil().getHighestKeyValuePairForSlayerExp(usernameSlayerExpHashMap, i);
-                    response.append(currentEntry.getKey() + "    " + main.getLangUtil().addNotation(main.getSBUtil().toSkillExp(main.getUtil().round(currentEntry.getValue().getTotalExp(), 2))) + "\n");
+                    response.append(currentEntry.getKey()).append("    ").append(main.getLangUtil().addNotation(main.getSBUtil().toSkillExp(main.getUtil().round(currentEntry.getValue().getTotalExp(), 2)))).append("\n");
                 }
             } else {
                 int totalSlayer = 0;
                 for (int i = 0; i < topX; i++) {
                     Entry<String, SlayerExp> currentEntry = main.getUtil().getHighestKeyValuePairForSlayerExp(usernameSlayerExpHashMap, i);
-                    response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + main.getLangUtil().addNotation(currentEntry.getValue().getTotalExp()) + "\n\n");
+                    response.append("**#").append(Math.incrementExact(i)).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue().getTotalExp())).append("\n\n");
                     totalSlayer += currentEntry.getValue().getTotalExp();
                 }
                 if (topX == guildMemberUuids.size())

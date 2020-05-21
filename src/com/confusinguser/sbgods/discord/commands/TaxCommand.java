@@ -46,7 +46,7 @@ public class TaxCommand extends Command implements EventListener {
 
             e.getChannel().sendMessage("Your tax info:").queue();
             e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
-            e.getChannel().sendMessage("Other arguments you can use are: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `info` and `setrole`!").queue();
+            e.getChannel().sendMessage("Other arguments you can use are: `owelist`, `info` and `setrole`, `paid (admin)`, `paidall (admin)`, `owe (admin)`, `oweall (admin)`!").queue();
             return;
         }
 
@@ -64,19 +64,14 @@ public class TaxCommand extends Command implements EventListener {
             String messageId = e.getChannel().sendMessage("...").complete().getId();
 
             Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
-
             TaxPayer taxPayer = main.getApiUtil().getTaxPayer(thePlayer);
 
             taxPayer.addOwes(-Integer.parseInt(args[3]));
-
             taxPayer.sendDataToServer();
 
             e.getChannel().deleteMessageById(messageId).queue();
-
             e.getChannel().sendMessage("Success! The player's current tax info:").queue();
-
             e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
-
             return;
         }
 
@@ -184,14 +179,14 @@ public class TaxCommand extends Command implements EventListener {
                 return;
             }
 
-            if (args.length <= 2) {
+            if (args.length < 3) {
                 e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " oweall <AMOUNT> [group]`!").queue();
                 return;
             }
             String role = "";
             int amount = Integer.parseInt(args[2]);
             if (args.length == 4) {
-                role = args[3];
+                role = args[3].toLowerCase();
             }
 
             ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
@@ -304,7 +299,7 @@ public class TaxCommand extends Command implements EventListener {
         }
 
         if (args[1].equalsIgnoreCase("setrole")) {
-            if (args.length <= 3) {
+            if (args.length < 4) {
                 e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " setrole <IGN> <ROLE>`!").queue();
                 return;
             }
@@ -312,20 +307,14 @@ public class TaxCommand extends Command implements EventListener {
             String messageId = e.getChannel().sendMessage("...").complete().getId();
 
             Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
-
             TaxPayer taxPayer = main.getApiUtil().getTaxPayer(thePlayer);
-
-            taxPayer.setRole(args[3]);
-
+            taxPayer.setRole(args[3].toLowerCase());
             taxPayer.sendDataToServer();
 
             e.getChannel().deleteMessageById(messageId).queue();
-
             e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
-
             return;
         }
         e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `info`, `setrole`!").queue();
-
     }
 }

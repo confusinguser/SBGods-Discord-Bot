@@ -76,14 +76,14 @@ public class SkillCommand extends Command implements EventListener {
                 for (int i = 0; i < topX; i++) {
                     Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillExpHashMap, i, true);
                     if (!currentEntry.getValue().isApproximate()) {
-                        response.append(currentEntry.getKey() + "    " + main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2) + "\n");
+                        response.append(currentEntry.getKey()).append("    ").append(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2)).append("\n");
                     }
                 }
             } else {
                 int totalAvgSkillLvl = 0;
                 for (int i = 0; i < topX; i++) {
                     Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillExpHashMap, i, true);
-                    response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2));
+                    response.append("**#").append(Math.incrementExact(i)).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2));
                     if (currentEntry.getValue().isApproximate()) {
                         response.append(" *(appr.)*");
                     }
@@ -147,7 +147,7 @@ public class SkillCommand extends Command implements EventListener {
                 if (highestSkillLevels.isApproximate()) {
                     descriptionBuilder.append("Approximate average skill level: **" + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "**\n\n");
                 } else {
-                    descriptionBuilder.append("Average skill level: " + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "\n\n");
+                    descriptionBuilder.append("Average skill level: **").append(main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3)).append("**\n\n");
                 }
 
                 descriptionBuilder
@@ -165,8 +165,8 @@ public class SkillCommand extends Command implements EventListener {
 
                 StringBuilder footerBuilder = new StringBuilder();
                 embedBuilder.setFooter(footerBuilder
-                        .append("Carpentry: " + highestSkillLevels.getCarpentry() + '\n')
-                        .append("Runecrafting: " + highestSkillLevels.getRunecrafting())
+                        .append("Carpentry: ").append(highestSkillLevels.getCarpentry() + '\n')
+                        .append("Runecrafting: ").append(highestSkillLevels.getRunecrafting())
                         .toString());
 
                 e.getChannel().sendMessage(embedBuilder.build()).queue();

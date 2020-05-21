@@ -10,10 +10,7 @@ import java.util.List;
 
 public class SBUtil {
 
-    private final SBGods main;
-
     public SBUtil(SBGods main) {
-        this.main = main;
     }
 
     public int toPetLevel(int xpAmount, PetTier tier) {
