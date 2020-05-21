@@ -25,19 +25,9 @@ public class SlayerCommand extends Command implements EventListener {
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
-            return;
-        }
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer) {
 
-        main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
-
-        DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromEvent(e);
-        if (currentDiscordServer == null) {
-            return;
-        }
-
-        if (currentDiscordServer.getChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getChannelId())) {
+        if (currentDiscordServer.getBotChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getBotChannelId())) {
             e.getChannel().sendMessage("Slayer commands cannot be ran in this channel!").queue();
             return;
         }
@@ -49,7 +39,6 @@ public class SlayerCommand extends Command implements EventListener {
             return;
         }
 
-        e.getChannel().sendTyping().queue();
         boolean spreadsheet = false;
         if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
             spreadsheet = true;
@@ -124,7 +113,6 @@ public class SlayerCommand extends Command implements EventListener {
 
         if (args[1].equalsIgnoreCase("player")) {
             String messageId = e.getChannel().sendMessage("...").complete().getId();
-            e.getChannel().sendTyping().queue();
 
             Player thePlayer;
             if (args.length >= 3) {

@@ -2,6 +2,7 @@ package com.confusinguser.sbgods.discord.commands;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
+import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -23,13 +24,7 @@ public class SbgodsCommand extends Command implements EventListener {
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
-            return;
-        }
-
-        main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
-        e.getChannel().sendMessage(main.getLangUtil().getProgressBar(0.5,20)).queue();
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordserver) {
         String[] args = e.getMessage().getContentRaw().split(" ");
 
         if (args.length == 1) {
@@ -54,7 +49,6 @@ public class SbgodsCommand extends Command implements EventListener {
                 return;
             }
 
-            e.getChannel().sendTyping().queue();
             Map.Entry<String, String> latestReleaseUrl = main.getApiUtil().getLatestReleaseUrl();
             if (latestReleaseUrl.getValue().equals("")) {
                 e.getChannel().sendMessage("There are no releases available!").queue();

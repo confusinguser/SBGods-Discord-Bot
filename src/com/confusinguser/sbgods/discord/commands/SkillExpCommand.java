@@ -6,7 +6,6 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 
@@ -24,33 +23,18 @@ public class SkillExpCommand extends Command implements EventListener {
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
-            return;
-        }
-        DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromEvent(e);
-        if (currentDiscordServer == null) {
-            return;
-        }
-        handleCommand(currentDiscordServer, e.getChannel(), e.getMessage().getContentRaw(), e.getAuthor().getName());
-    }
-
-    public void handleCommand(DiscordServer currentDiscordServer, MessageChannel channel, String messageRaw, String authorName) {
-
-        if (currentDiscordServer.getChannelId() != null && !channel.getId().contentEquals(currentDiscordServer.getChannelId())) {
-            channel.sendMessage("Skill commands cannot be ran in this channel!").queue();
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer) {
+        if (currentDiscordServer.getBotChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getBotChannelId())) {
+            e.getChannel().sendMessage("Skill commands cannot be ran in this channel!").queue();
             return;
         }
 
-        main.logger.info(authorName + " ran command: " + messageRaw);
-
-        String[] args = messageRaw.split(" ");
+        String[] args = e.getMessage().getContentRaw().split(" ");
 
         if (args.length <= 1) {
-            channel.sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
+            e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
             return;
         }
-        channel.sendTyping().queue();
 
         boolean spreadsheet = false;
         if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
@@ -63,9 +47,9 @@ public class SkillExpCommand extends Command implements EventListener {
 
             if (usernameSkillExpHashMap.size() == 0) {
                 if (currentDiscordServer.getHypixelGuild().getSkillProgress() == 0) {
-                    channel.sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards have a higher priority)").queue();
+                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards have a higher priority)").queue();
                 } else {
-                    channel.sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getSkillProgress() + " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
+                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getSkillProgress() + " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
                 }
                 return;
             }
@@ -78,7 +62,7 @@ public class SkillExpCommand extends Command implements EventListener {
                     try {
                         topX = Math.min(guildMemberUuids.size(), Integer.parseInt(args[2]));
                     } catch (NumberFormatException exception) {
-                        channel.sendMessage("**" + args[2] + "** is not a valid number!").queue();
+                        e.getChannel().sendMessage("**" + args[2] + "** is not a valid number!").queue();
                         return;
                     }
                 }
@@ -121,12 +105,12 @@ public class SkillExpCommand extends Command implements EventListener {
             for (int j = 0; j < responseList.size(); j++) {
                 String message = responseList.get(j);
                 if (j == 0 && !spreadsheet) {
-                    channel.sendMessage(message).queue();
+                    e.getChannel().sendMessage(message).queue();
                 } else {
                     if (spreadsheet) {
-                        channel.sendMessage("```arm\n" + message + "```").queue();
+                        e.getChannel().sendMessage("```arm\n" + message + "```").queue();
                     } else {
-                        channel.sendMessage("\u200E" + message).queue();
+                        e.getChannel().sendMessage("\u200E" + message).queue();
                     }
                 }
             }
@@ -138,13 +122,12 @@ public class SkillExpCommand extends Command implements EventListener {
                 Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
 
                 if (thePlayer.getSkyblockProfiles().isEmpty()) {
-                    channel.sendMessage("Player **" + args[2] + "** does not exist!").queue();
+                    e.getChannel().sendMessage("Player **" + args[2] + "** does not exist!").queue();
                     return;
                 }
 
                 SkillLevels highestSkillLevels = new SkillLevels();
                 for (String profile : thePlayer.getSkyblockProfiles()) {
-                    channel.sendTyping().queue();
                     SkillLevels skillLevels = main.getApiUtil().getProfileSkills(profile, thePlayer.getUUID());
 
                     if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
@@ -189,14 +172,14 @@ public class SkillExpCommand extends Command implements EventListener {
                         .append("Runecrafting: " + main.getSBUtil().toSkillExp(highestSkillLevels.getRunecrafting()))
                         .toString());
 
-                channel.sendMessage(embedBuilder.build()).queue();
+                e.getChannel().sendMessage(embedBuilder.build()).queue();
 
             } else {
-                channel.sendMessage("Invalid usage! Usage: *" + getName() + " player <IGN>*").queue();
+                e.getChannel().sendMessage("Invalid usage! Usage: *" + getName() + " player <IGN>*").queue();
             }
             return;
         }
 
-        channel.sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
+        e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
     }
 }

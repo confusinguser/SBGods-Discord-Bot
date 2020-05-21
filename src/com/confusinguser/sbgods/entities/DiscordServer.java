@@ -9,12 +9,12 @@ public enum DiscordServer {
     Test("385431231975653377", "673143091342868481", null);
 
     private final String serverId;
-    private final String channelId;
+    private final String botChannelId;
     private final HypixelGuild hypixelGuild;
 
-    DiscordServer(String serverId, String channelId, HypixelGuild hypixelGuild) {
+    DiscordServer(String serverId, String botChannelId, HypixelGuild hypixelGuild) {
         this.serverId = serverId;
-        this.channelId = channelId;
+        this.botChannelId = botChannelId;
         this.hypixelGuild = hypixelGuild;
     }
 
@@ -36,8 +36,8 @@ public enum DiscordServer {
         return serverId;
     }
 
-    public String getChannelId() {
-        return channelId;
+    public String getBotChannelId() {
+        return botChannelId;
     }
 
     public HypixelGuild getHypixelGuild() {

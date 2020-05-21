@@ -17,23 +17,11 @@ public class VerifyCommand extends Command implements EventListener {
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
-            return;
-        }
-
-        DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromEvent(e);
-        if (currentDiscordServer == null) {
-            return;
-        }
-
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer) {
         if (!e.getChannel().getName().equalsIgnoreCase("verify")) {
             e.getChannel().sendMessage("This command cant be used here.").queue();
             return;
         }
-
-        main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
-        e.getChannel().sendTyping().queue();
 
         String[] args = e.getMessage().getContentRaw().split(" ");
 
@@ -42,18 +30,7 @@ public class VerifyCommand extends Command implements EventListener {
             // Check if that is actual player ign
             Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
             if (player.getDiscordTag().equalsIgnoreCase(e.getAuthor().getAsTag())) {
-
-                String responseId = main.getUtil().verifyPlayer(e.getMember(), player.getDisplayName(), e.getGuild(), e.getChannel());
                 main.logger.fine("Added " + currentDiscordServer.toString() + " verified role to " + e.getAuthor().getAsTag());
-
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-
-                e.getChannel().deleteMessageById(e.getMessageId());
-                e.getChannel().deleteMessageById(responseId);
                 return;
             }
 
@@ -63,21 +40,13 @@ public class VerifyCommand extends Command implements EventListener {
         }
 
         String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag());
-        if (mcName.equals("")) {
-            e.getChannel().sendMessage("There was a error auto-detecting your minecraft ign... please do -verify {ign}").queue();
+        if (mcName.isEmpty()) {
+            e.getChannel().sendMessage("There was a error auto-detecting your minecraft ign... please do -verify <IGN>").queue();
             // Send error saying that auto-detect failed and they need to enter their username
             return;
         }
 
         // Verify player with mc name mcName
-        String responseId = main.getUtil().verifyPlayer(e.getMember(), mcName, e.getGuild(), e.getChannel());
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-
-        e.getChannel().deleteMessageById(e.getMessageId());
-        e.getChannel().deleteMessageById(responseId);
+        main.getUtil().verifyPlayer(e.getMember(), mcName, e.getGuild(), e.getChannel());
     }
 }

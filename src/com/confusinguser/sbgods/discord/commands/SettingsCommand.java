@@ -2,6 +2,7 @@ package com.confusinguser.sbgods.discord.commands;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
+import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -17,13 +18,7 @@ public class SettingsCommand extends Command {
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
-            return;
-        }
-
-        main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
-
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordserver) {
         String[] args = e.getMessage().getContentRaw().split(" ");
 
         if (!Objects.requireNonNull(e.getGuild().getMember(e.getAuthor())).getPermissions().contains(Permission.MANAGE_SERVER) || !e.getAuthor().getId().contentEquals(main.getCreatorId())) {

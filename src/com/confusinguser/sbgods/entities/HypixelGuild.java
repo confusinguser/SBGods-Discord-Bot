@@ -4,12 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum HypixelGuild {
-    SBG("5cd01bdf77ce84cf1204cd61", 250000, 822425, "Skyblock Gods", "SBG"),
-    SBDG("5e4e6d0d8ea8c9feb3f0e44f", 30000, 222425, "Skyblock Demigods", "SBDG", "Skyblock Demi Gods");
+    SBG("5cd01bdf77ce84cf1204cd61", "Skyblock Gods", "SBG Guild Member", "SBG"),
+    SBDG("5e4e6d0d8ea8c9feb3f0e44f","Skyblock Forceful", "SBF", "SBF Guild Member", "SBDG Guild Member", "Skyblock Demigods", "SBDG", "Skyblock Demi Gods");
 
     private final String guildId;
-    private final int slayerExpRec;
-    private final int skillExpRec;
     private final String[] names;
     private int playerSize = 125;
 
@@ -18,14 +16,12 @@ public enum HypixelGuild {
     private int slayerProgress;
     private int skillProgress;
 
-    HypixelGuild(String guildId, int slayerExpRec, int skillExpReq, String... names) {
+    HypixelGuild(String guildId, String... names) {
         this.guildId = guildId;
-        this.slayerExpRec = slayerExpRec;
-        this.skillExpRec = skillExpReq;
         this.names = names;
     }
 
-    public static HypixelGuild getEnum(String input) {
+    public static HypixelGuild getGuildByName(String input) {
         for (HypixelGuild guild : values()) {
             if (guild.isAltNameIgnoreCase(input)) {
                 return guild;
@@ -45,14 +41,6 @@ public enum HypixelGuild {
         return guildId;
     }
 
-    public int getSlayerExpRec() {
-        return slayerExpRec;
-    }
-
-    public int getSkillExpRec() {
-        return skillExpRec;
-    }
-
     public Map<String, SkillLevels> getSkillExpMap() {
         return skillExpMap;
     }
@@ -69,7 +57,7 @@ public enum HypixelGuild {
         this.slayerExpHashmap = slayerExpMap;
     }
 
-    private boolean isAltNameIgnoreCase(String input) {
+    public boolean isAltNameIgnoreCase(String input) {
         for (String name : names) {
             if (name.equalsIgnoreCase(input)) {
                 return true;
@@ -100,5 +88,9 @@ public enum HypixelGuild {
 
     public void setSkillProgress(int skillProgress) {
         this.skillProgress = skillProgress;
+    }
+
+    public String getDisplayName() {
+        return names[0];
     }
 }

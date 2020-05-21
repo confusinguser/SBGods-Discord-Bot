@@ -24,22 +24,11 @@ public class SkillCommand extends Command implements EventListener {
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
-            return;
-        }
-
-        DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromEvent(e);
-        if (currentDiscordServer == null) {
-            return;
-        }
-
-        if (currentDiscordServer.getChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getChannelId())) {
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer) {
+        if (currentDiscordServer.getBotChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getBotChannelId())) {
             e.getChannel().sendMessage("Skill commands cannot be ran in this channel!").queue();
             return;
         }
-
-        main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
 
         String[] args = e.getMessage().getContentRaw().split(" ");
 
@@ -52,8 +41,6 @@ public class SkillCommand extends Command implements EventListener {
         if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
             spreadsheet = true;
         }
-
-        e.getChannel().sendTyping().queue();
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
             ArrayList<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
