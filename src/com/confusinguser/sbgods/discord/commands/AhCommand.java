@@ -2,7 +2,7 @@ package com.confusinguser.sbgods.discord.commands;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
-import com.confusinguser.sbgods.entities.AHItem;
+import com.confusinguser.sbgods.entities.AhItem;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.PlayerAH;
@@ -11,9 +11,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.EventListener;
 
-public class AHCommand extends Command implements EventListener {
+public class AhCommand extends Command implements EventListener {
 
-    public AHCommand(SBGods main, DiscordBot discord) {
+    public AhCommand(SBGods main, DiscordBot discord) {
         this.main = main;
         this.discord = discord;
         this.name = "ah";
@@ -22,9 +22,7 @@ public class AHCommand extends Command implements EventListener {
     }
 
     @Override
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordserver) {
-        String[] args = e.getMessage().getContentRaw().split(" ");
-
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
         if (args.length <= 1) {
             e.getChannel().sendMessage("Invalid usage! Usage: `" + this.usage + "`").queue();
             return;
@@ -52,7 +50,7 @@ public class AHCommand extends Command implements EventListener {
         }
 
         for (int i = 0; i < playerAuctions.getItems().length; i++) {
-            AHItem item = playerAuctions.getItems()[i];
+            AhItem item = playerAuctions.getItems()[i];
 
             EmbedBuilder embedBuilder = new EmbedBuilder().setColor(item.getItemTierColor()).setTitle(item.getItemTier() + " | " + item.getItemName() + ":");
 

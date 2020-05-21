@@ -1,11 +1,11 @@
 package com.confusinguser.sbgods.entities;
 
 public class PlayerAH {
-    private AHItem[] items;
+    private AhItem[] items;
     private String error;
     private boolean isError = false;
 
-    public PlayerAH(AHItem[] items) {
+    public PlayerAH(AhItem[] items) {
         this.items = items;
     }
 
@@ -22,7 +22,7 @@ public class PlayerAH {
         return error;
     }
 
-    public AHItem[] getItems() {
+    public AhItem[] getItems() {
         return items;
     }
 }

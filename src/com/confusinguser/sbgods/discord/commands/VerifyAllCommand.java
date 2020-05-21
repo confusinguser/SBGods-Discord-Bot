@@ -23,19 +23,11 @@ public class VerifyAllCommand extends Command implements EventListener {
     }
 
     @Override
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer) {
-
-//        if (currentDiscordServer.getBotChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getBotChannelId())) {
-//            e.getChannel().sendMessage("Verify commands cannot be ran in this channel!").queue();
-//            return;
-//        }
-
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
         if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_ROLES)) {
             e.getChannel().sendMessage("You do not have permission to perform this command").queue();
             return;
         }
-
-        String[] args = e.getMessage().getContentRaw().split(" ");
 
         if (args.length >= 2 && args[1].equalsIgnoreCase("reset")) {
             if (args.length >= 3 && (args[2].equalsIgnoreCase("v") || args[2].equalsIgnoreCase("verified"))) {

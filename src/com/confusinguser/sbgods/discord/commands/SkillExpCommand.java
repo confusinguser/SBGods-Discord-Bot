@@ -23,13 +23,11 @@ public class SkillExpCommand extends Command implements EventListener {
     }
 
     @Override
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer) {
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
         if (currentDiscordServer.getBotChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getBotChannelId())) {
             e.getChannel().sendMessage("Skill commands cannot be ran in this channel!").queue();
             return;
         }
-
-        String[] args = e.getMessage().getContentRaw().split(" ");
 
         if (args.length <= 1) {
             e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();

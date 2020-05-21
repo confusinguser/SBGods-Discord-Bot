@@ -1,6 +1,6 @@
 package com.confusinguser.sbgods.entities;
 
-public class AHItem {
+public class AhItem {
 
     private final String itemName;
     private final String itemTier;
@@ -10,7 +10,7 @@ public class AHItem {
     private final Long end;
     private final Integer bids; //number of bids on the item
 
-    public AHItem(String itemName, String itemTier, Long startingBid, Long highestBid, String category, Long end, Integer bids) {
+    public AhItem(String itemName, String itemTier, Long startingBid, Long highestBid, String category, Long end, Integer bids) {
         this.itemName = itemName;
         this.itemTier = itemTier;
         this.startingBid = startingBid;

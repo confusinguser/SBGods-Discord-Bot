@@ -17,13 +17,11 @@ public class VerifyCommand extends Command implements EventListener {
     }
 
     @Override
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer) {
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
         if (!e.getChannel().getName().equalsIgnoreCase("verify")) {
             e.getChannel().sendMessage("This command cant be used here.").queue();
             return;
         }
-
-        String[] args = e.getMessage().getContentRaw().split(" ");
 
         if (args.length >= 2) {
 
@@ -41,7 +39,7 @@ public class VerifyCommand extends Command implements EventListener {
 
         String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag());
         if (mcName.isEmpty()) {
-            e.getChannel().sendMessage("There was a error auto-detecting your minecraft ign... please do -verify <IGN>").queue();
+            e.getChannel().sendMessage("There was an error auto-detecting your minecraft ign. Please do -verify <IGN>").queue();
             // Send error saying that auto-detect failed and they need to enter their username
             return;
         }

@@ -34,7 +34,7 @@ public class DiscordBot {
         PetsCommand petsCommand = new PetsCommand(main, this);
         KillsCommand killsCommand = new KillsCommand(main, this);
         DeathsCommand deathsCommand = new DeathsCommand(main, this);
-        AHCommand ahCommand = new AHCommand(main, this);
+        AhCommand ahCommand = new AhCommand(main, this);
         VerifyCommand verifyCommand = new VerifyCommand(main, this);
         verifyAllCommand = new VerifyAllCommand(main, this);
         TaxCommand taxCommand = new TaxCommand(main, this);

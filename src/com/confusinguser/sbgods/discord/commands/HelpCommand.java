@@ -20,7 +20,7 @@ public class HelpCommand extends Command implements EventListener {
     }
 
     @Override
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordserver) {
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("SBGods Discord Bot Help Page");
         Random colorRandom = new Random();
         embedBuilder = embedBuilder.setDescription(embedBuilder.getDescriptionBuilder()

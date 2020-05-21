@@ -24,9 +24,7 @@ public class PetsCommand extends Command implements EventListener {
     }
 
     @Override
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordserver) {
-        String[] args = e.getMessage().getContentRaw().split(" ");
-
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
         if (args.length <= 1) {
             e.getChannel().sendMessage("Invalid usage! Usage: `" + this.usage + "`").queue();
             return;

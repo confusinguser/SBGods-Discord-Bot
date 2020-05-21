@@ -28,7 +28,7 @@ public abstract class Command extends ListenerAdapter {
 
         main.getUtil().setTyping(true, e.getChannel());
         try {
-            handleCommand(e, discordServer);
+            handleCommand(e, discordServer, e.getMessage().getContentRaw().split(" "));
         } catch (Throwable t) {
             main.logger.severe("Exception when handling command '" + e.getMessage().getContentRaw() + "': " + t.getMessage() + "\n" + t);
         }
@@ -49,5 +49,5 @@ public abstract class Command extends ListenerAdapter {
         return name;
     }
 
-    public abstract void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer);
+    public abstract void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args);
 }

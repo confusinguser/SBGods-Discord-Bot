@@ -520,11 +520,11 @@ public class ApiUtil {
     }
 
     public PlayerAH getPlayerAHFromUsername(Player player) {
-        List<AHItem> items = new ArrayList<>();
+        List<AhItem> items = new ArrayList<>();
         for (String profile : player.getSkyblockProfiles()) {
             String response = getResponse(BASE_URL + "skyblock/auction" + "?key=" + main.getNextApiKey() + "&profile=" + profile, 60000);
             if (response == null)
-                return new PlayerAH("There was a error fetching that user's auctions, please try again later.");
+                return new PlayerAH("There was an error fetching that user's auctions, please try again later.");
 
             JSONArray auctionJSONArray;
             try {
@@ -543,10 +543,10 @@ public class ApiUtil {
                 Long end = unclaimedAuction.getLong("end");
                 Integer bids = unclaimedAuction.getJSONArray("bids").length(); // Number of bids on the item
 
-                items.add(new AHItem(itemName, itemTier, startingBid, highestBid, category, end, bids));
+                items.add(new AhItem(itemName, itemTier, startingBid, highestBid, category, end, bids));
             }
         }
-        return new PlayerAH(items.toArray(new AHItem[0]));
+        return new PlayerAH(items.toArray(new AhItem[0]));
     }
 
     public String getMcNameFromDisc(String discordName) {

@@ -18,9 +18,7 @@ public class SettingsCommand extends Command {
     }
 
     @Override
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordserver) {
-        String[] args = e.getMessage().getContentRaw().split(" ");
-
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
         if (!Objects.requireNonNull(e.getGuild().getMember(e.getAuthor())).getPermissions().contains(Permission.MANAGE_SERVER) || !e.getAuthor().getId().contentEquals(main.getCreatorId())) {
             e.getChannel().sendMessage("You do not have permission to change the settings!").queue();
             return;

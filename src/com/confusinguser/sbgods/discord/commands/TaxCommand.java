@@ -26,9 +26,7 @@ public class TaxCommand extends Command implements EventListener {
     }
 
     @Override
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer) {
-        String[] args = e.getMessage().getContentRaw().split(" ");
-
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
         if (args.length <= 1) {
             String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag());
             if (mcName.equalsIgnoreCase("")) {
