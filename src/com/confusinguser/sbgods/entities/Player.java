@@ -15,7 +15,7 @@ public class Player {
     private final String discordTag;
     private final boolean online;
     private final SBGods main;
-    private final ArrayList<String> skyblockProfiles;
+    private final List<String> skyblockProfiles;
 
     public Player(SBGods main) {
         this.UUID = null;
@@ -26,7 +26,7 @@ public class Player {
         this.skyblockProfiles = new ArrayList<>();
     }
 
-    public Player(String uuid, String displayName, String discordTag, boolean online, ArrayList<String> skyblockProfiles, SBGods main) {
+    public Player(String uuid, String displayName, String discordTag, boolean online, List<String> skyblockProfiles, SBGods main) {
         this.UUID = uuid;
         this.displayName = displayName;
         this.discordTag = discordTag;
@@ -58,7 +58,7 @@ public class Player {
         return online;
     }
 
-    public ArrayList<String> getSkyblockProfiles() {
+    public List<String> getSkyblockProfiles() {
         return skyblockProfiles;
     }
 

@@ -100,7 +100,7 @@ public class LangUtil {
         String progressChar = "#";
         String otherChar = "--";
 
-        if (amountDone != 0.0){
+        if (amountDone != 0.0) {
             returnVal += "**";
             returnVal += loopString(progressChar, (int) (amountDone * lengthOfBar));
             returnVal += "**";
@@ -110,13 +110,13 @@ public class LangUtil {
         return returnVal;
     }
 
-    public String loopString(String input, int loops){
-        String output = "";
+    public String loopString(String input, int loops) {
+        StringBuilder output = new StringBuilder();
 
-        for(int i = 0; i<loops; i++){
-            output += input;
+        for (int i = 0; i < loops; i++) {
+            output.append(input);
         }
 
-        return output;
+        return output.toString();
     }
 }

@@ -10,8 +10,8 @@ import java.util.Date;
 import java.util.logging.*;
 
 public class SBGods {
-    public static final String VERSION = "0.8.10";
-    public static final String VERSION_DESCRIPTION = "Improved -vall, made it automatically run every 12h";
+    public static final String VERSION = "0.8.11";
+    public static final String VERSION_DESCRIPTION = "Fixed issues with bot";
     private static final String CREATOR_ID = "244786205873405952";
     private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
     //private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing

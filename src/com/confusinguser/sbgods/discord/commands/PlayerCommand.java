@@ -27,7 +27,7 @@ public class PlayerCommand extends Command implements EventListener {
             return;
         }
 
-        String messageId = e.getChannel().sendMessage("Loading (" + main.getLangUtil().getProgressBar(0.0,20) + ")").complete().getId();
+        String messageId = e.getChannel().sendMessage("Loading (" + main.getLangUtil().getProgressBar(0.0, 20) + ")").complete().getId();
 
         Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
 
@@ -42,28 +42,28 @@ public class PlayerCommand extends Command implements EventListener {
         double totalMoney = 0.0;
         double progress = 0.0;
         int progressLength = 20;
-        double perProfileProgress = 1/ ((double) player.getSkyblockProfiles().size());
+        double perProfileProgress = 1 / ((double) player.getSkyblockProfiles().size());
 
         for (int i = 0; i < player.getSkyblockProfiles().size(); i++) {
             String profileId = player.getSkyblockProfiles().get(i);
-            progress+=perProfileProgress/4;
-            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress,progressLength) + ")").queue();
+            progress += perProfileProgress / 4;
+            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress, progressLength) + ")").queue();
 
             ArrayList<Pet> pets = main.getApiUtil().getProfilePets(profileId, player.getUUID()); // Pets in profile
             totalPets.addAll(pets);
 
-            progress+=perProfileProgress/4;
-            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress,progressLength) + ")").queue();
+            progress += perProfileProgress / 4;
+            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress, progressLength) + ")").queue();
 
             skillLevels = main.getApiUtil().getBestProfileSkillLevels(player.getUUID());
 
-            progress+=perProfileProgress/4;
-            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress,progressLength) + ")").queue();
+            progress += perProfileProgress / 4;
+            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress, progressLength) + ")").queue();
 
             totalMoney += main.getApiUtil().getTotalMoneyInProfile(profileId);
 
-            progress+=perProfileProgress/4;
-            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress,progressLength) + ")").queue();
+            progress += perProfileProgress / 4;
+            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress, progressLength) + ")").queue();
 
             slayerExp = SlayerExp.addExps(slayerExp, main.getApiUtil().getProfileSlayerExp(profileId, player.getUUID()));
         }
