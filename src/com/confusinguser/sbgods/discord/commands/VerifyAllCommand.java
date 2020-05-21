@@ -71,10 +71,13 @@ public class VerifyAllCommand extends Command implements EventListener {
             return;
         }
 
-        String messageId = e.getChannel().sendMessage("Attempting to auto-verify all players!").complete().getId();
+        String messageId = e.getChannel().sendMessage("Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(0.0,30) + ")").complete().getId();
 
         int playersVerified = 0;
+        int i = 0; //for loading animation
         for (Member member : e.getGuild().getMembers()) {
+            i++;
+            e.getChannel().editMessageById(messageId, "Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar((i) / ((double) e.getGuild().getMembers().size()),30) + ")").queue();
             // if member doesn't have the verified role, then try to verify them
             if (member.getRoles().stream().filter(role -> role.getName().equalsIgnoreCase("verified")).count() <= 0) {
                 String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag());

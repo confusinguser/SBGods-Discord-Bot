@@ -98,10 +98,26 @@ public class LangUtil {
     public String getProgressBar(double amountDone, int lengthOfBar) {
         String returnVal = "";
         String progressChar = "#";
-        String otherChar = "-";
+        String otherChar = "--";
 
-        returnVal += progressChar.repeat((int) (amountDone+lengthOfBar));
+        if (amountDone != 0.0){
+            returnVal += "**";
+            returnVal += loopString(progressChar, (int) (amountDone * lengthOfBar));
+            returnVal += "**";
+        }
+
+        returnVal += loopString(otherChar, lengthOfBar-((int) (amountDone*lengthOfBar)));
 
         return returnVal;
+    }
+
+    public String loopString(String input, int loops){
+        String output = "";
+
+        for(int i = 0; i<loops; i++){
+            output += input;
+        }
+
+        return output;
     }
 }
