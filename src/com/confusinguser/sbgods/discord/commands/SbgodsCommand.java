@@ -4,6 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
@@ -40,6 +41,10 @@ public class SbgodsCommand extends Command implements EventListener {
                     .setDescription(SBGods.VERSION_DESCRIPTION)
                     .setFooter("Made by " + Objects.requireNonNull(creatorUserObj).getAsTag());
             e.getChannel().sendMessage(embedBuilder.build()).queue();
+            return;
+        }
+
+        if(args[1].equalsIgnoreCase("test") && currentDiscordserver.equals(DiscordServer.Test)){
             return;
         }
 

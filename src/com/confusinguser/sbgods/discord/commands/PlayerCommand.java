@@ -29,7 +29,7 @@ public class PlayerCommand extends Command implements EventListener {
             return;
         }
 
-        String messageId = e.getChannel().sendMessage("Loading (0/4)").complete().getId();
+        String messageId = e.getChannel().sendMessage("Loading (" + main.getLangUtil().getProgressBar(0.0,20) + ")").complete().getId();
 
         Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
 
@@ -42,24 +42,30 @@ public class PlayerCommand extends Command implements EventListener {
         ArrayList<Pet> totalPets = new ArrayList<>();
         SlayerExp slayerExp = new SlayerExp();
         double totalMoney = 0.0;
+        double progress = 0.0;
+        int progressLength = 20;
+        double perProfileProgress = 1/ ((double) player.getSkyblockProfiles().size());
 
-        for (int i = 0; i < player.getSkyblockProfiles().size(); i++) { // Good Code > Smooth loading animation (also it "Profile 1.33" doesnt rly make sense)
-            // Sometimes you have to make sacrifices to the functionality, and users dont wanna see all the data becuase it makes them confused like, "wdym profile 1.5?? i dont have half a profile!"
+        for (int i = 0; i < player.getSkyblockProfiles().size(); i++) {
             String profileId = player.getSkyblockProfiles().get(i);
-            e.getChannel().editMessageById(messageId, "Loading (1/4) [Profile " + (i + 1) + "/" + player.getSkyblockProfiles().size() + "]").queue();
+            progress+=perProfileProgress/4;
+            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress,progressLength) + ")").queue();
 
             ArrayList<Pet> pets = main.getApiUtil().getProfilePets(profileId, player.getUUID()); // Pets in profile
             totalPets.addAll(pets);
 
-            e.getChannel().editMessageById(messageId, "Loading (2/4) [Profile " + (i + 1) + "/" + player.getSkyblockProfiles().size() + "]").queue();
+            progress+=perProfileProgress/4;
+            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress,progressLength) + ")").queue();
 
             skillLevels = main.getApiUtil().getBestProfileSkillLevels(player.getUUID());
 
-            e.getChannel().editMessageById(messageId, "Loading (3/4) [Profile " + (i + 1) + "/" + player.getSkyblockProfiles().size() + "]").queue();
+            progress+=perProfileProgress/4;
+            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress,progressLength) + ")").queue();
 
             totalMoney += main.getApiUtil().getTotalMoneyInProfile(profileId);
 
-            e.getChannel().editMessageById(messageId, "Loading (4/4) [Profile " + (i + 1) + "/" + player.getSkyblockProfiles().size() + "]").queue();
+            progress+=perProfileProgress/4;
+            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress,progressLength) + ")").queue();
 
             slayerExp = SlayerExp.addExps(slayerExp, main.getApiUtil().getProfileSlayerExp(profileId, player.getUUID()));
         }
