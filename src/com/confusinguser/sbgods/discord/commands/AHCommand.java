@@ -63,7 +63,7 @@ public class AHCommand extends Command implements EventListener {
             EmbedBuilder embedBuilder = new EmbedBuilder().setColor(item.getItemTierColor()).setTitle(item.getItemTier() + " | " + item.getItemName() + ":");
 
             embedBuilder.appendDescription("**" + item.getBids().toString() + "** bids\n");
-            embedBuilder.appendDescription("Going for: **" + (item.getHighestBid() == 0 ? item.getStartingBid() : item.getHighestBid()) + "** (Starting bid: " + item.getStartingBid() + ")\n");
+            embedBuilder.appendDescription("Going for: **" + main.getLangUtil().addNotation(item.getHighestBid() == 0 ? item.getStartingBid() : item.getHighestBid()) + "** (Starting bid: " + main.getLangUtil().addNotation(item.getStartingBid()) + ")\n");
             embedBuilder.appendDescription("Category: **" + item.getCategory() + "**");
 
             e.getChannel().sendMessage(embedBuilder.build()).queue();

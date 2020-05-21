@@ -29,7 +29,7 @@ public class SbgodsCommand extends Command implements EventListener {
         }
 
         main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
-
+        e.getChannel().sendMessage(main.getLangUtil().getProgressBar(0.5,20)).queue();
         String[] args = e.getMessage().getContentRaw().split(" ");
 
         if (args.length == 1) {
