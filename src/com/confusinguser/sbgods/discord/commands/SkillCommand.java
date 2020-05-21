@@ -145,21 +145,21 @@ public class SkillCommand extends Command implements EventListener {
                 StringBuilder descriptionBuilder = embedBuilder.getDescriptionBuilder();
 
                 if (highestSkillLevels.isApproximate()) {
-                    descriptionBuilder.append("Approximate average skill level: " + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "\n\n");
+                    descriptionBuilder.append("Approximate average skill level: **" + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "**\n\n");
                 } else {
                     descriptionBuilder.append("Average skill level: " + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "\n\n");
                 }
 
                 descriptionBuilder
-                        .append("Farming: " + highestSkillLevels.getFarming() + '\n')
-                        .append("Mining: " + highestSkillLevels.getMining() + '\n')
-                        .append("Combat: " + highestSkillLevels.getCombat() + '\n')
-                        .append("Foraging: " + highestSkillLevels.getForaging() + '\n')
-                        .append("Fishing: " + highestSkillLevels.getFishing() + '\n')
-                        .append("Enchanting: " + highestSkillLevels.getEnchanting() + '\n');
+                        .append("Farming: **" + highestSkillLevels.getFarming() + "**\n")
+                        .append("Mining: **" + highestSkillLevels.getMining() + "**\n")
+                        .append("Combat: **" + highestSkillLevels.getCombat() + "**\n")
+                        .append("Foraging: **" + highestSkillLevels.getForaging() + "**\n")
+                        .append("Fishing: **" + highestSkillLevels.getFishing() + "**\n")
+                        .append("Enchanting: **" + highestSkillLevels.getEnchanting() + "**\n");
                 if (highestSkillLevels.isApproximate())
-                    descriptionBuilder.append("Taming: " + highestSkillLevels.getTaming() + '\n');
-                descriptionBuilder.append("Alchemy: " + highestSkillLevels.getAlchemy() + '\n');
+                    descriptionBuilder.append("Taming: **" + highestSkillLevels.getTaming() + "**\n");
+                descriptionBuilder.append("Alchemy: **" + highestSkillLevels.getAlchemy() + "**\n");
 
                 embedBuilder.setDescription(descriptionBuilder.toString());
 
