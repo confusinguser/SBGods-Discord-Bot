@@ -438,7 +438,12 @@ public class ApiUtil {
             type = type.toLowerCase().replace("_", " ");
             type = type.substring(0, 1).toUpperCase() + type.substring(1);
 
-            output.add(new Pet(type, tier, active, xp));
+            try {
+                output.add(new Pet(type, tier, active, xp));
+            }catch(IndexOutOfBoundsException err){
+                //i have no idea what causes this error lmao but it is run when you do -player Leyrox
+                continue;
+            }
         }
         return output;
     }

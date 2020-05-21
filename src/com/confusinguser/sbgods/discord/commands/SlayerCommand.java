@@ -126,10 +126,10 @@ public class SlayerCommand extends Command implements EventListener {
 
                 EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x51047d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " slayer xp");
                 embedBuilder.setDescription(embedBuilder.getDescriptionBuilder()
-                        .append("Total slayer xp: ").append(main.getLangUtil().addNotation(playerSlayerExp.getTotalExp())).append("\n\n")
-                        .append("Zombie: ").append(main.getLangUtil().addNotation(playerSlayerExp.getZombie())).append('\n')
-                        .append("Spider: ").append(main.getLangUtil().addNotation(playerSlayerExp.getSpider())).append('\n')
-                        .append("Wolf: ").append(main.getLangUtil().addNotation(playerSlayerExp.getWolf())).append('\n')
+                        .append("Total slayer xp: **" + main.getLangUtil().addNotation(playerSlayerExp.getTotalExp()) + "**\n\n")
+                        .append("Zombie: **" + main.getLangUtil().addNotation(playerSlayerExp.getZombie()) + "**\n")
+                        .append("Spider: **" + main.getLangUtil().addNotation(playerSlayerExp.getSpider()) + "**\n")
+                        .append("Wolf: **" + main.getLangUtil().addNotation(playerSlayerExp.getWolf()) + "**\n")
                         .toString());
 
                 e.getChannel().deleteMessageById(messageId).queue();
