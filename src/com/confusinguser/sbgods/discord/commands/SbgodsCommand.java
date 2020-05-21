@@ -4,7 +4,6 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
@@ -94,6 +93,7 @@ public class SbgodsCommand extends Command implements EventListener {
                 return;
             }
             e.getChannel().sendMessage("Stopping bot...").complete(); // Bot is going to shut down so we have to complete this before
+            main.getUtil().setTyping(false, e.getChannel());
             System.exit(0);
             return;
         }
