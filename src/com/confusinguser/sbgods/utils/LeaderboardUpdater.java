@@ -24,8 +24,13 @@ public class LeaderboardUpdater {
             updateLeaderboardCacheForGuild(HypixelGuild.SBDG);
         }, 0, 9, TimeUnit.MINUTES);
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
-            main.getDiscord().verifyAllCommand.verifyAll(main.getDiscord().getJDA().getTextChannelById("713012939258593290"));
-        }, 0, 720, TimeUnit.MINUTES); // Every 12h
+            try {
+                main.getDiscord().verifyAllCommand.verifyAll(main.getDiscord().getJDA().awaitReady().getTextChannelById("713012939258593290"));
+                main.getDiscord().verifyAllCommand.verifyAll(main.getDiscord().getJDA().awaitReady().getTextChannelById("713024923945402431"));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }, 10, 720, TimeUnit.MINUTES); // Every 12h
     }
 
     private void updateLeaderboardCacheForGuild(HypixelGuild guild) {

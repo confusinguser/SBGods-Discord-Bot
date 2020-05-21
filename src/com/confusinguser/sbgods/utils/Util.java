@@ -127,7 +127,8 @@ public class Util {
         }
 
         try {
-            member.modifyNickname(mcName).complete();
+            if (member.getEffectiveName().toLowerCase().contains(mcName))
+                member.modifyNickname(member.getEffectiveName() + "(" + mcName + ")").complete();
         } catch (HierarchyException ignored) {
         } // Don't have perms to change nick
 

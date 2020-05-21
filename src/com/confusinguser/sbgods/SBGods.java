@@ -10,8 +10,8 @@ import java.util.Date;
 import java.util.logging.*;
 
 public class SBGods {
-    public static final String VERSION = "0.8.9";
-    public static final String VERSION_DESCRIPTION = "Better loading 'animations'";
+    public static final String VERSION = "0.8.10";
+    public static final String VERSION_DESCRIPTION = "Improved -vall, made it automatically run every 12h";
     private static final String CREATOR_ID = "244786205873405952";
     private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
     //private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
@@ -29,7 +29,6 @@ public class SBGods {
     private int keyIndex = 0;
 
     public SBGods() {
-
         ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new SimpleFormatter() {
             @Override
@@ -54,7 +53,6 @@ public class SBGods {
         this.langUtil = new LangUtil(this);
         this.jsonApiUtil = new JsonApiUtil(this);
         this.cacheUtil = new CacheUtil(this);
-        this.leaderboardUpdater = new LeaderboardUpdater(this);
         instance = this;
         try {
             this.discordBot = new DiscordBot(this);
@@ -62,6 +60,7 @@ public class SBGods {
             logger.severe("Failed to login, is the discord token invalid?");
             System.exit(-1);
         }
+        this.leaderboardUpdater = new LeaderboardUpdater(this);
     }
 
     public static SBGods getInstance() {
