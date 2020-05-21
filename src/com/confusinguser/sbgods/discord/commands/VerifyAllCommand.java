@@ -69,9 +69,9 @@ public class VerifyAllCommand extends Command implements EventListener {
 
         int playersVerified = 0;
         int i = 0; //for loading animation
-        for (Member member : discord.getMembers().stream().filter((member -> !member.getUser().isBot())).collect(Collectors.toList())) {
+        for (Member member : discord.getMembers()) {
             i++;
-            channel.editMessageById(messageId, "Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar((i) / ((double) discord.getMembers().size()),30) + ")").queue();
+            channel.editMessageById(messageId, "Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(i / (double) discord.getMembers().size(),30) + ")").queue();
             String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag());
             if (!mcName.equals("")) {
                 playersVerified++;

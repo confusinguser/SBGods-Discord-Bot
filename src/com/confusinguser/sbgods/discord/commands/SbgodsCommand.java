@@ -41,7 +41,7 @@ public class SbgodsCommand extends Command implements EventListener {
             return;
         }
 
-        if(args[1].equalsIgnoreCase("test") && currentDiscordserver.equals(DiscordServer.Test)){
+        if(args[1].equalsIgnoreCase("test") && currentDiscordServer.equals(DiscordServer.Test)){
             return;
         }
 
