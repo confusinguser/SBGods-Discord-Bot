@@ -77,20 +77,20 @@ public class SlayerCommand extends Command implements EventListener {
             if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
                 for (int i = 0; i < topX; i++) {
                     Entry<String, SlayerExp> currentEntry = main.getUtil().getHighestKeyValuePairForSlayerExp(usernameSlayerExpHashMap, i);
-                    response.append(currentEntry.getKey() + "    " + main.getSBUtil().toSkillExp(main.getUtil().round(currentEntry.getValue().getTotalExp(), 2)) + "\n");
+                    response.append(currentEntry.getKey() + "    " + main.getLangUtil().addNotation(main.getSBUtil().toSkillExp(main.getUtil().round(currentEntry.getValue().getTotalExp(), 2))) + "\n");
                 }
             } else {
                 int totalSlayer = 0;
                 for (int i = 0; i < topX; i++) {
                     Entry<String, SlayerExp> currentEntry = main.getUtil().getHighestKeyValuePairForSlayerExp(usernameSlayerExpHashMap, i);
-                    response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + currentEntry.getValue().getTotalExp() + "\n\n");
+                    response.append("**#" + Math.incrementExact(i) + "** *" + currentEntry.getKey() + ":* " + main.getLangUtil().addNotation(currentEntry.getValue().getTotalExp()) + "\n\n");
                     totalSlayer += currentEntry.getValue().getTotalExp();
                 }
                 if (topX == guildMemberUuids.size())
                     response.append("**Average guild slayer exp: ");
                 else
                     response.append("**Average slayer exp top #").append(topX).append(": ");
-                response.append((int) ((double) totalSlayer / topX)).append("**");
+                response.append(main.getLangUtil().addNotation(Math.round((double) totalSlayer / topX))).append("**");
             }
             String responseString = response.toString();
             // Split the message every 2000 characters in a nice looking way because of discord limitations
@@ -126,10 +126,10 @@ public class SlayerCommand extends Command implements EventListener {
 
                 EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x51047d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " slayer xp");
                 embedBuilder.setDescription(embedBuilder.getDescriptionBuilder()
-                        .append("Total slayer xp: " + playerSlayerExp.getTotalExp() + "\n\n")
-                        .append("Zombie: " + playerSlayerExp.getZombie() + '\n')
-                        .append("Spider: " + playerSlayerExp.getSpider() + '\n')
-                        .append("Wolf: " + playerSlayerExp.getWolf() + '\n')
+                        .append("Total slayer xp: " + main.getLangUtil().addNotation(playerSlayerExp.getTotalExp()) + "\n\n")
+                        .append("Zombie: " + main.getLangUtil().addNotation(playerSlayerExp.getZombie()) + '\n')
+                        .append("Spider: " + main.getLangUtil().addNotation(playerSlayerExp.getSpider()) + '\n')
+                        .append("Wolf: " + main.getLangUtil().addNotation(playerSlayerExp.getWolf()) + '\n')
                         .toString());
 
                 e.getChannel().deleteMessageById(messageId).queue();

@@ -77,7 +77,7 @@ public class KillsCommand extends Command {
 
             for (int i = 0; i < topX; i++) {
                 Entry<String, Integer> currentEntry = main.getUtil().getHighestKeyValuePair(totalKills, i);
-                embedBuilder.appendDescription("**#" + Math.incrementExact(i) + "**\t" + currentEntry.getKey() + ": " + currentEntry.getValue() + '\n');
+                embedBuilder.appendDescription("**#" + Math.incrementExact(i) + "**\t" + currentEntry.getKey() + ": " + main.getLangUtil().addNotation(currentEntry.getValue()) + '\n');
             }
 
             e.getChannel().deleteMessageById(messageId).queue();
