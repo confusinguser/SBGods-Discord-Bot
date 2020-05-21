@@ -3,12 +3,16 @@ package com.confusinguser.sbgods.discord.commands;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
+import com.confusinguser.sbgods.entities.HypixelGuild;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.hooks.EventListener;
+
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class VerifyAllCommand extends Command implements EventListener {
 
@@ -20,98 +24,72 @@ public class VerifyAllCommand extends Command implements EventListener {
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
-            return;
-        }
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer) {
 
-        DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromEvent(e);
-        if (currentDiscordServer == null) {
-            return;
-        }
-
-//        if (currentDiscordServer.getChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getChannelId())) {
+//        if (currentDiscordServer.getBotChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getBotChannelId())) {
 //            e.getChannel().sendMessage("Verify commands cannot be ran in this channel!").queue();
 //            return;
 //        }
 
         if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_ROLES)) {
-            e.getChannel().sendMessage("You do not have permissions to perform this command").queue();
+            e.getChannel().sendMessage("You do not have permission to perform this command").queue();
             return;
         }
 
-        main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
+        String[] args = e.getMessage().getContentRaw().split(" ");
 
-        if (e.getMessage().getContentRaw().equalsIgnoreCase("-vall reset")) {
-            for (Member member : e.getGuild().getMembers()) {
-
-                e.getChannel().sendTyping().queue();
-                for (Role role : e.getGuild().getRolesByName("SBG Guild Member", true)) {
-                    try {
-                        e.getGuild().removeRoleFromMember(member, role).queue();
-
-                    } catch (HierarchyException ignored) {
+        if (args.length >= 2 && args[1].equalsIgnoreCase("reset")) {
+            if (args.length >= 3 && (args[2].equalsIgnoreCase("v") || args[2].equalsIgnoreCase("verified"))) {
+                for (Member member : e.getGuild().getMembers()) {
+                    for (Role role : e.getGuild().getRolesByName("verified", true)) {
+                        try {
+                            e.getGuild().removeRoleFromMember(member, role).queue();
+                        } catch (HierarchyException ignored) {
+                        }
                     }
                 }
-                for (Role role : e.getGuild().getRolesByName("SBF Guild Member", true)) {
-                    try {
-                        e.getGuild().removeRoleFromMember(member, role).queue();
+                e.getChannel().sendMessage("Removed everyone's verified roles!").queue();
+                return;
+            }
 
+            for (Member member : e.getGuild().getMembers()) {
+                for (Role role : member.getRoles().stream().filter(role -> HypixelGuild.getGuildByName(role.getName()) != null).collect(Collectors.toList())) {
+                    try {
+                        e.getGuild().removeRoleFromMember(member, role).complete();
                     } catch (HierarchyException ignored) {
                     }
                 }
                 for (Role role : e.getGuild().getRolesByName("Verified", true)) {
                     try {
-                        e.getGuild().removeRoleFromMember(member, role).queue();
-
+                        e.getGuild().removeRoleFromMember(member, role).complete();
                     } catch (HierarchyException ignored) {
                     }
                 }
 
             }
-
-
-            e.getChannel().sendMessage("Removed everyones verified and guild roles!").queue();
-
+            e.getChannel().sendMessage("Removed everyone's verified and guild roles!").queue();
             return;
         }
 
-        if (e.getMessage().getContentRaw().equalsIgnoreCase("-vall reset v")) {
-            for (Member member : e.getGuild().getMembers()) {
+        String messageId = e.getChannel().sendMessage("Attempting to auto-verify all players!").complete().getId();
 
-                e.getChannel().sendTyping().queue();
-                for (Role role : e.getGuild().getRolesByName("Verified", true)) {
-                    try {
-                        main.logger.info("Removed " + member.getUser().getAsTag() + "'s verified role");
-                        e.getGuild().removeRoleFromMember(member, role).queue();
-
-                    } catch (HierarchyException ignored) {
-                    }
-                }
-
-            }
-
-
-            e.getChannel().sendMessage("Removed everyones verified roles!").queue();
-
-            return;
-        }
-
-        e.getChannel().sendMessage("Attempting to auto-verify all players!").queue();
-
+        int playersVerified = 0;
         for (Member member : e.getGuild().getMembers()) {
-            e.getChannel().sendTyping().queue();
-            main.logger.info("Attempting to auto-verify " + member.getUser().getAsTag());
-
-            String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag());
-
-            if (!mcName.equals("")) {
-                // Verify them automaticly!
-                main.getUtil().verifyPlayer(member, mcName, e.getGuild(), e.getChannel());
+            // if member doesn't have the verified role, then try to verify them
+            if (member.getRoles().stream().filter(role -> role.getName().equalsIgnoreCase("verified")).count() <= 0) {
+                String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag());
+                if (!mcName.equals("")) {
+                    playersVerified++;
+                    main.getUtil().verifyPlayer(member, mcName, e.getGuild(), e.getChannel());
+                }
             }
         }
+        e.getChannel().editMessageById(messageId, playersVerified == 0 ? "Did not verify any players" : "Verified a total of " + playersVerified + (playersVerified == 1 ? " player!" : " players!")).queue();
 
-
-        e.getChannel().sendMessage("Auto-verify all players complete!").queue();
+        main.getUtil().scheduleCommandAfter(() ->
+                e.getChannel().getHistoryAfter(messageId, 100).complete().getRetrievedHistory().stream()
+                .filter(message -> message.getContentRaw().startsWith("[VerifyAll]") // Get all messages that start with [VerifyAll]
+                        && message.getAuthor().isBot())
+                .forEach(message -> message.delete().queue()), 10, TimeUnit.SECONDS);
     }
 }

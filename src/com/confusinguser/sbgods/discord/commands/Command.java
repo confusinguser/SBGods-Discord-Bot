@@ -2,6 +2,7 @@ package com.confusinguser.sbgods.discord.commands;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
+import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -11,6 +12,24 @@ public class Command extends ListenerAdapter {
     String name;
     String usage;
     String[] aliases;
+
+    @Override
+    public void onMessageReceived(MessageReceivedEvent e) {
+        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
+            return;
+        }
+
+        main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
+
+        DiscordServer discordServer = DiscordServer.getDiscordServerFromEvent(e);
+        if (discordServer == null) {
+            return;
+        } // Only allowed servers may use commands
+
+        main.getUtil().setTyping(true, e.getChannel());
+        handleCommand(e, discordServer);
+        main.getUtil().setTyping(false, e.getChannel());
+    }
 
     boolean isNotTheCommand(MessageReceivedEvent e) {
         if (e.getMessage().getContentRaw().toLowerCase().split(" ")[0].contentEquals(discord.commandPrefix + this.getName()))
@@ -25,4 +44,6 @@ public class Command extends ListenerAdapter {
     public String getName() {
         return name;
     }
+
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer) {}
 }

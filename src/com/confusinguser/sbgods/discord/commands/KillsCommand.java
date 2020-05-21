@@ -2,6 +2,7 @@ package com.confusinguser.sbgods.discord.commands;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
+import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -20,13 +21,7 @@ public class KillsCommand extends Command {
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
-            return;
-        }
-
-        main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
-
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordserver) {
         String[] args = e.getMessage().getContentRaw().split(" ");
 
         if (args.length <= 1) {
@@ -35,7 +30,6 @@ public class KillsCommand extends Command {
         }
 
         String messageId = e.getChannel().sendMessage("...").complete().getId();
-        e.getChannel().sendTyping().queue();
 
         if (args[1].equalsIgnoreCase("player")) {
             HashMap<String, Integer> totalKills = new HashMap<>();

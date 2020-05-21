@@ -3,6 +3,7 @@ package com.confusinguser.sbgods.discord.commands;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.AHItem;
+import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.PlayerAH;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -21,13 +22,7 @@ public class AHCommand extends Command implements EventListener {
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent e) {
-        if (e.getAuthor().isBot() || isNotTheCommand(e) || discord.shouldNotRun(e)) {
-            return;
-        }
-
-        main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
-
+    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordserver) {
         String[] args = e.getMessage().getContentRaw().split(" ");
 
         if (args.length <= 1) {
@@ -36,7 +31,6 @@ public class AHCommand extends Command implements EventListener {
         }
 
         String messageId = e.getChannel().sendMessage("...").complete().getId();
-        e.getChannel().sendTyping().queue();
 
         Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[1]);
         PlayerAH playerAuctions = main.getApiUtil().getPlayerAHFromUsername(thePlayer);
@@ -56,8 +50,6 @@ public class AHCommand extends Command implements EventListener {
         }
 
         for (int i = 0; i < playerAuctions.getItems().length; i++) {
-
-            e.getChannel().sendTyping().queue();
             AHItem item = playerAuctions.getItems()[i];
 
             EmbedBuilder embedBuilder = new EmbedBuilder().setColor(item.getItemTierColor()).setTitle(item.getItemTier() + " | " + item.getItemName() + ":");
