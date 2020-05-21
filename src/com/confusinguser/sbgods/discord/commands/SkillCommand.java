@@ -149,15 +149,15 @@ public class SkillCommand extends Command implements EventListener {
                 }
 
                 descriptionBuilder
-                        .append("Farming: **" + highestSkillLevels.getFarming() + "**\n")
-                        .append("Mining: **" + highestSkillLevels.getMining() + "**\n")
-                        .append("Combat: **" + highestSkillLevels.getCombat() + "**\n")
-                        .append("Foraging: **" + highestSkillLevels.getForaging() + "**\n")
-                        .append("Fishing: **" + highestSkillLevels.getFishing() + "**\n")
-                        .append("Enchanting: **" + highestSkillLevels.getEnchanting() + "**\n");
-                if (highestSkillLevels.isApproximate())
-                    descriptionBuilder.append("Taming: **" + highestSkillLevels.getTaming() + "**\n");
-                descriptionBuilder.append("Alchemy: **" + highestSkillLevels.getAlchemy() + "**\n");
+                        .append("Farming: **").append(highestSkillLevels.getFarming()).append("**\n")
+                        .append("Mining: **").append(highestSkillLevels.getMining()).append("**\n")
+                        .append("Combat: **").append(highestSkillLevels.getCombat()).append("**\n")
+                        .append("Foraging: **").append(highestSkillLevels.getForaging()).append("**\n")
+                        .append("Fishing: **").append(highestSkillLevels.getFishing()).append("**\n")
+                        .append("Enchanting: **").append(highestSkillLevels.getEnchanting()).append("**\n");
+                if (!highestSkillLevels.isApproximate())
+                    descriptionBuilder.append("Taming: **").append(highestSkillLevels.getTaming()).append("**\n");
+                descriptionBuilder.append("Alchemy: **").append(highestSkillLevels.getAlchemy()).append("**\n");
 
                 embedBuilder.setDescription(descriptionBuilder.toString());
 

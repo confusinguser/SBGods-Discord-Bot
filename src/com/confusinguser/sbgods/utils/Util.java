@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Util {
@@ -24,13 +25,13 @@ public class Util {
     private final SBGods main;
     private final List<MessageChannel> typingChannels = new ArrayList<>();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-
+    private final Pattern stripColorCodesRegex = Pattern.compile("§[a-f0-9rlkmn]");
 
     public Util(SBGods main) {
         this.main = main;
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             for (MessageChannel channel : typingChannels) channel.sendTyping().queue();
-        }, 0, 4, TimeUnit.SECONDS);
+        }, 0, 1, TimeUnit.SECONDS);
     }
 
     public Entry<String, Integer> getHighestKeyValuePair(Map<String, Integer> map, int position) {
@@ -127,8 +128,10 @@ public class Util {
         }
 
         try {
-            if (member.getEffectiveName().toLowerCase().contains(mcName))
-                member.modifyNickname(member.getEffectiveName() + "(" + mcName + ")").complete();
+            if (member.getEffectiveName().toLowerCase().contains(mcName)) {
+                if ((member.getEffectiveName() + "(" + mcName + ")").length() > 32) member.modifyNickname(mcName).complete();
+                else member.modifyNickname(member.getEffectiveName() + "(" + mcName + ")").complete();
+            }
         } catch (HierarchyException ignored) {
         } // Don't have perms to change nick
 
@@ -198,5 +201,9 @@ public class Util {
             typingChannels.remove(channel);
             channel.deleteMessageById(channel.sendMessage("\u200E").complete().getId()).queue(); // To remove the typing status instantly
         }
+    }
+
+    public String stripColorCodes(String input) {
+        return stripColorCodesRegex.matcher(input).replaceAll("");
     }
 }

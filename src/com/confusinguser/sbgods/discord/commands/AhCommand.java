@@ -28,12 +28,12 @@ public class AhCommand extends Command implements EventListener {
             return;
         }
 
-        String messageId = e.getChannel().sendMessage("Loading (" + main.getLangUtil().getProgressBar(0.0,20) + ")").complete().getId();
+        String messageId = e.getChannel().sendMessage("Loading (" + main.getLangUtil().getProgressBar(0.0, 20) + ")").complete().getId();
 
         Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[1]);
-        e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(0.5,20) + ")").queue();
+        e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(0.5, 20) + ")").queue();
         PlayerAH playerAuctions = main.getApiUtil().getPlayerAHFromUsername(thePlayer);
-        e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(1.0,20) + ")").queue();
+        e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(1.0, 20) + ")").queue();
 
         if (playerAuctions.isError()) {
             e.getChannel().deleteMessageById(messageId).queue();

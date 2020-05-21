@@ -2,6 +2,7 @@ package com.confusinguser.sbgods.utils;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.*;
+import com.confusinguser.sbgods.entities.banking.BankTransaction;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -687,5 +688,18 @@ public class ApiUtil {
             }
         }
         return totalMoney;
+    }
+
+    public SkyblockProfile getSkyblockProfileByProfileUUID(String profileUUID) {
+        String response = main.getApiUtil().getResponse(main.getApiUtil().BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 600000);
+        if (response == null) return new SkyblockProfile();
+        JSONObject jsonObject = new JSONObject(response);
+
+        List<Player> members = jsonObject.getJSONObject("profile").getJSONObject("members").keySet().stream().map(this::getPlayerFromUUID).collect(Collectors.toList());
+        List<BankTransaction> transactions = new ArrayList<>();
+        jsonObject.getJSONObject("profile").getJSONObject("banking").getJSONArray("transactions").forEach(transaction -> {
+            if (transaction instanceof JSONObject) transactions.add(new BankTransaction((JSONObject) transaction));
+        });
+        return new SkyblockProfile(members, transactions);
     }
 }

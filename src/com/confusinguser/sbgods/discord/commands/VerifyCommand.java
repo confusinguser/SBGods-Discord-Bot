@@ -18,16 +18,16 @@ public class VerifyCommand extends Command implements EventListener {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
-        if (!e.getChannel().getName().equalsIgnoreCase("verify")) {
-            e.getChannel().sendMessage("This command cant be used here.").queue();
+        if (!e.getChannel().getName().toLowerCase().contains("verify") && !e.getChannel().getName().toLowerCase().contains("bot")) {
+            e.getChannel().sendMessage("This command cannot be used in this channel").queue();
             return;
         }
 
         if (args.length >= 2) {
-
             // Check if that is actual player ign
             Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
             if (player.getDiscordTag().equalsIgnoreCase(e.getAuthor().getAsTag())) {
+                main.getUtil().verifyPlayer(e.getMember(), player.getDisplayName(), e.getGuild(), e.getChannel());
                 main.logger.fine("Added " + currentDiscordServer.toString() + " verified role to " + e.getAuthor().getAsTag());
                 return;
             }
