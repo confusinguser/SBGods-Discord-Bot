@@ -59,7 +59,7 @@ public class VerifyAllCommand extends Command implements EventListener {
                     } catch (HierarchyException ignored) {
                     }
                 }
-                for (Role role : e.getGuild().getRolesByName("Verified", true)) {
+                for (Role role : e.getGuild().getRolesByName("verified", true)) {
                     try {
                         e.getGuild().removeRoleFromMember(member, role).complete();
                     } catch (HierarchyException ignored) {
