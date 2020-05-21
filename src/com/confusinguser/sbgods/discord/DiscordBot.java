@@ -15,12 +15,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DiscordBot {
-    public final SkillExpCommand skillExpCommand;
+    public final VerifyAllCommand verifyAllCommand;
     private final SBGods main;
     private final ArrayList<Command> commands;
     private final JDA jda;
     public String commandPrefix = "-";
-    public SettingsCommand settingsCommand;
 
     public DiscordBot(SBGods main) throws LoginException {
         String token = "NjY0OTAwNzM0NTk2NDE1NDg4.XreLHQ.l2viqcJ-uYvB3rAGcBa3OWhRuf0";
@@ -28,7 +27,7 @@ public class DiscordBot {
         this.main = main;
         SlayerCommand slayerCommand = new SlayerCommand(main, this);
         SkillCommand skillCommand = new SkillCommand(main, this);
-        skillExpCommand = new SkillExpCommand(main, this);
+        SkillExpCommand skillExpCommand = new SkillExpCommand(main, this);
         HelpCommand helpCommand = new HelpCommand(main, this);
         SbgodsCommand sbgodsCommand = new SbgodsCommand(main, this);
         WhatguildCommand whatguildCommand = new WhatguildCommand(main, this);
@@ -37,13 +36,9 @@ public class DiscordBot {
         DeathsCommand deathsCommand = new DeathsCommand(main, this);
         AHCommand ahCommand = new AHCommand(main, this);
         VerifyCommand verifyCommand = new VerifyCommand(main, this);
-        VerifyAllCommand verifyAllCommand = new VerifyAllCommand(main, this);
+        verifyAllCommand = new VerifyAllCommand(main, this);
         TaxCommand taxCommand = new TaxCommand(main, this);
         PlayerCommand playerCommand = new PlayerCommand(main, this);
-        // applyCommand = new ApplyCommand(main, this);
-        // importApplicationCommand = new ImportApplicationCommand(main, this);
-        // inviteQueueCommand = new InviteQueueCommand(main, this);
-        // settingsCommand = new SettingsCommand(main, this);
 
         commands = new ArrayList<>(Arrays.asList(slayerCommand, skillCommand, skillExpCommand, helpCommand, sbgodsCommand, whatguildCommand, petsCommand, killsCommand, deathsCommand, ahCommand, verifyCommand, verifyAllCommand, taxCommand, playerCommand));
 

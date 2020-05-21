@@ -145,7 +145,7 @@ public class SkillCommand extends Command implements EventListener {
                 StringBuilder descriptionBuilder = embedBuilder.getDescriptionBuilder();
 
                 if (highestSkillLevels.isApproximate()) {
-                    descriptionBuilder.append("Approximate average skill level: **" + main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3) + "**\n\n");
+                    descriptionBuilder.append("Approximate average skill level: **").append(main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3)).append("**\n\n");
                 } else {
                     descriptionBuilder.append("Average skill level: **").append(main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3)).append("**\n\n");
                 }

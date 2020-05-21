@@ -3,7 +3,6 @@ package com.confusinguser.sbgods;
 import java.awt.*;
 import java.io.Console;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.URLDecoder;
@@ -39,8 +38,5 @@ class Start {
 
         SBGods sbgods = new SBGods();
         if (logTerminalError) sbgods.logger.info("Could not open terminal");
-        LeaderboardUpdater updater = new LeaderboardUpdater();
-        Thread updaterThread = new Thread(updater);
-        updaterThread.start();
     }
 }

@@ -1,34 +1,31 @@
-package com.confusinguser.sbgods;
+package com.confusinguser.sbgods.utils;
 
-import com.confusinguser.sbgods.entities.*;
+import com.confusinguser.sbgods.SBGods;
+import com.confusinguser.sbgods.entities.HypixelGuild;
+import com.confusinguser.sbgods.entities.Player;
+import com.confusinguser.sbgods.entities.SkillLevels;
+import com.confusinguser.sbgods.entities.SlayerExp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class LeaderboardUpdater implements Runnable {
+public class LeaderboardUpdater {
 
     private static LeaderboardUpdater instance;
     private final SBGods main;
 
-    LeaderboardUpdater() {
-        this.main = SBGods.getInstance();
-        LeaderboardUpdater.instance = this;
-    }
-
-    static LeaderboardUpdater getInstance() {
-        return instance;
-    }
-
-    public void run() {
-        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-        executor.scheduleAtFixedRate(() -> {
+    public LeaderboardUpdater(SBGods main) {
+        this.main = main;
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             updateLeaderboardCacheForGuild(HypixelGuild.SBG);
             updateLeaderboardCacheForGuild(HypixelGuild.SBDG);
         }, 0, 9, TimeUnit.MINUTES);
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+            main.getDiscord().verifyAllCommand.verifyAll(main.getDiscord().getJDA().getTextChannelById("713012939258593290"));
+        }, 0, 720, TimeUnit.MINUTES); // Every 12h
     }
 
     private void updateLeaderboardCacheForGuild(HypixelGuild guild) {

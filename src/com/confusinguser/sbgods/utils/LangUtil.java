@@ -85,8 +85,8 @@ public class LangUtil {
                     returnVal = Math.floor(returnVal);
                     returnVal = (returnVal / Math.pow(10, o)) * 10;
                     returnValStr = +main.getUtil().round(returnVal, o - 1) + notValue;
-                    if(o == 1){
-                        returnValStr = returnValStr.replace(".0","");
+                    if (o == 1) {
+                        returnValStr = returnValStr.replace(".0", "");
                     }
                 }
                 checkNum *= 10;
@@ -100,7 +100,7 @@ public class LangUtil {
         String progressChar = "#";
         String otherChar = "-";
 
-        returnVal += progressChar.repeat((int) (amountDone+lengthOfBar));
+        returnVal += progressChar.repeat((int) (amountDone + lengthOfBar));
 
         return returnVal;
     }

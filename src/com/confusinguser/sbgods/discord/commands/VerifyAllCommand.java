@@ -5,8 +5,7 @@ import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.hooks.EventListener;
@@ -70,26 +69,34 @@ public class VerifyAllCommand extends Command implements EventListener {
             e.getChannel().sendMessage("Removed everyone's verified and guild roles!").queue();
             return;
         }
+        verifyAll(e.getChannel(), e.getGuild()); // TODO - do this with all other commands
+    }
 
-        String messageId = e.getChannel().sendMessage("Attempting to auto-verify all players!").complete().getId();
+    private void verifyAll(MessageChannel channel, Guild discord) {
+        String messageId = channel.sendMessage("Attempting to auto-verify all players!").complete().getId();
 
         int playersVerified = 0;
-        for (Member member : e.getGuild().getMembers()) {
-            // if member doesn't have the verified role, then try to verify them
-            if (member.getRoles().stream().filter(role -> role.getName().equalsIgnoreCase("verified")).count() <= 0) {
-                String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag());
-                if (!mcName.equals("")) {
-                    playersVerified++;
-                    main.getUtil().verifyPlayer(member, mcName, e.getGuild(), e.getChannel());
-                }
+        for (Member member : discord.getMembers()) {
+            String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag());
+            if (!mcName.equals("")) {
+                playersVerified++;
+                main.getUtil().verifyPlayer(member, mcName, discord, channel);
             }
         }
-        e.getChannel().editMessageById(messageId, playersVerified == 0 ? "Did not verify any players" : "Verified a total of " + playersVerified + (playersVerified == 1 ? " player!" : " players!")).queue();
+
+        channel.editMessageById(messageId, playersVerified == 0 ? "Did not verify any players" : "Verified a total of " + playersVerified + (playersVerified == 1 ? " player!" : " players!")).queue();
 
         main.getUtil().scheduleCommandAfter(() ->
-                e.getChannel().getHistoryAfter(messageId, 100).complete().getRetrievedHistory().stream()
-                .filter(message -> message.getContentRaw().startsWith("[VerifyAll]") // Get all messages that start with [VerifyAll]
-                        && message.getAuthor().isBot())
-                .forEach(message -> message.delete().queue()), 10, TimeUnit.SECONDS);
+                channel.getHistoryAfter(messageId, 100).complete().getRetrievedHistory().stream()
+                        .filter(message -> message.getContentRaw().startsWith("[VerifyAll]") // Get all messages that start with [VerifyAll]
+                                && discord.getJDA().getSelfUser().getId().equals(message.getAuthor().getId()))
+                        .forEach(message -> message.delete().queue()), 10, TimeUnit.SECONDS);
+    }
+
+    public void verifyAll(TextChannel textChannel) {
+        if (textChannel == null) {
+            return;
+        }
+        verifyAll(textChannel, textChannel.getGuild());
     }
 }

@@ -135,8 +135,7 @@ public class Util {
         List<String> memberRoleNames = member.getRoles().stream().map(Role::getName).collect(Collectors.toList()); // Make a list of all role names the member has
 
         boolean sendMsg = false;
-
-        for (Role role : discord.getRolesByName("Verified", true)) {
+        for (Role role : discord.getRolesByName("verified", true)) {
             try {
                 sendMsg = true;
                 discord.addRoleToMember(member, role).complete();
@@ -145,7 +144,6 @@ public class Util {
         }
 
         // Add guild roles if they are in one
-        channel.sendTyping().queue();
         Player thePlayer = main.getApiUtil().getPlayerFromUsername(mcName);
         if (thePlayer.getSkyblockProfiles().isEmpty()) {
             return;
@@ -156,7 +154,6 @@ public class Util {
         }
         HypixelGuild guild = HypixelGuild.getGuildById(guildId);
 
-        channel.sendTyping().queue();
         for (Role role : discord.getRoles().stream().filter(role -> guild != null && guild.isAltNameIgnoreCase(role.getName())).collect(Collectors.toList())) {
             try {
                 discord.addRoleToMember(member, role).queue();
@@ -171,7 +168,6 @@ public class Util {
             }
         }
 
-        channel.sendTyping().queue();
         if (sendMsg) {
             if (guild == null) {
                 channel.sendMessage("[VerifyAll] Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "!").queue();

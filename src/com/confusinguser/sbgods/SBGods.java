@@ -24,6 +24,7 @@ public class SBGods {
     private final LangUtil langUtil;
     private final JsonApiUtil jsonApiUtil;
     private final CacheUtil cacheUtil;
+    private final LeaderboardUpdater leaderboardUpdater;
     private DiscordBot discordBot;
     private int keyIndex = 0;
 
@@ -40,11 +41,11 @@ public class SBGods {
         logger.setUseParentHandlers(false);
 
         if (SBGods.class.getProtectionDomain().getCodeSource().getLocation().toString().endsWith(".jar")) { // If not inside IDE
-            handler.setLevel(Level.INFO);
-            logger.setLevel(Level.INFO); // Only show info
+            handler.setLevel(Level.INFO); // Make handler only send info+ events
+            logger.setLevel(Level.INFO); // Only show info+
         } else {
-            handler.setLevel(Level.FINEST); // Make handler send fine events
-            logger.setLevel(Level.FINEST); // Show all logging events
+            handler.setLevel(Level.ALL); // Make handler send all events
+            logger.setLevel(Level.ALL); // Show all logging events
         }
 
         this.apiutil = new ApiUtil(this);
@@ -53,7 +54,7 @@ public class SBGods {
         this.langUtil = new LangUtil(this);
         this.jsonApiUtil = new JsonApiUtil(this);
         this.cacheUtil = new CacheUtil(this);
-        //this.configValues = new ConfigValues(this);
+        this.leaderboardUpdater = new LeaderboardUpdater(this);
         instance = this;
         try {
             this.discordBot = new DiscordBot(this);
@@ -106,7 +107,7 @@ public class SBGods {
     }
 
     public LeaderboardUpdater getLeaderboardUpdater() {
-        return LeaderboardUpdater.getInstance();
+        return leaderboardUpdater;
     }
 
     public Logger getLogger() {
