@@ -197,8 +197,7 @@ public class Util {
         if (typing) {
             channel.sendTyping().queue();
             typingChannels.add(channel);
-        }
-        else {
+        } else {
             typingChannels.remove(channel);
             channel.deleteMessageById(channel.sendMessage("\u200E").complete().getId()).queue(); // To remove the typing status instantly
         }

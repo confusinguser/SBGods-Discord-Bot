@@ -18,7 +18,6 @@ public class SBGods {
     private static SBGods instance;
     public final String[] keys = {"bc90572a-1547-41a5-8f28-d7664916a28d", "3963906e-ffb6-45b9-b07b-80ca9838eb20"};
     public final Logger logger = Logger.getLogger(this.getClass().getName());
-    //private ConfigValues configValues;
     private final ApiUtil apiutil;
     private final Util util;
     private final SBUtil sbUtil;

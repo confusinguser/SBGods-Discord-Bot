@@ -13,9 +13,7 @@ public class LeaderboardUpdater implements Runnable {
 
     private static LeaderboardUpdater instance;
     private final SBGods main;
-
-    private boolean alreadyran = false;
-
+    
     LeaderboardUpdater() {
         this.main = SBGods.getInstance();
         LeaderboardUpdater.instance = this;
@@ -28,11 +26,6 @@ public class LeaderboardUpdater implements Runnable {
     public void run() {
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         executor.scheduleAtFixedRate(() -> {
-            if (System.currentTimeMillis() > 1589014800000L && !alreadyran && System.currentTimeMillis() < 1589018400000L) {
-                // 11am 09-05-2020
-                alreadyran = true;
-                main.getDiscord().skillExpCommand.handleCommand(DiscordServer.SBGods, main.getDiscord().getJDA().getTextChannelById(673619910324387885L), "-skillexp leaderboard all spreadsheet", "Automated Action");
-            }
             updateLeaderboardCacheForGuild(HypixelGuild.SBG);
             updateLeaderboardCacheForGuild(HypixelGuild.SBDG);
         }, 0, 9, TimeUnit.MINUTES);

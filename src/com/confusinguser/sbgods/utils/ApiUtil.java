@@ -54,8 +54,6 @@ public class ApiUtil {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
-                // Restore interrupted state...
                 Thread.currentThread().interrupt();
             }
         } else {
@@ -91,7 +89,7 @@ public class ApiUtil {
         } catch (IOException ex) {
             fails++;
             if (fails % 10 == 0) {
-                main.logger.warning("Failed to connect to the Hypixel API " + fails + " times, this may be a problem: " + ex.toString());
+                main.logger.warning("Failed to connect to the Hypixel API " + fails + " times: " + ex);
             }
         }
 
@@ -99,7 +97,6 @@ public class ApiUtil {
             try {
                 Thread.sleep(17000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
                 Thread.currentThread().interrupt();
             }
             return getResponse(url_string, cacheTime);
@@ -110,7 +107,7 @@ public class ApiUtil {
         } else if (ioException != null) {
             fails++;
             if (fails % 10 == 0) {
-                main.logger.warning("Failed to connect to the Hypixel API " + fails + " times, this may be a problem: " + ioException.toString() + '\n' + ioException.fillInStackTrace());
+                main.logger.warning("Failed to connect to the Hypixel API " + fails + " times: " + ioException);
             }
             return getResponse(url_string, cacheTime);
         }
@@ -119,7 +116,6 @@ public class ApiUtil {
     }
 
     public String getNonHypixelResponse(String url_string) {
-
         StringBuffer response = null;
         HttpURLConnection con = null;
         IOException ioException = null;
@@ -149,7 +145,7 @@ public class ApiUtil {
         } catch (IOException ex) {
             fails++;
             if (fails % 10 == 0) {
-                main.logger.warning("Failed to connect to the API " + fails + " times, this may be a problem: " + ex.toString() + '\n' + ex.fillInStackTrace());
+                main.logger.warning("Failed to connect to the API " + fails + " times: " + ex);
             }
         }
 
@@ -157,7 +153,6 @@ public class ApiUtil {
             try {
                 Thread.sleep(17000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
                 Thread.currentThread().interrupt();
             }
             return getNonHypixelResponse(url_string);
@@ -168,7 +163,7 @@ public class ApiUtil {
         } else if (ioException != null) {
             fails++;
             if (fails % 10 == 0) {
-                main.logger.warning("Failed to connect to the API " + fails + " times, this may be a problem: " + ioException.toString() + '\n' + ioException.fillInStackTrace());
+                main.logger.warning("Failed to connect to the API " + fails + " times: " + ioException);
             }
             return getNonHypixelResponse(url_string);
         }

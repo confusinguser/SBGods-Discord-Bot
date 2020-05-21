@@ -21,7 +21,7 @@ public class TaxPayer {
         if (jsonData == null) {
             this.jsonData = new JSONObject();
             this.jsonData.put("owes", 0);
-            this.jsonData.put("role", "Default");
+            this.jsonData.put("role", "default");
             this.jsonData.put("name", name);
         } else {
             this.jsonData = jsonData;
@@ -55,7 +55,7 @@ public class TaxPayer {
 
     public void setRole(String role) {
         jsonData.remove("role");
-        jsonData.put("role", role);
+        jsonData.put("role", role.toLowerCase());
     }
 
     public String getName() {
@@ -82,7 +82,7 @@ public class TaxPayer {
     public EmbedBuilder getDiscordEmbed() {
         EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0xb8300b).setTitle(getName() + "'s Tax Status");
 
-        embedBuilder.appendDescription("Role: **" + getRole() + "**\n");
+        embedBuilder.appendDescription("Role: **" + main.getLangUtil().toLowerCaseButFirstLetter(getRole()) + "**\n");
         embedBuilder.appendDescription("Owes: **" + getOwes() + "**");
 
         return embedBuilder;
