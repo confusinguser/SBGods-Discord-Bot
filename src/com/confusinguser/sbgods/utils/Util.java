@@ -122,12 +122,14 @@ public class Util {
         return output;
     }
 
-    public void verifyPlayer(Member member, String mcName, Guild discord, MessageChannel channel) {
-        DiscordServer discordServer = DiscordServer.getDiscordServerFromDiscordGuild(discord);
-        if (discordServer == null) {
-            return;
-        }
-
+    /**
+     * @param member The discord {@link Member} object
+     * @param mcName The minecraft IGN
+     * @param discord The discord {@link Guild} object
+     * @param channel The discord {@link MessageChannel} object
+     * @return If verifiaction was successful and player wasn't already verified
+     */
+    public boolean verifyPlayer(Member member, String mcName, Guild discord, MessageChannel channel) {
         try {
             if (!member.getEffectiveName().toLowerCase().contains(mcName.toLowerCase())) {
                 if ((member.getEffectiveName() + " (" + mcName + ")").length() > 32) member.modifyNickname(mcName).complete();
@@ -153,7 +155,7 @@ public class Util {
         // Add guild roles if they are in one
         Player thePlayer = main.getApiUtil().getPlayerFromUsername(mcName);
         if (thePlayer.getSkyblockProfiles().isEmpty()) {
-            return;
+            return sendMsg;
         }
         String guildId = main.getApiUtil().getGuildIDFromUUID(thePlayer.getUUID());
         if (guildId == null) {
@@ -182,6 +184,7 @@ public class Util {
                 channel.sendMessage(main.getDiscord().escapeMarkdown("[Verify] Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "! (Guild: " + guild.getDisplayName() + ")")).queue();
             }
         }
+        return sendMsg;
     }
 
     public List<JSONObject> getJSONObjectListByJSONArray(JSONArray jsonArray) {
