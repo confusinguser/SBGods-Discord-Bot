@@ -24,7 +24,7 @@ public class HelpCommand extends Command implements EventListener {
     @Override
     public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
         if (args.length >= 2) {
-            HelpMessage message = HelpMessage.getHelpFromCommand(String.join("", Arrays.copyOfRange(args, 1, args.length - 1)));
+            HelpMessage message = HelpMessage.getHelpFromCommand(String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
             if (message != null) {
                 e.getChannel().sendMessage(message.getEmbed()).queue();
             } else {
@@ -32,6 +32,7 @@ public class HelpCommand extends Command implements EventListener {
             }
             return;
         }
+
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("SBGods Discord Bot Help Page");
         Random colorRandom = new Random();
         embedBuilder = embedBuilder.setDescription(embedBuilder.getDescriptionBuilder()
@@ -48,6 +49,7 @@ public class HelpCommand extends Command implements EventListener {
                 .append("tax info <IGN>: \t**Check how much tax a player owes**\n")
                 .append("tax owelist: \t**Shows a leaderboard with who owes the most**\n\n")
                 .append("ah <IGN>: \t**Shows the player's auctions**\n\n")
+                .append("help <COMMAND>: \t**Shows the help for a specific command**\n\n")
                 .toString())
                 .setColor(new Color(colorRandom.nextFloat(), colorRandom.nextFloat(), colorRandom.nextFloat()))
                 .setFooter("Version " + SBGods.VERSION + "\nDescription: " + SBGods.VERSION_DESCRIPTION);
