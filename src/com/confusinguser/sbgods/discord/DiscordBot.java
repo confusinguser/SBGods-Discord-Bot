@@ -9,15 +9,17 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class DiscordBot {
     public final VerifyAllCommand verifyAllCommand;
     private final SBGods main;
-    private final ArrayList<Command> commands;
+    private final ArrayList<ListenerAdapter> commands;
     private final JDA jda;
     public String commandPrefix = "-";
 
@@ -40,15 +42,17 @@ public class DiscordBot {
         TaxCommand taxCommand = new TaxCommand(main, this);
         PlayerCommand playerCommand = new PlayerCommand(main, this);
 
-        commands = new ArrayList<>(Arrays.asList(slayerCommand, skillCommand, skillExpCommand, helpCommand, sbgodsCommand, whatguildCommand, petsCommand, killsCommand, deathsCommand, ahCommand, verifyCommand, verifyAllCommand, taxCommand, playerCommand));
+        MessageListener messageListener = new MessageListener(main, this);
+
+        commands = new ArrayList<>(Arrays.asList(slayerCommand, skillCommand, skillExpCommand, helpCommand, sbgodsCommand, whatguildCommand, petsCommand, killsCommand, deathsCommand, ahCommand, verifyCommand, verifyAllCommand, taxCommand, playerCommand, messageListener));
 
         JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT)
                 .setToken(token)
                 .setStatus(OnlineStatus.ONLINE)
                 .setActivity(Activity.playing("Use " + helpCommand.getName() + " to get started"));
 
-        for (Command command : commands) {
-            jdaBuilder.addEventListeners(command);
+        for (ListenerAdapter listener : commands) {
+            jdaBuilder.addEventListeners(listener);
         }
         jda = jdaBuilder.build();
         jda.getPresence().setActivity(Activity.playing("Use " + commandPrefix + "help to get started. Made by ConfusingUser#5712"));
@@ -56,7 +60,10 @@ public class DiscordBot {
     }
 
     public boolean isValidCommand(String command) {
-        for (Command validCommand : commands) {
+        for (Command validCommand : commands.stream().filter(listener -> {
+            if (listener instanceof Command) return true;
+            else return false;
+        }).map(listener -> (Command) listener).collect(Collectors.toList())) {
             String validCommandString = validCommand.getName();
             if (command.equalsIgnoreCase(validCommandString)) {
                 return true;
