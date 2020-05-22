@@ -247,7 +247,7 @@ public enum HelpMessage {
         embedBuilder.setTitle("`" + SBGods.getInstance().getLangUtil().toLowerCaseButFirstLetter(command) + "` command help.");
         Random colorRandom = new Random();
         embedBuilder.setColor(new Color(colorRandom.nextFloat(), colorRandom.nextFloat(), colorRandom.nextFloat()));
-        embedBuilder.setFooter("Version " + SBGods.VERSION + "\nDescription: " + SBGods.VERSION_DESCRIPTION);
+        embedBuilder.setFooter("Version " + SBGods.VERSION + "\nDescription: " + SBGods.VERSION_DESCRIPTION_MINOR);
         embedBuilder.addField("Usage", "`" + SBGods.getInstance().getDiscord().commandPrefix + usage + "`",false);
 
         embedBuilder.addField("Sub-commands", "`" + (subCommands.length==0? "NONE" : String.join("`\n`" + SBGods.getInstance().getDiscord().commandPrefix, subCommands)) + "`", false);
