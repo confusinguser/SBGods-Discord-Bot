@@ -6,6 +6,9 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 public abstract class Command extends ListenerAdapter {
     SBGods main = SBGods.getInstance();
     DiscordBot discord = main.getDiscord();
@@ -28,7 +31,10 @@ public abstract class Command extends ListenerAdapter {
 
         main.getUtil().setTyping(true, e.getChannel());
         try {
-            handleCommand(e, discordServer, e.getMessage().getContentRaw().split(" "));
+            ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+            executorService.execute(() ->
+                    handleCommand(e, discordServer, e.getMessage().getContentRaw().split(" ")));
+            executorService.shutdown();
         } catch (Throwable t) {
             main.logger.severe("Exception when handling command '" + e.getMessage().getContentRaw() + "': \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t));
         }

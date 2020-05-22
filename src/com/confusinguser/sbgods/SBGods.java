@@ -11,8 +11,8 @@ import java.util.Date;
 import java.util.logging.*;
 
 public class SBGods {
-    public static final String VERSION = "0.8.11.2";
-    public static final String VERSION_DESCRIPTION = "Messages in channel named #verify will be deleted after 30 secs";
+    public static final String VERSION = "0.8.11.4";
+    public static final String VERSION_DESCRIPTION = "Fixed bugs with -verifyall";
     private static final String[] DEVELOPERS = {"244786205873405952", "497210228274757632"};
     private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
     //private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing

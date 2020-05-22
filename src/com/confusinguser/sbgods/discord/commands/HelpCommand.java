@@ -49,7 +49,8 @@ public class HelpCommand extends Command implements EventListener {
                 .append("tax owelist: \t**Shows a leaderboard with who owes the most**\n\n")
                 .append("ah <IGN>: \t**Shows the player's auctions**\n\n")
                 .toString())
-                .setColor(new Color(colorRandom.nextFloat(), colorRandom.nextFloat(), colorRandom.nextFloat()));
+                .setColor(new Color(colorRandom.nextFloat(), colorRandom.nextFloat(), colorRandom.nextFloat()))
+                .setFooter("Version " + SBGods.VERSION + "\nDescription: " + SBGods.VERSION_DESCRIPTION);
 
         e.getChannel().sendMessage(embedBuilder.build()).queue();
     }

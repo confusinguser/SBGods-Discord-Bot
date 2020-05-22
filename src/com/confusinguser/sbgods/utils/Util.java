@@ -128,9 +128,10 @@ public class Util {
         }
 
         try {
-            if (member.getEffectiveName().toLowerCase().contains(mcName)) {
-                if ((member.getEffectiveName() + "(" + mcName + ")").length() > 32) member.modifyNickname(mcName).complete();
-                else member.modifyNickname(member.getEffectiveName() + "(" + mcName + ")").complete();
+            if (member.getEffectiveName().contains("(")) member.modifyNickname(mcName).complete();
+            if (!member.getEffectiveName().toLowerCase().contains(mcName.toLowerCase())) {
+                if ((member.getEffectiveName() + " (" + mcName + ")").length() > 32) member.modifyNickname(mcName).complete();
+                else member.modifyNickname(member.getEffectiveName() + " (" + mcName + ")").complete();
             }
         } catch (HierarchyException ignored) {
         } // Don't have perms to change nick
@@ -141,8 +142,10 @@ public class Util {
         boolean sendMsg = false;
         for (Role role : discord.getRolesByName("verified", true)) {
             try {
-                sendMsg = true;
-                discord.addRoleToMember(member, role).complete();
+                if (!member.getRoles().contains(role)) {
+                    sendMsg = true;
+                    discord.addRoleToMember(member, role).complete();
+                }
             } catch (HierarchyException ignored) {
             }
         }
@@ -174,9 +177,9 @@ public class Util {
 
         if (sendMsg) {
             if (guild == null) {
-                channel.sendMessage("[Verify] Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "!").queue();
+                channel.sendMessage(main.getDiscord().escapeMarkdown("[Verify] Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "!")).queue();
             } else {
-                channel.sendMessage("[Verify] Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "! (Guild: " + guild.getDisplayName() + ")").queue();
+                channel.sendMessage(main.getDiscord().escapeMarkdown("[Verify] Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "! (Guild: " + guild.getDisplayName() + ")")).queue();
             }
         }
     }

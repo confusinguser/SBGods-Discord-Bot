@@ -55,15 +55,12 @@ public class DiscordBot {
             jdaBuilder.addEventListeners(listener);
         }
         jda = jdaBuilder.build();
-        jda.getPresence().setActivity(Activity.playing("Use " + commandPrefix + "help to get started. Made by ConfusingUser#5712"));
+        jda.getPresence().setActivity(Activity.playing("Use " + commandPrefix + "help to get started. \nMade by ConfusingUser#5712 & Soopyboo32#3042"));
         main.logger.info("Bot ready to take commands");
     }
 
     public boolean isValidCommand(String command) {
-        for (Command validCommand : commands.stream().filter(listener -> {
-            if (listener instanceof Command) return true;
-            else return false;
-        }).map(listener -> (Command) listener).collect(Collectors.toList())) {
+        for (Command validCommand : commands.stream().filter(listener -> listener instanceof Command).map(listener -> (Command) listener).collect(Collectors.toList())) {
             String validCommandString = validCommand.getName();
             if (command.equalsIgnoreCase(validCommandString)) {
                 return true;
