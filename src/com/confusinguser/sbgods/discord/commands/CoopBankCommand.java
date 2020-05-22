@@ -7,7 +7,6 @@ import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SkyblockProfile;
 import com.confusinguser.sbgods.entities.banking.BankTransaction;
 import com.confusinguser.sbgods.entities.banking.TransactionType;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.HashMap;
@@ -35,7 +34,7 @@ public class CoopBankCommand extends Command {
             SkyblockProfile skyblockProfile = main.getApiUtil().getSkyblockProfileByProfileUUID(profile);
 
             Map<String, Double> personalBankMap = new HashMap<>();
-            EmbedBuilder profileEmbed = new EmbedBuilder();
+            //EmbedBuilder profileEmbed = new EmbedBuilder();
 
             for (BankTransaction transaction : skyblockProfile.getBankHistory()) {
                 if (transaction.getType() == TransactionType.DEPOSIT) {
@@ -44,6 +43,11 @@ public class CoopBankCommand extends Command {
                     personalBankMap.put(transaction.getInitiatorName(), personalBankMap.get(transaction.getInitiatorName()) - transaction.getAmount());
                 }
             }
+
+            StringBuilder response = new StringBuilder();
+            personalBankMap.forEach((key, value) -> response.append(key).append(" has ").append(value));
+
+            e.getChannel().sendMessage(response.toString()).queue();
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.confusinguser.sbgods.entities;
 
 import com.confusinguser.sbgods.SBGods;
-import com.confusinguser.sbgods.discord.DiscordBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
@@ -10,6 +9,7 @@ import java.util.Random;
 
 public enum HelpMessage {
 
+    //<editor-fold desc="All -help [COMMAND] data">
     HELP("help",
             "help [COMMAND]",
             new String[]{"help [COMMAND] [SUBCOMMAND]"},
@@ -44,7 +44,7 @@ public enum HelpMessage {
 
     SBGODS("sbgods",
             "sbgods [COMMAND]",
-            new String[]{"sbgods version","sbgods update","sbgods stop"},
+            new String[]{"sbgods version", "sbgods update", "sbgods stop"},
             "Some commands to change bot stuff"),
 
     SBGODS_VERSION("sbgods version",
@@ -77,7 +77,7 @@ public enum HelpMessage {
 
     SKILL("skill",
             "skill [SUBCOMMAND]",
-            new String[]{"skill player [IGN]","skill leaderboard [LENGTH | all]"},
+            new String[]{"skill player [IGN]", "skill leaderboard [LENGTH | all]"},
             "The main skill command."),
 
     SKILL_PLAYER("skill player",
@@ -92,7 +92,7 @@ public enum HelpMessage {
 
     SKILLEXP("skillexp",
             "skill [SUBCOMMAND]",
-            new String[]{"skillexp player [IGN]","skillexp leaderboard [LENGTH | all]"},
+            new String[]{"skillexp player [IGN]", "skillexp leaderboard [LENGTH | all]"},
             "The main skillexp command."),
 
     SKILLEXP_PLAYER("skillexp player",
@@ -107,7 +107,7 @@ public enum HelpMessage {
 
     SLAYER("slayer",
             "slayer [SUBCOMMAND]",
-            new String[]{"slayer player [IGN]","slayer leaderboard [LENGTH | all]"},
+            new String[]{"slayer player [IGN]", "slayer leaderboard [LENGTH | all]"},
             "The main slayer command."),
 
     SLAYER_PLAYER("slayer player",
@@ -122,7 +122,7 @@ public enum HelpMessage {
 
     TAX("tax",
             "tax [SUBCOMMAND]",
-            new String[]{"tax owelist","tax info", "tax setrole", "tax paid", "tax paidall", "tax owe", "tax oweall"},
+            new String[]{"tax owelist", "tax info", "tax setrole", "tax paid", "tax paidall", "tax owe", "tax oweall"},
             "The main tax command.",
             "This will also show your tax info"),
 
@@ -206,6 +206,7 @@ public enum HelpMessage {
             "whatguild [IGN]",
             new String[]{},
             "Lists the guild that the player is in");
+    //</editor-fold>
 
     private final String command;
     private final String usage;
@@ -231,12 +232,15 @@ public enum HelpMessage {
     public String getCommand() {
         return command;
     }
+
     public String getUsage() {
         return usage;
     }
+
     public String[] getSubcommands() {
         return subCommands;
     }
+
     public String[] getHelpLines() {
         return helpLines;
     }
@@ -247,10 +251,11 @@ public enum HelpMessage {
         embedBuilder.setTitle("`" + SBGods.getInstance().getLangUtil().toLowerCaseButFirstLetter(command) + "` command help.");
         Random colorRandom = new Random();
         embedBuilder.setColor(new Color(colorRandom.nextFloat(), colorRandom.nextFloat(), colorRandom.nextFloat()));
-        embedBuilder.setFooter("Version " + SBGods.VERSION + "\nDescription: " + SBGods.VERSION_DESCRIPTION_MINOR);
-        embedBuilder.addField("Usage", "`" + SBGods.getInstance().getDiscord().commandPrefix + usage + "`",false);
-
-        embedBuilder.addField("Sub-commands", "`" + (subCommands.length==0? "NONE" : String.join("`\n`" + SBGods.getInstance().getDiscord().commandPrefix, subCommands)) + "`", false);
+        embedBuilder.addField("Usage", "`" + SBGods.getInstance().getDiscord().commandPrefix + usage + "`", false);
+        if (subCommands.length > 0) {
+            embedBuilder.addField("Sub-commands", "`" + String.join("`\n`" + SBGods.getInstance().getDiscord().commandPrefix, subCommands) + "`", false);
+        }
+        embedBuilder.setFooter("Version " + SBGods.VERSION);
 
         for (String helpLine : helpLines) {
             embedBuilder.appendDescription(helpLine + "\n");
