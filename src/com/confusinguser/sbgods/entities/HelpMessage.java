@@ -250,7 +250,7 @@ public enum HelpMessage {
         embedBuilder.setFooter("Version " + SBGods.VERSION + "\nDescription: " + SBGods.VERSION_DESCRIPTION_MINOR);
         embedBuilder.addField("Usage", "`" + SBGods.getInstance().getDiscord().commandPrefix + usage + "`",false);
 
-        embedBuilder.addField("Sub-commands", "`" + (subCommands.length==0? "NONE" : String.join("`\n`" + SBGods.getInstance().getDiscord().commandPrefix, subCommands)) + "`", false);
+        embedBuilder.addField("Sub-commands", "`" + (subCommands.length==0? "NONE" : SBGods.getInstance().getDiscord().commandPrefix + String.join("`\n`" + SBGods.getInstance().getDiscord().commandPrefix, subCommands)) + "`", false);
 
         for (String helpLine : helpLines) {
             embedBuilder.appendDescription(helpLine + "\n");
