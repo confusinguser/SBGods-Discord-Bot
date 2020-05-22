@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.exceptions.HierarchyException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +129,6 @@ public class Util {
         }
 
         try {
-            if (member.getEffectiveName().contains("(")) member.modifyNickname(mcName).complete();
             if (!member.getEffectiveName().toLowerCase().contains(mcName.toLowerCase())) {
                 if ((member.getEffectiveName() + " (" + mcName + ")").length() > 32) member.modifyNickname(mcName).complete();
                 else member.modifyNickname(member.getEffectiveName() + " (" + mcName + ")").complete();
@@ -208,5 +208,16 @@ public class Util {
 
     public String stripColorCodes(String input) {
         return stripColorCodesRegex.matcher(input).replaceAll("");
+    }
+
+    /**
+     * For recursiveness
+     */
+    public File getFileToUse(String fileName) {
+        File file = new File(fileName);
+        if (file.exists()) {
+            file = getFileToUse(fileName.replace(".jar", "") + "_new.jar");
+        }
+        return file;
     }
 }

@@ -563,11 +563,7 @@ public class ApiUtil {
         String response = getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/setDiscordMcName.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace("#", "*").replace(" ", "%20") + "&mc=" + mcName);
     }
 
-    public Path downloadFile(String urlStr, String fileLocation) throws IOException {
-        File file = new File(fileLocation);
-        if (!file.createNewFile()) {
-            return downloadFile(urlStr, fileLocation.replace(".jar", "") + "_new.jar");
-        }
+    public Path downloadFile(String urlStr, File file) throws IOException {
         URL url = new URL(urlStr);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setDoInput(true);
@@ -585,7 +581,7 @@ public class ApiUtil {
         }
         fis.close();
         bis.close();
-        return Paths.get(fileLocation);
+        return Paths.get(file.getPath());
     }
 
     public Map.Entry<String, String> getLatestReleaseUrl() {

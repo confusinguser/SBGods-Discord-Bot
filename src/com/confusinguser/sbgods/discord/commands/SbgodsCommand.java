@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class SbgodsCommand extends Command implements EventListener {
             EmbedBuilder embedBuilder = new EmbedBuilder()
                     .setTitle("Version " + SBGods.VERSION)
                     .setDescription(SBGods.VERSION_DESCRIPTION)
-                    .setFooter("Made by ConfusingUser#5712 & SoopyBoo32#3042");
+                    .setFooter("Made by ConfusingUser#5712 & Soopyboo32#3042");
             e.getChannel().sendMessage(embedBuilder.build()).queue();
             return;
         }
@@ -52,15 +53,16 @@ public class SbgodsCommand extends Command implements EventListener {
                 return;
             }
 
-
             String messageId = e.getChannel().sendMessage("Downloading update...").complete().getId();
 
+            File file = main.getUtil().getFileToUse(latestReleaseUrl.getKey());
             Path newFilePath;
             try {
-                newFilePath = main.getApiUtil().downloadFile(latestReleaseUrl.getValue(), latestReleaseUrl.getKey());
+                newFilePath = main.getApiUtil().downloadFile(latestReleaseUrl.getValue(), file);
             } catch (IOException ex) {
                 e.getChannel().sendMessage("There was a problem when downloading the latest release").queue();
                 main.logger.severe("Exception when downloading the latest release: \n" + main.getLangUtil().beautifyStackTrace(ex.getStackTrace(), ex));
+                file.delete();
                 return;
             }
             if (!SBGods.class.getProtectionDomain().getCodeSource().getLocation().toString().endsWith(".jar")) {
