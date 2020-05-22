@@ -4,14 +4,12 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.Objects;
 
 public class SbgodsCommand extends Command implements EventListener {
 
@@ -30,12 +28,10 @@ public class SbgodsCommand extends Command implements EventListener {
         }
 
         if (args[1].equalsIgnoreCase("version")) {
-            User creatorUserObj = discord.getJDA().getUserById(main.getCreatorId());
-
             EmbedBuilder embedBuilder = new EmbedBuilder()
                     .setTitle("Version " + SBGods.VERSION)
                     .setDescription(SBGods.VERSION_DESCRIPTION)
-                    .setFooter("Made by " + Objects.requireNonNull(creatorUserObj).getAsTag());
+                    .setFooter("Made by ConfusingUser#5712 & SoopyBoo32#3042");
             e.getChannel().sendMessage(embedBuilder.build()).queue();
             return;
         }
@@ -45,7 +41,7 @@ public class SbgodsCommand extends Command implements EventListener {
         }
 
         if (args[1].equalsIgnoreCase("update")) {
-            if (e.getMember() != null && e.getMember().getRoles().stream().noneMatch(role -> role.getName().toLowerCase().contains("bot") || e.getAuthor().getId().equals(main.getCreatorId()))) {
+            if (e.getMember() != null && e.getMember().getRoles().stream().noneMatch(role -> role.getName().toLowerCase().contains("bot") || main.isDeveloper(e.getAuthor().getId()))) {
                 e.getChannel().sendMessage("You do not have the permission to update the bot!").queue();
                 return;
             }
@@ -85,7 +81,7 @@ public class SbgodsCommand extends Command implements EventListener {
         }
 
         if (args[1].equalsIgnoreCase("stop")) {
-            if (e.getMember() != null && e.getMember().getRoles().stream().noneMatch(role -> role.getName().toLowerCase().contains("bot") || e.getAuthor().getId().equals(main.getCreatorId()))) {
+            if (e.getMember() != null && e.getMember().getRoles().stream().noneMatch(role -> role.getName().toLowerCase().contains("bot") || main.isDeveloper(e.getAuthor().getId()))) {
                 e.getChannel().sendMessage("You do not have the permission to stop the bot!").queue();
                 return;
             }

@@ -6,8 +6,6 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-import java.util.Objects;
-
 public class SettingsCommand extends Command {
 
     public SettingsCommand(SBGods main, DiscordBot discord) {
@@ -19,7 +17,7 @@ public class SettingsCommand extends Command {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
-        if (!Objects.requireNonNull(e.getGuild().getMember(e.getAuthor())).getPermissions().contains(Permission.MANAGE_SERVER) || !e.getAuthor().getId().contentEquals(main.getCreatorId())) {
+        if (e.getMember() == null || e.getMember() != null && !e.getMember().getPermissions().contains(Permission.MANAGE_SERVER) && !main.isDeveloper(e.getAuthor().getId())) {
             e.getChannel().sendMessage("You do not have permission to change the settings!").queue();
             return;
         }
