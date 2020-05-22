@@ -52,7 +52,7 @@ public class HelpCommand extends Command implements EventListener {
                 .append("help <COMMAND>: \t**Shows the help for a specific command**\n\n")
                 .toString())
                 .setColor(new Color(colorRandom.nextFloat(), colorRandom.nextFloat(), colorRandom.nextFloat()))
-                .setFooter("Version " + SBGods.VERSION + "\nDescription: " + SBGods.VERSION_DESCRIPTION);
+                .setFooter("Version " + SBGods.VERSION + "\nDescription: " + SBGods.VERSION_DESCRIPTION_MINOR);
 
         e.getChannel().sendMessage(embedBuilder.build()).queue();
     }
