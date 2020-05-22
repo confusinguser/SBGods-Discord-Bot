@@ -174,9 +174,9 @@ public class Util {
 
         if (sendMsg) {
             if (guild == null) {
-                channel.sendMessage("[VerifyAll] Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "!").queue();
+                channel.sendMessage("[Verify] Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "!").queue();
             } else {
-                channel.sendMessage("[VerifyAll] Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "! (Guild: " + guild.getDisplayName() + ")").queue();
+                channel.sendMessage("[Verify] Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "! (Guild: " + guild.getDisplayName() + ")").queue();
             }
         }
     }

@@ -10,14 +10,14 @@ public enum HelpMessage {
 
     HELP("Help", "help", "Line1", "Line2");
 
-    private String title;
-    private String command;
-    private String[] helpLines;
+    private final String title;
+    private final String command;
+    private final String[] helpLines;
 
-    HelpMessage(String title, String command, String... lines){
-        this.title=title;
-        this.command=command;
-        this.helpLines=lines;
+    HelpMessage(String title, String command, String... lines) {
+        this.title = title;
+        this.command = command;
+        this.helpLines = lines;
     }
 
     public static HelpMessage getHelpFromCommand(String input) {
@@ -29,16 +29,19 @@ public enum HelpMessage {
         return null;
     }
 
-    public String getTitle(){
+    public String getTitle() {
         return title;
     }
-    public String getCommand(){
+
+    public String getCommand() {
         return command;
     }
-    public String[] getHelpLines(){
+
+    public String[] getHelpLines() {
         return helpLines;
     }
-    public MessageEmbed getEmbed(){
+
+    public MessageEmbed getEmbed() {
         EmbedBuilder embedBuilder = new EmbedBuilder();
 
         embedBuilder.setTitle(title);
@@ -46,7 +49,7 @@ public enum HelpMessage {
         embedBuilder.setColor(new Color(colorRandom.nextFloat(), colorRandom.nextFloat(), colorRandom.nextFloat()));
         embedBuilder.setFooter("Help for the `" + command + "`.");
 
-        for(String helpLine : helpLines){
+        for (String helpLine : helpLines) {
             embedBuilder.appendDescription(helpLine);
         }
 

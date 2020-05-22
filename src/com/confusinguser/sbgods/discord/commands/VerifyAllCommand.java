@@ -83,7 +83,7 @@ public class VerifyAllCommand extends Command implements EventListener {
 
         main.getUtil().scheduleCommandAfter(() ->
                 channel.getHistoryAfter(messageId, 100).complete().getRetrievedHistory().stream()
-                        .filter(message -> message.getContentRaw().startsWith("[VerifyAll]") // Get all messages that start with [VerifyAll]
+                        .filter(message -> message.getContentRaw().startsWith("[Verify]") // Get all messages that start with [VerifyAll]
                                 && discord.getJDA().getSelfUser().getId().equals(message.getAuthor().getId()))
                         .forEach(message -> message.delete().queue()), 10, TimeUnit.SECONDS);
     }
