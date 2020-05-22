@@ -30,14 +30,15 @@ public abstract class Command extends ListenerAdapter {
         } // Only allowed servers may use commands
 
         main.getUtil().setTyping(true, e.getChannel());
-        try {
-            ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-            executorService.execute(() ->
-                    handleCommand(e, discordServer, e.getMessage().getContentRaw().split(" ")));
-            executorService.shutdown();
-        } catch (Throwable t) {
-            main.logger.severe("Exception when handling command '" + e.getMessage().getContentRaw() + "': \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t));
-        }
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.execute(() -> {
+            try {
+                handleCommand(e, discordServer, e.getMessage().getContentRaw().split(" "));
+            } catch (Throwable t) {
+                main.logger.severe("Exception when handling command '" + e.getMessage().getContentRaw() + "': \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t));
+            }
+        });
+        executorService.shutdown();
         main.getUtil().setTyping(false, e.getChannel());
     }
 

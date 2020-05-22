@@ -253,7 +253,7 @@ public enum HelpMessage {
         embedBuilder.setColor(new Color(colorRandom.nextFloat(), colorRandom.nextFloat(), colorRandom.nextFloat()));
         embedBuilder.addField("Usage", "`" + SBGods.getInstance().getDiscord().commandPrefix + usage + "`", false);
         if (subCommands.length > 0) {
-            embedBuilder.addField("Sub-commands", "`" + String.join("`\n`" + SBGods.getInstance().getDiscord().commandPrefix, subCommands) + "`", false);
+            embedBuilder.addField("Sub-commands", "`" + SBGods.getInstance().getDiscord().commandPrefix + String.join("`\n`" + SBGods.getInstance().getDiscord().commandPrefix, subCommands) + "`", false);
         }
         embedBuilder.setFooter("Version " + SBGods.VERSION);
 
