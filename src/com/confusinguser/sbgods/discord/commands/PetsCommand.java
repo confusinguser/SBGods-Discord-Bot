@@ -31,11 +31,15 @@ public class PetsCommand extends Command implements EventListener {
         }
 
         String messageId = e.getChannel().sendMessage("...").complete().getId();
-
         Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[1]);
+
+        if (thePlayer.getUUID() == null) {
+            e.getChannel().deleteMessageById(messageId).queue();
+            e.getChannel().sendMessage("Player **" + args[1] + "** does not exist!").queue();
+        }
         if (thePlayer.getSkyblockProfiles().isEmpty()) {
             e.getChannel().deleteMessageById(messageId).queue();
-            e.getChannel().sendMessage("Player **" + args[2] + "** does not exist!").queue();
+            e.getChannel().sendMessage("Player **" + args[1] + "** has never played Skyblock!").queue();
             return;
         }
 

@@ -119,4 +119,13 @@ public class LangUtil {
 
         return output.toString();
     }
+
+    public String beautifyStackTrace(StackTraceElement[] trace, Throwable t) {
+        StringBuilder output = new StringBuilder(t.getMessage());
+        for (StackTraceElement traceElement : trace) {
+            output.append("\n\tat ").append(traceElement);
+        }
+
+        return output.toString();
+    }
 }

@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.hooks.EventListener;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
@@ -65,7 +64,7 @@ public class SbgodsCommand extends Command implements EventListener {
                 newFilePath = main.getApiUtil().downloadFile(latestReleaseUrl.getValue(), latestReleaseUrl.getKey());
             } catch (IOException ex) {
                 e.getChannel().sendMessage("There was a problem when downloading the latest release").queue();
-                main.logger.severe(ex.toString() + '\n' + Arrays.toString(ex.getStackTrace()));
+                main.logger.severe("Exception when downloading the latest release: \n" + main.getLangUtil().beautifyStackTrace(ex.getStackTrace(), ex));
                 return;
             }
             if (!SBGods.class.getProtectionDomain().getCodeSource().getLocation().toString().endsWith(".jar")) {

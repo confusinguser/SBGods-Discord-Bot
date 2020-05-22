@@ -1,7 +1,6 @@
 package com.confusinguser.sbgods.utils;
 
 import com.confusinguser.sbgods.SBGods;
-import com.confusinguser.sbgods.entities.Pet;
 import com.confusinguser.sbgods.entities.PetTier;
 
 import java.util.ArrayList;
@@ -21,9 +20,12 @@ public class SBUtil {
         int xpTotal = 0;
         int level = 1;
 
-
         for (int i = 0; i < 100; i++) {
-            xpTotal += levels.get(i);
+            try {
+                xpTotal += levels.get(i);
+            } catch (IndexOutOfBoundsException ex) {
+                return 100;
+            }
 
             if (xpTotal > xpAmount) {
                 break;
@@ -106,27 +108,6 @@ public class SBUtil {
         exp += exp * (level - Math.floor(level));
 
         return exp;
-    }
-
-    public ArrayList<Pet> keepHighestLevelOfPet(ArrayList<Pet> profilePets, ArrayList<Pet> totalPets) {
-        ArrayList<Pet> output = new ArrayList<>(profilePets);
-        for (Pet pet : profilePets) {
-            if (totalPets.contains(pet)) {
-                if (pet.getLevel() < findPetOfType(pet.getType(), totalPets).getLevel()) {
-                    output.remove(pet);
-                }
-            }
-        }
-        return output;
-    }
-
-    private Pet findPetOfType(String type, ArrayList<Pet> allPets) {
-        for (Pet pet : allPets) {
-            if (pet.getType().contentEquals(type)) {
-                return pet;
-            }
-        }
-        return new Pet(null, null, false, 0);
     }
 
     public String alternateToNormalSkillTypes(String skill_type) {
