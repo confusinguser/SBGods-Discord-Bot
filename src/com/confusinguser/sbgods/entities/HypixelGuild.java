@@ -74,16 +74,16 @@ public enum HypixelGuild {
         return playerSize;
     }
 
+    public void setPlayerSize(int playerSize) {
+        this.playerSize = playerSize;
+    }
+
     public int getSkillReq() {
         return skillReq;
     }
 
     public int getSlayerReq() {
         return slayerReq;
-    }
-
-    public void setPlayerSize(int playerSize) {
-        this.playerSize = playerSize;
     }
 
     public int getSlayerProgress() {

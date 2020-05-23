@@ -33,7 +33,7 @@ public class SbgodsCommand extends Command implements EventListener {
                     .setTitle("Version " + SBGods.VERSION)
                     .setDescription(
                             "Minor: " + SBGods.VERSION_DESCRIPTION_MINOR +
-                            "\nPatch: " + SBGods.VERSION_DESCRIPTION_PATCH)
+                                    "\nPatch: " + SBGods.VERSION_DESCRIPTION_PATCH)
                     .setFooter("Made by ConfusingUser#5712 & Soopyboo32#3042");
             e.getChannel().sendMessage(embedBuilder.build()).queue();
             return;

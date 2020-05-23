@@ -40,25 +40,23 @@ public class PlayerCommand extends Command implements EventListener {
         SkillLevels skillLevels = new SkillLevels();
         ArrayList<Pet> totalPets = new ArrayList<>();
         SlayerExp slayerExp = new SlayerExp();
+        String guildName;
         double totalMoney = 0.0;
         double progress = 0.0;
-        int progressLength = 20;
-        double perProfileProgress = 1 / ((double) player.getSkyblockProfiles().size());
 
         for (int i = 0; i < player.getSkyblockProfiles().size(); i++) {
             String profileId = player.getSkyblockProfiles().get(i);
-            progress += perProfileProgress;
-            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress, progressLength) + ")").queue();
+            progress += 1d / player.getSkyblockProfiles().size();
+            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress, 20) + ")").queue();
 
             ArrayList<Pet> pets = main.getApiUtil().getProfilePets(profileId, player.getUUID()); // Pets in profile
             totalPets.addAll(pets);
 
             skillLevels = main.getApiUtil().getBestProfileSkillLevels(player.getUUID());
-
             totalMoney += main.getApiUtil().getTotalMoneyInProfile(profileId);
-
             slayerExp = SlayerExp.addExps(slayerExp, main.getApiUtil().getProfileSlayerExp(profileId, player.getUUID()));
         }
+        guildName = main.getApiUtil().getGuildFromUUID(player.getUUID());
 
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(player.getDisplayName()).setColor(0xb8300b).setThumbnail("https://visage.surgeplay.com/bust/" + player.getUUID()).setFooter("SBGods");
         User discordUser = null;
@@ -70,14 +68,14 @@ public class PlayerCommand extends Command implements EventListener {
             embedBuilder.addField("Discord", discordUser.getAsMention(), true);
         embedBuilder.addField("Status", player.isOnline() ? "Online" : "Offline", true);
 
-        embedBuilder.addField("Guild", main.getApiUtil().getGuildFromUUID(player.getUUID()), false);
+        embedBuilder.addField("Guild", guildName == null ? "Not in a guild!" : guildName, false);
 
         embedBuilder.addField("Average skill level", main.getUtil().round(skillLevels.getAvgSkillLevel(), 2) + (skillLevels.isApproximate() ? " (Approx)" : ""), true);
         embedBuilder.addField("Slayer EXP", main.getLangUtil().addNotation(slayerExp.getTotalExp()), true);
         embedBuilder.addField("Total money (All coops)", totalMoney == 0 ? "Banking API off" : main.getLangUtil().addNotation(totalMoney), true);
 
-        embedBuilder.addField("Skill LB Position", player.getSkillPos() == -1 ? "Not in Guild" : player.getSkillPos() == -2 ? "Bot is loading..." : "#" + (player.getSkillPos() + 1), true);
-        embedBuilder.addField("Slayer LB Position", player.getSlayerPos() == -1 ? "Not in Guild" : player.getSkillPos() == -2 ? "Bot is loading..." : "#" + (player.getSlayerPos() + 1), true);
+        embedBuilder.addField("Skill LB Position", player.getSkillPos() == -1 ? "Not in guild" : player.getSkillPos() == -2 ? "Bot is loading..." : "#" + (player.getSkillPos() + 1), true);
+        embedBuilder.addField("Slayer LB Position", player.getSlayerPos() == -1 ? "Not in guild" : player.getSkillPos() == -2 ? "Bot is loading..." : "#" + (player.getSlayerPos() + 1), true);
 
         StringBuilder petStr = new StringBuilder();
         for (Pet pet : totalPets) {
@@ -85,7 +83,7 @@ public class PlayerCommand extends Command implements EventListener {
                 petStr.append("\n").append(main.getLangUtil().toLowerCaseButFirstLetter(pet.getTier().toString())).append(" ").append(pet.getType()).append(" (").append(pet.getLevel()).append(")");
             }
         }
-        embedBuilder.addField("Active pets (One per profile)", petStr.toString(), false);
+        embedBuilder.addField("Active pets (one per profile)", petStr.toString(), false);
 
         MessageEmbed messageEmbed = embedBuilder.build();
 

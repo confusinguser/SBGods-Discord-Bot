@@ -1,7 +1,10 @@
 package com.confusinguser.sbgods.utils;
 
 import com.confusinguser.sbgods.SBGods;
-import com.confusinguser.sbgods.entities.*;
+import com.confusinguser.sbgods.entities.HypixelGuild;
+import com.confusinguser.sbgods.entities.Player;
+import com.confusinguser.sbgods.entities.SkillLevels;
+import com.confusinguser.sbgods.entities.SlayerExp;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -123,8 +126,8 @@ public class Util {
     }
 
     /**
-     * @param member The discord {@link Member} object
-     * @param mcName The minecraft IGN
+     * @param member  The discord {@link Member} object
+     * @param mcName  The minecraft IGN
      * @param discord The discord {@link Guild} object
      * @param channel The discord {@link MessageChannel} object
      * @return If verifiaction was successful and player wasn't already verified
@@ -132,7 +135,8 @@ public class Util {
     public boolean verifyPlayer(Member member, String mcName, Guild discord, MessageChannel channel) {
         try {
             if (!member.getEffectiveName().toLowerCase().contains(mcName.toLowerCase())) {
-                if ((member.getEffectiveName() + " (" + mcName + ")").length() > 32) member.modifyNickname(mcName).complete();
+                if ((member.getEffectiveName() + " (" + mcName + ")").length() > 32)
+                    member.modifyNickname(mcName).complete();
                 else member.modifyNickname(member.getEffectiveName() + " (" + mcName + ")").complete();
             }
         } catch (HierarchyException ignored) {
