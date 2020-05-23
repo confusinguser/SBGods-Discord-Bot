@@ -8,12 +8,11 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
-import net.dv8tion.jda.api.hooks.EventListener;
 
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class VerifyAllCommand extends Command implements EventListener {
+public class VerifyAllCommand extends Command {
 
     public VerifyAllCommand(SBGods main, DiscordBot discord) {
         this.main = main;
@@ -68,14 +67,19 @@ public class VerifyAllCommand extends Command implements EventListener {
         String messageId = channel.sendMessage("Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(0.0, 30) + ")").complete().getId();
 
         int playersVerified = 0;
-        int i = 0; //for loading animation
+        int i = 0; // For loading animation
         for (Member member : discord.getMembers()) {
             i++;
             channel.editMessageById(messageId, "Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(i / (double) discord.getMembers().size(), 30) + ")").queue();
             String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag());
             if (!mcName.equals("")) {
-                if (main.getUtil().verifyPlayer(member, mcName, discord, channel)) {
+                int response = main.getUtil().verifyPlayer(member, mcName, discord, channel);
+                if (response == 1) { // Message was sent
                     playersVerified++;
+                } else if (response == 2) { // Bot still loading
+                    channel.deleteMessageById(messageId).queue();
+                    channel.sendMessage("Bot is still loading the leaderboards! Try again in a few minutes").queue();
+                    return;
                 }
             }
         }
@@ -84,7 +88,7 @@ public class VerifyAllCommand extends Command implements EventListener {
 
         main.getUtil().scheduleCommandAfter(() ->
                 channel.getHistoryAfter(messageId, 100).complete().getRetrievedHistory().stream()
-                        .filter(message -> message.getContentRaw().startsWith("[Verify]") // Get all messages that start with [Verify]
+                        .filter(message -> message.getContentRaw().startsWith("Linked") // Get all messages that start with "Linked"
                                 && discord.getJDA().getSelfUser().getId().equals(message.getAuthor().getId()))
                         .forEach(message -> message.delete().queue()), 10, TimeUnit.SECONDS);
     }

@@ -6,13 +6,12 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HelpMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.EventListener;
 
 import java.awt.*;
 import java.util.Arrays;
 import java.util.Random;
 
-public class HelpCommand extends Command implements EventListener {
+public class HelpCommand extends Command {
 
     public HelpCommand(SBGods main, DiscordBot discord) {
         this.main = main;

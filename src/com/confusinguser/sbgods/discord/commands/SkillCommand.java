@@ -7,14 +7,13 @@ import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.EventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class SkillCommand extends Command implements EventListener {
+public class SkillCommand extends Command {
 
     public SkillCommand(SBGods main, DiscordBot discord) {
         this.main = main;

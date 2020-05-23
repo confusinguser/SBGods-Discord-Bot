@@ -5,9 +5,8 @@ import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.EventListener;
 
-public class VerifyCommand extends Command implements EventListener {
+public class VerifyCommand extends Command {
 
     public VerifyCommand(SBGods main, DiscordBot discord) {
         this.main = main;
@@ -22,12 +21,13 @@ public class VerifyCommand extends Command implements EventListener {
             e.getChannel().sendMessage("This command cannot be used in this channel").queue();
             return;
         }
+        if (e.getMember() == null) return;
 
         if (args.length >= 2) {
             // Check if that is actual player ign
             Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
             if (player.getDiscordTag().equalsIgnoreCase(e.getAuthor().getAsTag())) {
-                if (!main.getUtil().verifyPlayer(e.getMember(), player.getDisplayName(), e.getGuild(), e.getChannel())) {
+                if (main.getUtil().verifyPlayer(e.getMember(), player.getDisplayName(), e.getGuild(), e.getChannel()) != 0) {
                     e.getChannel().sendMessage("You are already verified!").queue();
                     return;
                 }
@@ -43,7 +43,6 @@ public class VerifyCommand extends Command implements EventListener {
         String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag());
         if (mcName.isEmpty()) {
             e.getChannel().sendMessage("There was an error auto-detecting your minecraft ign. Please do -verify <IGN>").queue();
-            // Send error saying that auto-detect failed and they need to enter their username
             return;
         }
 

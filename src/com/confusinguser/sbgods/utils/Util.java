@@ -1,10 +1,7 @@
 package com.confusinguser.sbgods.utils;
 
 import com.confusinguser.sbgods.SBGods;
-import com.confusinguser.sbgods.entities.HypixelGuild;
-import com.confusinguser.sbgods.entities.Player;
-import com.confusinguser.sbgods.entities.SkillLevels;
-import com.confusinguser.sbgods.entities.SlayerExp;
+import com.confusinguser.sbgods.entities.*;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -130,9 +127,9 @@ public class Util {
      * @param mcName  The minecraft IGN
      * @param discord The discord {@link Guild} object
      * @param channel The discord {@link MessageChannel} object
-     * @return If verifiaction was successful and player wasn't already verified
+     * @return 0 if message was not sent, or 1 if message was sent, or 2 if bot still hasn't loaded leaderboards
      */
-    public boolean verifyPlayer(Member member, String mcName, Guild discord, MessageChannel channel) {
+    public int verifyPlayer(Member member, String mcName, Guild discord, MessageChannel channel) {
         try {
             if (!member.getEffectiveName().toLowerCase().contains(mcName.toLowerCase())) {
                 if ((member.getEffectiveName() + " (" + mcName + ")").length() > 32)
@@ -158,10 +155,8 @@ public class Util {
 
         // Add guild roles if they are in one
         Player thePlayer = main.getApiUtil().getPlayerFromUsername(mcName);
-        if (thePlayer.getSkyblockProfiles().isEmpty()) {
-            return sendMsg;
-        }
-        String guildId = main.getApiUtil().getGuildIDFromUUID(thePlayer.getUUID());
+
+        String guildId = thePlayer.getGuildId();
         if (guildId == null) {
             guildId = "";
         }
@@ -181,14 +176,78 @@ public class Util {
             }
         }
 
-        if (sendMsg) {
-            if (guild == null) {
-                channel.sendMessage(main.getDiscord().escapeMarkdown("[Verify] Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "!")).queue();
+        // Give Elite, SBK and SBG rank
+        HypixelGuild hypixelGuild = HypixelGuild.getGuildById(guildId);
+        DiscordServer discordServer = DiscordServer.getDiscordServerFromDiscordGuild(discord);
+        if (hypixelGuild != null && discordServer != null && hypixelGuild == discordServer.getHypixelGuild()) {
+            int highestLeaderboardPos = Math.min(thePlayer.getSkillPos(), thePlayer.getSlayerPos());
+            if (highestLeaderboardPos == -2) {
+                return 2;
+            }
+            if (highestLeaderboardPos <= 5) {
+                for (Role role : discord.getRolesByName("Skyblock God \uD83D\uDE4F" /* \uD83D\uDE4F = 🙏 */, true)) {
+                    try {
+                        discord.addRoleToMember(member, role).queue();
+                    } catch (HierarchyException ignored) {
+                    }
+                }
             } else {
-                channel.sendMessage(main.getDiscord().escapeMarkdown("[Verify] Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "! (Guild: " + guild.getDisplayName() + ")")).queue();
+                for (Role role : discord.getRoles().stream()
+                        .filter(role -> role.getName().toLowerCase().equals("skyblock god \uD83D\uDE4F"))
+                        .collect(Collectors.toList())) {
+                    try {
+                        discord.removeRoleFromMember(member, role).queue();
+                    } catch (HierarchyException ignored) {
+                    }
+                }
+            }
+            if (highestLeaderboardPos <= 15) {
+                for (Role role : discord.getRolesByName("Skyblock King \uD83D\uDC51" /* \uD83D\uDC51 = 👑 */, true)) {
+                    try {
+                        discord.addRoleToMember(member, role).queue();
+                    } catch (HierarchyException ignored) {
+                    }
+                }
+            } else {
+                for (Role role : discord.getRoles().stream()
+                        .filter(role -> role.getName().toLowerCase().equals("skyblock king \uD83D\uDC51") ||
+                                role.getName().toLowerCase().equals("skyblock god \uD83D\uDE4F"))
+                        .collect(Collectors.toList())) {
+                    try {
+                        discord.removeRoleFromMember(member, role).queue();
+                    } catch (HierarchyException ignored) {
+                    }
+                }
+            }
+            if (highestLeaderboardPos <= 45 && hypixelGuild != HypixelGuild.SBDG) {
+                for (Role role : discord.getRolesByName("Elite", true)) {
+                    try {
+                        discord.addRoleToMember(member, role).queue();
+                    } catch (HierarchyException ignored) {
+                    }
+                }
+            } else {
+                for (Role role : discord.getRoles().stream()
+                        .filter(role -> role.getName().toLowerCase().equals("elite") ||
+                                role.getName().toLowerCase().equals("skyblock king \uD83D\uDC51") ||
+                                role.getName().toLowerCase().equals("skyblock god \uD83D\uDE4F"))
+                        .collect(Collectors.toList())) {
+                    try {
+                        discord.removeRoleFromMember(member, role).queue();
+                    } catch (HierarchyException ignored) {
+                    }
+                }
             }
         }
-        return sendMsg;
+
+        if (sendMsg) {
+            if (guild == null) {
+                channel.sendMessage(main.getDiscord().escapeMarkdown("Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "!")).queue();
+            } else {
+                channel.sendMessage(main.getDiscord().escapeMarkdown("Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "! (Guild: " + guild.getDisplayName() + ")")).queue();
+            }
+        }
+        return sendMsg ? 1 : 0;
     }
 
     public List<JSONObject> getJSONObjectListByJSONArray(JSONArray jsonArray) {

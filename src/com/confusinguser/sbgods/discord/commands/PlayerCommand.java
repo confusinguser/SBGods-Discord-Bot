@@ -9,9 +9,8 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
-import java.util.EventListener;
 
-public class PlayerCommand extends Command implements EventListener {
+public class PlayerCommand extends Command {
 
     public PlayerCommand(SBGods main, DiscordBot discord) {
         this.main = main;
@@ -60,11 +59,11 @@ public class PlayerCommand extends Command implements EventListener {
 
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(player.getDisplayName()).setColor(0xb8300b).setThumbnail("https://visage.surgeplay.com/bust/" + player.getUUID()).setFooter("SBGods");
         User discordUser = null;
-        if(!player.getDiscordTag().equals("")){
+        if (!player.getDiscordTag().equals("")) {
             discordUser = main.getDiscord().getJDA().getUserByTag(player.getDiscordTag());
         }
 
-        if (player.getDiscordTag() != null && discordUser != null )
+        if (player.getDiscordTag() != null && discordUser != null)
             embedBuilder.addField("Discord", discordUser.getAsMention(), true);
         embedBuilder.addField("Status", player.isOnline() ? "Online" : "Offline", true);
 

@@ -62,6 +62,9 @@ public class Player {
         return skyblockProfiles;
     }
 
+    /**
+     * @return The skill leaderboard position or {@code -1} if player is not in guild or {@code -2} if bot is still loading
+     */
     public int getSkillPos() {
         if (getGuildId() == null) return -1;
         HypixelGuild guild = HypixelGuild.getGuildById(getGuildId());
@@ -73,6 +76,9 @@ public class Player {
         return list.stream().map(Map.Entry::getKey).collect(Collectors.toList()).indexOf(getDisplayName());
     }
 
+    /**
+     * @return The slayer leaderboard position or {@code -1} if player is not in guild or {@code -2} if bot is still loading
+     */
     public int getSlayerPos() {
         if (getGuildId() == null) return -1;
         HypixelGuild guild = HypixelGuild.getGuildById(getGuildId());

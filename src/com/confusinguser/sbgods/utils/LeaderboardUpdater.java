@@ -20,8 +20,8 @@ public class LeaderboardUpdater {
     public LeaderboardUpdater(SBGods main) {
         this.main = main;
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
-            updateLeaderboardCacheForGuild(HypixelGuild.SBG);
-            updateLeaderboardCacheForGuild(HypixelGuild.SBDG);
+            for (HypixelGuild hypixelGuild : HypixelGuild.values())
+                updateLeaderboardCacheForGuild(hypixelGuild);
         }, 0, 9, TimeUnit.MINUTES);
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             try {

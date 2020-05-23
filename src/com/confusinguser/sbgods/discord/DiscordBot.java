@@ -58,7 +58,7 @@ public class DiscordBot {
         }
         jda = jdaBuilder.build();
         jda.getPresence().setActivity(Activity.playing("Use " + commandPrefix + "help to get started. \nMade by ConfusingUser#5712 & Soopyboo32#3042"));
-        main.logger.info("Bot ready to take commands");
+        main.logger.info("Bot ready to take commands on " + Arrays.stream(main.getActiveServers()).map(DiscordServer::toString).collect(Collectors.joining(", ")));
     }
 
     public boolean isValidCommand(String command) {

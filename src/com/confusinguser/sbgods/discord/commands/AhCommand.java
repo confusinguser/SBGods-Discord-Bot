@@ -9,9 +9,7 @@ import com.confusinguser.sbgods.entities.PlayerAH;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-import java.util.EventListener;
-
-public class AhCommand extends Command implements EventListener {
+public class AhCommand extends Command {
 
     public AhCommand(SBGods main, DiscordBot discord) {
         this.main = main;

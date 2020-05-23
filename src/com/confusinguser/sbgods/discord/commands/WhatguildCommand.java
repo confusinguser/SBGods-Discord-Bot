@@ -5,9 +5,8 @@ import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.hooks.EventListener;
 
-public class WhatguildCommand extends Command implements EventListener {
+public class WhatguildCommand extends Command {
 
     public WhatguildCommand(SBGods main, DiscordBot discord) {
         this.main = main;
