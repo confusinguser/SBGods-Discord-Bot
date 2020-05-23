@@ -7,12 +7,10 @@ import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SlayerExp;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.GuildChannel;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.awt.*;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -48,20 +46,17 @@ public class ApplyCommand extends Command {
 
         e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar(0.75, 20) + ")").queue();
 
-        if (e.getGuild().getCategoriesByName("applications", true).get(0).getTextChannels().stream().map(GuildChannel::getName).collect(Collectors.toList()).contains(player.getDisplayName().toLowerCase() + "s-application")) {
-            e.getChannel().sendMessage("You already have a pending application.").queue();
-            e.getChannel().deleteMessageById(messageId).queue();
-            return;
-        }
+        e.getChannel().sendMessage("You already have a pending application.").queue();
+        e.getChannel().deleteMessageById(messageId).queue();
 
         if (skillLevels.isApproximate()) {
-            e.getChannel().sendMessage("You need to turn your api on before doing this command.").queue();
+            e.getChannel().sendMessage("You need to turn your skill API on before applying.").queue();
             e.getChannel().deleteMessageById(messageId).queue();
             return;
         }
 
-        boolean meetsSlayer = true; // set these back to false when done testing
-        boolean meetsSkill = true;
+        boolean meetsSlayer = false;
+        boolean meetsSkill = false;
 
         if (slayerExp.getTotalExp() > currentDiscordServer.getHypixelGuild().getSlayerReq()) {
             meetsSlayer = true;
@@ -73,49 +68,34 @@ public class ApplyCommand extends Command {
         e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar(1.0, 20) + ")").queue();
 
         if (!meetsSkill && !meetsSlayer) {
-            e.getChannel().sendMessage("You dont meet the slayer requirement of " + currentDiscordServer.getHypixelGuild().getSlayerReq() + "\nOr this skill requirement of " + currentDiscordServer.getHypixelGuild().getSkillReq()).queue();
+            e.getChannel().sendMessage("You dont meet the slayer requirement of " + currentDiscordServer.getHypixelGuild().getSlayerReq() + " slayer exp" + "\nor this skill requirement of " + currentDiscordServer.getHypixelGuild().getSkillReq() + " average skill level").queue();
             e.getChannel().deleteMessageById(messageId).queue();
             return;
-        }
-        if (!meetsSlayer) {
-            e.getChannel().sendMessage("You dont meet the slayer requirement of " + currentDiscordServer.getHypixelGuild().getSlayerReq()).queue();
+        } else if (!meetsSlayer) {
+            e.getChannel().sendMessage("You dont meet the slayer requirement of " + currentDiscordServer.getHypixelGuild().getSlayerReq() + " slayer exp").queue();
             e.getChannel().deleteMessageById(messageId).queue();
             return;
-        }
-        if (!meetsSkill) {
-            e.getChannel().sendMessage("You dont meet the skill requirement of " + currentDiscordServer.getHypixelGuild().getSkillReq()).queue();
+        } else if (!meetsSkill) {
+            e.getChannel().sendMessage("You dont meet the skill requirement of " + currentDiscordServer.getHypixelGuild().getSkillReq() + " average skill level").queue();
             e.getChannel().deleteMessageById(messageId).queue();
             return;
         }
 
-        double playerScore = ((double) slayerExp.getTotalExp() / currentDiscordServer.getHypixelGuild().getSlayerReq() + skillLevels.getAvgSkillLevel() / currentDiscordServer.getHypixelGuild().getSkillReq())/2;
+        double playerScore = ((double) slayerExp.getTotalExp() / currentDiscordServer.getHypixelGuild().getSlayerReq() + (double) main.getSBUtil().toSkillExp(skillLevels.getAvgSkillLevel()) / currentDiscordServer.getHypixelGuild().getSkillReq()) / 2;
 
-        TextChannel textChannel = e.getGuild().getTextChannelById(e.getGuild().createTextChannel(
-                main.getLangUtil().makePossessiveForm(player.getDisplayName()).replace("'", "") + "-application")
-                .setParent(e.getGuild().getCategoriesByName("applications", true).get(0))
-                .setTopic(player.getDisplayName() + "'s application")
-                .setPosition(Integer.MAX_VALUE - (int) (playerScore * 1000))
-                .complete().getId());
-
-        EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("Guild Application (Score " + (int) (playerScore*100) + ")").setColor(0xb8300b);
+        EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(main.getLangUtil().makePossessiveForm(player.getDisplayName()) + " application (Score " + Math.round(playerScore * 100) + ")").setColor(new Color((int) (117 * playerScore) /* Gets "redder" the higher score you have */, 48, 11));
 
         embedBuilder.setThumbnail("https://visage.surgeplay.com/bust/" + player.getUUID());
-        embedBuilder.appendDescription("Your application is under review...");
-        embedBuilder.appendDescription("\nAny news about the application's status will be posted in this channel");
-        embedBuilder.appendDescription("\n\nYou can also talk to staff about your application in this channel");
+        embedBuilder.appendDescription("Slayer exp: " + slayerExp.getTotalExp());
+        embedBuilder.appendDescription("\nAvg. skill level: " + skillLevels.getAvgSkillLevel());
         embedBuilder.setTimestamp(new Date().toInstant());
 
-        if (textChannel != null) {
-            Message message = textChannel.sendMessage(embedBuilder.build()).complete();
-            message.addReaction("\uD83D\uDC4D").queue();
-            message.addReaction("\uD83D\uDC4E").queue();
-            message.pin().queue();
-            textChannel.putPermissionOverride(e.getMember()).setAllow(Permission.VIEW_CHANNEL).queue();
+        ((TextChannel) e.getGuild().getChannels().stream().filter(channel -> channel.getName().contains("accepted-applications"))
+                .collect(Collectors.toList()).get(0))
+                .sendMessage(embedBuilder.build())
+                .queue(message -> message.addReaction("☑").queue());
 
-            e.getChannel().sendMessage("Application successfully created!").queue();
-        } else {
-            e.getChannel().sendMessage("Could not create channel for this application! Please contact staff for help").queue();
-        }
+        e.getChannel().sendMessage("The application was successfully created! It may take up to a day to get invited to the guild").queue();
         e.getChannel().deleteMessageById(messageId).queue();
     }
 }
