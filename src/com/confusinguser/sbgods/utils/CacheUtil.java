@@ -32,7 +32,7 @@ public class CacheUtil {
         long currentTime = new Date().getTime();
         for (Response response : cache) {
             if (response.getURL().contentEquals(url)) {
-                return (response.getTimeStamp() - currentTime) <= Math.min(cacheTime, MAX_CACHE_TIME);
+                return (currentTime - (response.getTimeStamp()) <= Math.min(cacheTime, MAX_CACHE_TIME));
             }
         }
         return false;
@@ -41,11 +41,11 @@ public class CacheUtil {
     public Response getCachedResponse(String url, long cacheTime) {
         long currentTime = new Date().getTime();
         for (Response response : cache) {
-            if ((response.getTimeStamp() - currentTime) > MAX_CACHE_TIME) {
+            if (currentTime - (response.getTimeStamp()) > MAX_CACHE_TIME) {
                 cache.remove(response);
             }
             if (response.getURL().contentEquals(url)) {
-                if ((response.getTimeStamp() - currentTime) < Math.min(MAX_CACHE_TIME, cacheTime)) {
+                if ((currentTime - response.getTimeStamp()) < Math.min(MAX_CACHE_TIME, cacheTime)) {
                     return response;
                 }
             }

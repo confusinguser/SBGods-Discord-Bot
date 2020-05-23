@@ -113,6 +113,7 @@ public class ApiUtil {
             return getResponse(url_string, cacheTime);
         }
         fails = 0;
+        main.getCacheUtil().addToCache(main.getCacheUtil().stripUnnecesaryInfo(url_string), response.toString());
         return response.toString();
     }
 

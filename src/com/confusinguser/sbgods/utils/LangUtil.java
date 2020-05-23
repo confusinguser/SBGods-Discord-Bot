@@ -97,10 +97,10 @@ public class LangUtil {
 
     public String getProgressBar(double amountDone, int lengthOfBar) {
         String returnVal = "";
-        String progressChar = "#";
-        String otherChar = "--";
+        String progressChar = "■";
+        String otherChar = "□";
 
-        if (amountDone != 0.0) {
+        if (amountDone > 1/lengthOfBar) {
             returnVal += "**";
             returnVal += loopString(progressChar, (int) (amountDone * lengthOfBar));
             returnVal += "**";

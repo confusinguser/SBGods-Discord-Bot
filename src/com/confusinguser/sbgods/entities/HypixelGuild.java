@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum HypixelGuild {
-    SBG("5cd01bdf77ce84cf1204cd61", "Skyblock Gods", "SBG Guild Member", "SBG"),
-    SBDG("5e4e6d0d8ea8c9feb3f0e44f", "Skyblock Forceful", "SBF", "SBF Guild Member", "SBDG Guild Member", "Skyblock Demigods", "SBDG", "Skyblock Demi Gods");
+    SBG("5cd01bdf77ce84cf1204cd61", 300000, 26, "Skyblock Gods", "SBG Guild Member", "SBG"),
+    SBDG("5e4e6d0d8ea8c9feb3f0e44f", 30000, 18, "Skyblock Forceful", "SBF", "SBF Guild Member", "SBDG Guild Member", "Skyblock Demigods", "SBDG", "Skyblock Demi Gods");
 
     private final String guildId;
+    private final int skillReq;
+    private final int slayerReq;
     private final String[] names;
     private int playerSize = 125;
 
@@ -16,8 +18,10 @@ public enum HypixelGuild {
     private int slayerProgress;
     private int skillProgress;
 
-    HypixelGuild(String guildId, String... names) {
+    HypixelGuild(String guildId, int slayerReq, int skillReq, String... names) {
         this.guildId = guildId;
+        this.slayerReq = slayerReq;
+        this.skillReq = skillReq;
         this.names = names;
     }
 
@@ -68,6 +72,14 @@ public enum HypixelGuild {
 
     public int getPlayerSize() {
         return playerSize;
+    }
+
+    public int getSkillReq() {
+        return skillReq;
+    }
+
+    public int getSlayerReq() {
+        return slayerReq;
     }
 
     public void setPlayerSize(int playerSize) {

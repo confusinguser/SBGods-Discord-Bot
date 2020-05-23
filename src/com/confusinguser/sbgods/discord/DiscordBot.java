@@ -42,6 +42,7 @@ public class DiscordBot {
         TaxCommand taxCommand = new TaxCommand(main, this);
         PlayerCommand playerCommand = new PlayerCommand(main, this);
         CoopBankCommand coopBankCommand = new CoopBankCommand(main, this);
+        ApplyCommand applyCommand = new ApplyCommand(main, this);
 
         MessageListener messageListener = new MessageListener(main, this);
 
