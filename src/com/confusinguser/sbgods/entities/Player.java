@@ -63,6 +63,7 @@ public class Player {
     }
 
     public int getSkillPos() {
+        if (getGuildId() == null) return -1;
         HypixelGuild guild = HypixelGuild.getGuildById(getGuildId());
         if (guild == null) return -1;
         if (guild.getSkillExpMap().isEmpty()) return -2;
@@ -73,6 +74,7 @@ public class Player {
     }
 
     public int getSlayerPos() {
+        if (getGuildId() == null) return -1;
         HypixelGuild guild = HypixelGuild.getGuildById(getGuildId());
         if (guild == null) return -1;
         if (guild.getSlayerExpMap().isEmpty()) return -2;
