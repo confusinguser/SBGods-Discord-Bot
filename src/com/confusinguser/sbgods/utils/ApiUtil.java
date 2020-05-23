@@ -689,9 +689,15 @@ public class ApiUtil {
 
         List<Player> members = jsonObject.getJSONObject("profile").getJSONObject("members").keySet().stream().map(this::getPlayerFromUUID).collect(Collectors.toList());
         List<BankTransaction> transactions = new ArrayList<>();
-        jsonObject.getJSONObject("profile").getJSONObject("banking").getJSONArray("transactions").forEach(transaction -> {
-            if (transaction instanceof JSONObject) transactions.add(new BankTransaction((JSONObject) transaction));
-        });
-        return new SkyblockProfile(members, transactions);
+        double balance;
+        try {
+            jsonObject.getJSONObject("profile").getJSONObject("banking").getJSONArray("transactions").forEach(transaction -> {
+                if (transaction instanceof JSONObject) transactions.add(new BankTransaction((JSONObject) transaction));
+            });
+            balance = jsonObject.getJSONObject("profile").getJSONObject("banking").getDouble("balance");
+        } catch (JSONException e) { // Banking API off
+            return new SkyblockProfile(members, new ArrayList<>(), 0);
+        }
+        return new SkyblockProfile(members, transactions, balance);
     }
 }

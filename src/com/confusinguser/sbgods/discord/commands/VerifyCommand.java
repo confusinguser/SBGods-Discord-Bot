@@ -27,7 +27,10 @@ public class VerifyCommand extends Command implements EventListener {
             // Check if that is actual player ign
             Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
             if (player.getDiscordTag().equalsIgnoreCase(e.getAuthor().getAsTag())) {
-                main.getUtil().verifyPlayer(e.getMember(), player.getDisplayName(), e.getGuild(), e.getChannel());
+                if (!main.getUtil().verifyPlayer(e.getMember(), player.getDisplayName(), e.getGuild(), e.getChannel())) {
+                    e.getChannel().sendMessage("You are already verified!").queue();
+                    return;
+                }
                 main.logger.fine("Added " + currentDiscordServer.toString() + " verified role to " + e.getAuthor().getAsTag());
                 return;
             }

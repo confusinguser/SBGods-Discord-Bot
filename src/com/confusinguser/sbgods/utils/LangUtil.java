@@ -92,7 +92,7 @@ public class LangUtil {
                 checkNum *= 10;
             }
         }
-        return returnValStr;
+        return returnValStr.replace(".0", "");
     }
 
     public String getProgressBar(double amountDone, int lengthOfBar) {
@@ -121,7 +121,7 @@ public class LangUtil {
     }
 
     public String beautifyStackTrace(StackTraceElement[] trace, Throwable t) {
-        StringBuilder output = new StringBuilder('\t' + t.getMessage());
+        StringBuilder output = new StringBuilder('\t' + t.toString());
         for (StackTraceElement traceElement : trace) {
             output.append("\n\tat ").append(traceElement);
         }
