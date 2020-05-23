@@ -44,7 +44,6 @@ public class PlayerCommand extends Command implements EventListener {
         double progress = 0.0;
         int progressLength = 20;
         double perProfileProgress = 1 / ((double) player.getSkyblockProfiles().size());
-        main.logger.info(player.getDiscordTag());
 
         for (int i = 0; i < player.getSkyblockProfiles().size(); i++) {
             String profileId = player.getSkyblockProfiles().get(i);
@@ -64,7 +63,7 @@ public class PlayerCommand extends Command implements EventListener {
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(player.getDisplayName()).setColor(0xb8300b).setThumbnail("https://visage.surgeplay.com/bust/" + player.getUUID()).setFooter("SBGods");
         User discordUser = null;
         if(!player.getDiscordTag().equals("")){
-            main.getDiscord().getJDA().getUserByTag(player.getDiscordTag());
+            discordUser = main.getDiscord().getJDA().getUserByTag(player.getDiscordTag());
         }
 
         if (player.getDiscordTag() != null && discordUser != null )
