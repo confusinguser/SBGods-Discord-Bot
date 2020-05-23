@@ -29,17 +29,17 @@ public abstract class Command extends ListenerAdapter {
             return;
         } // Only allowed servers may use commands
 
-        main.getUtil().setTyping(true, e.getChannel());
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.execute(() -> {
+            main.getUtil().setTyping(true, e.getChannel());
             try {
                 handleCommand(e, discordServer, e.getMessage().getContentRaw().split(" "));
             } catch (Throwable t) {
                 main.logger.severe("Exception when handling command '" + e.getMessage().getContentRaw() + "': \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t));
             }
+            main.getUtil().setTyping(false, e.getChannel());
         });
         executorService.shutdown();
-        main.getUtil().setTyping(false, e.getChannel());
     }
 
     boolean isNotTheCommand(MessageReceivedEvent e) {
