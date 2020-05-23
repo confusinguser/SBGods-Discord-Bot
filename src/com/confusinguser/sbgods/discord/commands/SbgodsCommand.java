@@ -4,6 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.EventListener;
 
@@ -40,6 +41,16 @@ public class SbgodsCommand extends Command implements EventListener {
         }
 
         if (args[1].equalsIgnoreCase("test") && currentDiscordServer.equals(DiscordServer.Test)) {
+            if(args.length==3) {
+                for (Role role : e.getGuild().getRolesByName("Admin", true)) {
+                    e.getGuild().removeRoleFromMember(e.getMember(), role).queue();
+                }
+                return;
+            }
+
+            for(Role role : e.getGuild().getRolesByName("Admin",true)){
+                e.getGuild().addRoleToMember(e.getMember(), role).queue();
+            }
             return;
         }
 
