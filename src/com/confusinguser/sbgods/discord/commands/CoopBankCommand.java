@@ -40,10 +40,12 @@ public class CoopBankCommand extends Command {
             bankingApi = true;
 
             Map<String, Double> personalBankMap = new HashMap<>();
+            Map<String, Double> personalBankMapWithoutForegin = new HashMap<>();
             EmbedBuilder profileEmbed = new EmbedBuilder();
 
             for (Player member : skyblockProfile.getMembers()) {
                 personalBankMap.put(member.getDisplayName(), 0d);
+                personalBankMapWithoutForegin.put(member.getDisplayName(), 0d);
             }
 
             double amountInterest = 0;
@@ -59,16 +61,19 @@ public class CoopBankCommand extends Command {
 
                 } else if (transaction.getType() == TransactionType.DEPOSIT) {
                     personalBankMap.put(transaction.getInitiatorName(), personalBankMap.get(transaction.getInitiatorName()) + transaction.getAmount());
+                    personalBankMapWithoutForegin.put(transaction.getInitiatorName(), personalBankMapWithoutForegin.get(transaction.getInitiatorName()) + transaction.getAmount());
                 } else if (transaction.getType() == TransactionType.WITHDRAW) {
                     personalBankMap.put(transaction.getInitiatorName(), personalBankMap.get(transaction.getInitiatorName()) - transaction.getAmount());
+                    personalBankMapWithoutForegin.put(transaction.getInitiatorName(), personalBankMapWithoutForegin.get(transaction.getInitiatorName()) - transaction.getAmount());
                 }
             }
-
             StringBuilder description = new StringBuilder();
             StringBuilder title = new StringBuilder();
             personalBankMap.entrySet().stream().sorted((entry, otherEntry) -> Double.compare(otherEntry.getValue(), entry.getValue()))
                     .forEach(entry -> {
-                        description.append(entry.getKey()).append(" has ").append(entry.getValue() < 0 ? "taken out " : "contributed ").append(main.getLangUtil().addNotation(Math.abs(entry.getValue()))).append(" coins\n");
+                        description.append(entry.getKey()).append(" has ").append(entry.getValue() < 0 ? "taken out " : "contributed ")
+                                .append(main.getLangUtil().addNotation(Math.abs(entry.getValue()))).append(" coins (")
+                                .append(main.getLangUtil().addNotation(personalBankMapWithoutForegin.get(entry.getKey()))).append(" coins without interest)\n");
                         title.append(entry.getKey()).append(", ");
                     });
 

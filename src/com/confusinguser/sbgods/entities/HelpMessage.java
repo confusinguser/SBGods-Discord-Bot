@@ -9,7 +9,7 @@ import java.util.Random;
 
 public enum HelpMessage {
 
-    //<editor-fold desc="All -help [COMMAND] data">
+    //<editor-fold defaultstate="collapsed" desc="All -help [COMMAND] data">
     HELP("help",
             "help [COMMAND]",
             new String[]{"help [COMMAND] [SUBCOMMAND]"},
@@ -18,28 +18,23 @@ public enum HelpMessage {
 
     AH("ah",
             "ah [IGN]",
-            new String[]{},
-            "Lists the player (and coop)'s Auctions."),
+            "Lists the player's and coop's Auctions."),
 
     DEATHS("deaths",
             "deaths player [IGN]",
-            new String[]{},
-            "Lists every death to show how pathetic the player is."),
+            "Lists every death to show how pathetic the player is."), // Maybe a bit too offensive?
 
     KILLS("kills",
             "kills player [IGN]",
-            new String[]{},
             "Lists the player's kills."),
 
     PETS("pets",
             "pets [IGN]",
-            new String[]{},
             "List the player's pets (on all profiles).",
             "Will also show what pets are equiped and what level they are."),
 
     PLAYER("player",
             "player [IGN]",
-            new String[]{},
             "Lists lots of stats about a player"),
 
     SBGODS("sbgods",
@@ -49,18 +44,15 @@ public enum HelpMessage {
 
     SBGODS_VERSION("sbgods version",
             "sbgods version",
-            new String[]{},
             "Lists the bot version information."),
 
     SBGODS_UPDATE("sbgods update",
             "sbgods update",
-            new String[]{},
             "Updates the bot from github.",
             "Requires to be a bot dev to use."),
 
     SBGODS_STOP("sbgods stop",
             "sbgods stop",
-            new String[]{},
             "Stops the SBGods bot.",
             "This may cause the bot to:",
             "1) Just stop",
@@ -82,12 +74,10 @@ public enum HelpMessage {
 
     SKILL_PLAYER("skill player",
             "skill player [IGN]",
-            new String[]{},
             "Shows a player's skill levels."),
 
     SKILL_LEADERBOARD("skill",
             "skill leaderboard [LENGTH | all]",
-            new String[]{},
             "Shows the guild's skill leaderboard."),
 
     SKILLEXP("skillexp",
@@ -97,12 +87,10 @@ public enum HelpMessage {
 
     SKILLEXP_PLAYER("skillexp player",
             "skillexp player [IGN]",
-            new String[]{},
             "Shows a player's skillexp levels."),
 
     SKILLEXP_LEADERBOARD("skillexp",
             "skillexp leaderboard [LENGTH | all]",
-            new String[]{},
             "Shows the guild's skillexp leaderboard."),
 
     SLAYER("slayer",
@@ -112,12 +100,10 @@ public enum HelpMessage {
 
     SLAYER_PLAYER("slayer player",
             "slayer player [IGN]",
-            new String[]{},
             "Shows a player's slayer exp."),
 
     SLAYER_LEADERBOARD("slayer",
             "slayer leaderboard [LENGTH | all]",
-            new String[]{},
             "Shows the guild's slayer leaderboard."),
 
     TAX("tax",
@@ -128,45 +114,38 @@ public enum HelpMessage {
 
     TAX_OWELIST("tax owelist",
             "tax owelist",
-            new String[]{},
             "Lists everyone in the guild that owes tax."),
 
     TAX_INFO("tax info",
             "tax info [IGN]",
-            new String[]{},
             "Will show the tax info for a specific player."),
 
     TAX_SETROLE("tax setrole",
             "tax setrole [IGN] [ROLE]",
-            new String[]{},
             "Sets a player's tax role.",
             "",
             "Requires to be a bot dev or server admin to use."),
 
     TAX_PAID("tax paid",
             "tax paid [PLAYER] [AMOUNT]",
-            new String[]{},
             "Sets a player as having paid amount of tax. (Additive)",
             "",
             "Requires to be a bot dev or server admin to use."),
 
     TAX_PAIDALL("tax paidall",
             "tax paidall [AMOUNT]",
-            new String[]{},
             "Sets everyone as having paid amount of tax. (Additive)",
             "",
             "Requires to be a bot dev or server admin to use."),
 
     TAX_OWE("tax owe",
             "tax owe [PLAYER] [AMOUNT]",
-            new String[]{},
             "Sets a player as owing that amount of tax. (Additive)",
             "",
             "Requires to be a bot dev or server admin to use."),
 
     TAX_OWEALL("tax",
             "tax [SUBCOMMAND]",
-            new String[]{},
             "Sets everyone as owing that amount of tax. (Additive)",
             "",
             "Requires to be a bot dev or server admin to use."),
@@ -189,7 +168,6 @@ public enum HelpMessage {
 
     VERIFYALL_RESET_VERIFIED("verifyall reset verified",
             "verifyall reset verified",
-            new String[]{},
             "Removes the verified role from all players.",
             "This will not remove sbg and sbf guild member roles.",
             "",
@@ -197,16 +175,16 @@ public enum HelpMessage {
 
     VERIFY("verify",
             "verify [IGN]",
-            new String[]{},
             "Will verify you based of the given ign.",
             "If no ign is given it will attempt to auto-get your ign.",
-            "Auto-getting someones ign will not work 90% of the time tho."),
+            "Auto-getting someone's ign will not work 90% of the time."),
 
     WHATGUILD("whatguild",
             "whatguild [IGN]",
-            new String[]{},
             "Lists the guild that the player is in");
     //</editor-fold>
+
+    private final SBGods main = SBGods.getInstance();
 
     private final String command;
     private final String usage;
@@ -217,6 +195,13 @@ public enum HelpMessage {
         this.command = command;
         this.usage = usage;
         this.subCommands = subCommands;
+        this.helpLines = lines;
+    }
+
+    HelpMessage(String command, String usage, String... lines) {
+        this.command = command;
+        this.usage = usage;
+        this.subCommands = new String[0];
         this.helpLines = lines;
     }
 
@@ -237,7 +222,7 @@ public enum HelpMessage {
         return usage;
     }
 
-    public String[] getSubcommands() {
+    public String[] getSubCommands() {
         return subCommands;
     }
 
@@ -248,12 +233,12 @@ public enum HelpMessage {
     public MessageEmbed getEmbed() {
         EmbedBuilder embedBuilder = new EmbedBuilder();
 
-        embedBuilder.setTitle("`" + SBGods.getInstance().getLangUtil().toLowerCaseButFirstLetter(command) + "` command help.");
+        embedBuilder.setTitle("`" + command + "` command help.");
         Random colorRandom = new Random();
         embedBuilder.setColor(new Color(colorRandom.nextFloat(), colorRandom.nextFloat(), colorRandom.nextFloat()));
-        embedBuilder.addField("Usage", "`" + SBGods.getInstance().getDiscord().commandPrefix + usage + "`", false);
+        embedBuilder.addField("Usage", "`" + main.getDiscord().commandPrefix + usage + "`", false);
         if (subCommands.length > 0) {
-            embedBuilder.addField("Sub-commands", "`" + SBGods.getInstance().getDiscord().commandPrefix + String.join("`\n`" + SBGods.getInstance().getDiscord().commandPrefix, subCommands) + "`", false);
+            embedBuilder.addField("Sub-commands", "`" + main.getDiscord().commandPrefix + String.join("`\n`" + main.getDiscord().commandPrefix, subCommands) + "`", false);
         }
         embedBuilder.setFooter("Version " + SBGods.VERSION);
 
