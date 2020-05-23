@@ -7,7 +7,9 @@ import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SlayerExp;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.GuildChannel;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -46,7 +48,7 @@ public class ApplyCommand extends Command {
 
         e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar(0.75, 20) + ")").queue();
 
-        if (e.getGuild().getCategoriesByName("applications", true).stream().map(GuildChannel::getName).collect(Collectors.toList()).contains(player.getDisplayName() + "s-application")) {
+        if (e.getGuild().getCategoriesByName("applications", true).get(0).getTextChannels().stream().map(GuildChannel::getName).collect(Collectors.toList()).contains(player.getDisplayName().toLowerCase() + "s-application")) {
             e.getChannel().sendMessage("You already have a pending application.").queue();
             e.getChannel().deleteMessageById(messageId).queue();
             return;
@@ -58,8 +60,8 @@ public class ApplyCommand extends Command {
             return;
         }
 
-        boolean meetsSlayer = false;
-        boolean meetsSkill = false;
+        boolean meetsSlayer = true; // set these back to false when done testing
+        boolean meetsSkill = true;
 
         if (slayerExp.getTotalExp() > currentDiscordServer.getHypixelGuild().getSlayerReq()) {
             meetsSlayer = true;
@@ -86,16 +88,16 @@ public class ApplyCommand extends Command {
             return;
         }
 
-        double playerScore = ((double) slayerExp.getTotalExp() / currentDiscordServer.getHypixelGuild().getSlayerReq() + skillLevels.getAvgSkillLevel() / currentDiscordServer.getHypixelGuild().getSkillReq()) - 2;
+        double playerScore = ((double) slayerExp.getTotalExp() / currentDiscordServer.getHypixelGuild().getSlayerReq() + skillLevels.getAvgSkillLevel() / currentDiscordServer.getHypixelGuild().getSkillReq())/2;
 
         TextChannel textChannel = e.getGuild().getTextChannelById(e.getGuild().createTextChannel(
                 main.getLangUtil().makePossessiveForm(player.getDisplayName()).replace("'", "") + "-application")
                 .setParent(e.getGuild().getCategoriesByName("applications", true).get(0))
                 .setTopic(player.getDisplayName() + "'s application")
-                .setPosition(Integer.MAX_VALUE + (int) (playerScore * 1000))
+                .setPosition(Integer.MAX_VALUE - (int) (playerScore * 1000))
                 .complete().getId());
 
-        EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("Guild Application").setColor(0xb8300b);
+        EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("Guild Application (Score " + (int) (playerScore*100) + ")").setColor(0xb8300b);
 
         embedBuilder.setThumbnail("https://visage.surgeplay.com/bust/" + player.getUUID());
         embedBuilder.appendDescription("Your application is under review...");
@@ -104,7 +106,12 @@ public class ApplyCommand extends Command {
         embedBuilder.setTimestamp(new Date().toInstant());
 
         if (textChannel != null) {
-            textChannel.sendMessage(embedBuilder.build()).queue((message) -> message.pin().queue());
+            Message message = textChannel.sendMessage(embedBuilder.build()).complete();
+            message.addReaction("\uD83D\uDC4D").queue();
+            message.addReaction("\uD83D\uDC4E").queue();
+            message.pin().queue();
+            textChannel.putPermissionOverride(e.getMember()).setAllow(Permission.VIEW_CHANNEL).queue();
+
             e.getChannel().sendMessage("Application successfully created!").queue();
         } else {
             e.getChannel().sendMessage("Could not create channel for this application! Please contact staff for help").queue();
