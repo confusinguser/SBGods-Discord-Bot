@@ -44,32 +44,30 @@ public class PlayerCommand extends Command implements EventListener {
         double progress = 0.0;
         int progressLength = 20;
         double perProfileProgress = 1 / ((double) player.getSkyblockProfiles().size());
+        main.logger.info(player.getDiscordTag());
 
         for (int i = 0; i < player.getSkyblockProfiles().size(); i++) {
             String profileId = player.getSkyblockProfiles().get(i);
-            progress += perProfileProgress / 4;
+            progress += perProfileProgress;
             e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress, progressLength) + ")").queue();
 
             ArrayList<Pet> pets = main.getApiUtil().getProfilePets(profileId, player.getUUID()); // Pets in profile
             totalPets.addAll(pets);
 
-            progress += perProfileProgress / 4;
-
             skillLevels = main.getApiUtil().getBestProfileSkillLevels(player.getUUID());
 
-            progress += perProfileProgress / 4;
-
             totalMoney += main.getApiUtil().getTotalMoneyInProfile(profileId);
-
-            progress += perProfileProgress / 4;
 
             slayerExp = SlayerExp.addExps(slayerExp, main.getApiUtil().getProfileSlayerExp(profileId, player.getUUID()));
         }
 
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(player.getDisplayName()).setColor(0xb8300b).setThumbnail("https://visage.surgeplay.com/bust/" + player.getUUID()).setFooter("SBGods");
-        User discordUser = main.getDiscord().getJDA().getUserByTag(player.getDiscordTag());
+        User discordUser = null;
+        if(!player.getDiscordTag().equals("")){
+            main.getDiscord().getJDA().getUserByTag(player.getDiscordTag());
+        }
 
-        if (player.getDiscordTag() != null && discordUser != null)
+        if (player.getDiscordTag() != null && discordUser != null )
             embedBuilder.addField("Discord", discordUser.getAsMention(), true);
         embedBuilder.addField("Status", player.isOnline() ? "Online" : "Offline", true);
 
