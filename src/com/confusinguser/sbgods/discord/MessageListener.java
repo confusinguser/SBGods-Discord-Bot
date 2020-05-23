@@ -4,6 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import java.sql.Time;
 import java.util.concurrent.TimeUnit;
 
 public class MessageListener extends ListenerAdapter {
@@ -21,9 +22,9 @@ public class MessageListener extends ListenerAdapter {
         if (discord.shouldNotRun(e)) {
             return;
         }
-        if (e.getChannel().getName().equalsIgnoreCase("verify") &&
+        if (e.getChannel().getName().contains("verified") &&
                 e.getChannel().getHistoryFromBeginning(1).complete().getRetrievedHistory().get(0).getIdLong() != e.getMessage().getIdLong()) {
-            main.getUtil().scheduleCommandAfter(() -> e.getMessage().delete().queue(), 30, TimeUnit.SECONDS);
+            e.getMessage().delete().queueAfter(30,TimeUnit.SECONDS);
         }
     }
 }

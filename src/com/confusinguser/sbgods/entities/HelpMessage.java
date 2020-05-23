@@ -76,7 +76,7 @@ public enum HelpMessage {
             "skill player [IGN]",
             "Shows a player's skill levels."),
 
-    SKILL_LEADERBOARD("skill",
+    SKILL_LEADERBOARD("skill leaderboard",
             "skill leaderboard [LENGTH | all]",
             "Shows the guild's skill leaderboard."),
 
@@ -89,7 +89,7 @@ public enum HelpMessage {
             "skillexp player [IGN]",
             "Shows a player's skillexp levels."),
 
-    SKILLEXP_LEADERBOARD("skillexp",
+    SKILLEXP_LEADERBOARD("skillexp leaderboard",
             "skillexp leaderboard [LENGTH | all]",
             "Shows the guild's skillexp leaderboard."),
 
@@ -102,7 +102,7 @@ public enum HelpMessage {
             "slayer player [IGN]",
             "Shows a player's slayer exp."),
 
-    SLAYER_LEADERBOARD("slayer",
+    SLAYER_LEADERBOARD("slayer leaderboard",
             "slayer leaderboard [LENGTH | all]",
             "Shows the guild's slayer leaderboard."),
 
