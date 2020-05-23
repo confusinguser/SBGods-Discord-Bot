@@ -100,7 +100,7 @@ public class LangUtil {
         String progressChar = "■";
         String otherChar = "□";
 
-        if (amountDone > 1/lengthOfBar) {
+        if (amountDone > 1d / lengthOfBar) {
             returnVal += "**";
             returnVal += loopString(progressChar, (int) (amountDone * lengthOfBar));
             returnVal += "**";

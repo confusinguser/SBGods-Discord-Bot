@@ -77,7 +77,7 @@ public class CoopBankCommand extends Command {
                         title.append(entry.getKey()).append(", ");
                     });
 
-            profileEmbed.setTitle(title.toString().substring(0, title.length()-2));
+            profileEmbed.setTitle(title.toString().substring(0, title.length() - 2));
             profileEmbed.addField("Total money", main.getLangUtil().addNotation(skyblockProfile.getBalance()) + " coins", false);
             profileEmbed.addField("Members", description.toString(), false);
             e.getChannel().sendMessage(profileEmbed.build()).queue();

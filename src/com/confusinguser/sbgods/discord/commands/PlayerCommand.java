@@ -54,9 +54,7 @@ public class PlayerCommand extends Command implements EventListener {
             totalPets.addAll(pets);
 
             skillLevels = main.getApiUtil().getBestProfileSkillLevels(player.getUUID());
-
             totalMoney += main.getApiUtil().getTotalMoneyInProfile(profileId);
-
             slayerExp = SlayerExp.addExps(slayerExp, main.getApiUtil().getProfileSlayerExp(profileId, player.getUUID()));
         }
 
@@ -85,7 +83,7 @@ public class PlayerCommand extends Command implements EventListener {
                 petStr.append("\n").append(main.getLangUtil().toLowerCaseButFirstLetter(pet.getTier().toString())).append(" ").append(pet.getType()).append(" (").append(pet.getLevel()).append(")");
             }
         }
-        embedBuilder.addField("Active pets (One per profile)", petStr.toString(), false);
+        embedBuilder.addField("Active pets (one per profile)", petStr.toString(), false);
 
         MessageEmbed messageEmbed = embedBuilder.build();
 
