@@ -4,6 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.*;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -53,17 +54,14 @@ public class PlayerCommand extends Command implements EventListener {
             totalPets.addAll(pets);
 
             progress += perProfileProgress / 4;
-            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress, progressLength) + ")").queue();
 
             skillLevels = main.getApiUtil().getBestProfileSkillLevels(player.getUUID());
 
             progress += perProfileProgress / 4;
-            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress, progressLength) + ")").queue();
 
             totalMoney += main.getApiUtil().getTotalMoneyInProfile(profileId);
 
             progress += perProfileProgress / 4;
-            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress, progressLength) + ")").queue();
 
             slayerExp = SlayerExp.addExps(slayerExp, main.getApiUtil().getProfileSlayerExp(profileId, player.getUUID()));
         }
@@ -92,7 +90,9 @@ public class PlayerCommand extends Command implements EventListener {
         }
         embedBuilder.addField("Active pets (One per profile)", petStr.toString(), false);
 
+        MessageEmbed messageEmbed = embedBuilder.build();
+
         e.getChannel().deleteMessageById(messageId).queue();
-        e.getChannel().sendMessage(embedBuilder.build()).queue();
+        e.getChannel().sendMessage(messageEmbed).queue();
     }
 }
