@@ -81,7 +81,7 @@ public enum HypixelGuild {
     }
 
     public int getSkillReq() {
-        return SBGods.getInstance().getSBUtil().toSkillExp(skillReq);
+        return skillReq;
     }
 
     public int getSlayerReq() {
