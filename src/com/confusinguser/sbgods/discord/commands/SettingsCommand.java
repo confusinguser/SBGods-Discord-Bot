@@ -37,5 +37,14 @@ public class SettingsCommand extends Command {
             main.getJsonApiUtil().updateSettings();
             e.getChannel().sendMessage("The prefix is now `" + args[2] + "`");
         }
+
+        if (args[1].contentEquals("dev")) { //for doing dev things... no-one should even know about it exept devs
+            if(!e.getMember().hasPermission(Permission.MANAGE_SERVER)){
+                return;
+            }
+            if (args[2].contentEquals("addGApplyReact")) {
+                e.getChannel().retrievePinnedMessages().complete().get(0).addReaction("☑");
+            }
+        }
     }
 }
