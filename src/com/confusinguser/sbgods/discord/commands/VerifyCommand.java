@@ -26,6 +26,10 @@ public class VerifyCommand extends Command {
         if (args.length >= 2) {
             // Check if that is actual player ign
             Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
+            if(player == null || player.getDiscordTag() == null){
+                e.getChannel().sendMessage(e.getAuthor().getAsMention() + " Could not find MC account " + args[1]).queue();
+                return;
+            }
             if (player.getDiscordTag().equalsIgnoreCase(e.getAuthor().getAsTag())) {
                 if (main.getUtil().verifyPlayer(e.getMember(), player.getDisplayName(), e.getGuild(), e.getChannel()) != 0) {
                     e.getChannel().sendMessage("You are already verified!").queue();

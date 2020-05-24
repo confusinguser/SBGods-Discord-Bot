@@ -21,7 +21,7 @@ public class MessageListener extends ListenerAdapter {
         if (discord.shouldNotRun(e)) {
             return;
         }
-        if (e.getChannel().getName().contains("verified") &&
+        if (e.getChannel().getName().contains("verif") &&
                 e.getChannel().getHistoryFromBeginning(1).complete().getRetrievedHistory().get(0).getIdLong() != e.getMessage().getIdLong()) {
             e.getMessage().delete().queueAfter(30, TimeUnit.SECONDS);
         }
