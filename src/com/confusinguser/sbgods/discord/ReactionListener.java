@@ -7,6 +7,7 @@ import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SlayerExp;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -27,7 +28,8 @@ public class ReactionListener extends ListenerAdapter {
 
     @Override
     public void onMessageReactionAdd(MessageReactionAddEvent e) {
-        if(e.getUser().isBot()){
+        DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromDiscordGuild(e.getGuild());
+        if ((e.getUser() != null && e.getUser().isBot()) || e.getUser() == null || currentDiscordServer == null) {
             return;
         }
 
@@ -38,18 +40,17 @@ public class ReactionListener extends ListenerAdapter {
 
         if (e.getChannel().getName().toLowerCase().contains("apply") &&
                 e.getReaction().getReactionEmote().getEmoji().equalsIgnoreCase("☑")) {
-            apply(e);
+            apply(e, e.getUser(), currentDiscordServer);
         }
 
     }
 
-    private void apply(MessageReactionAddEvent e){
-
+    private void apply(MessageReactionAddEvent e, User user, DiscordServer currentDiscordServer) {
         String messageId = e.getChannel().sendMessage("Loading... (" + main.getLangUtil().getProgressBar(0.0, 20) + ")").complete().getId();
 
-        String playerIGN = main.getApiUtil().getMcNameFromDisc(e.getUser().getAsTag());
+        String playerIGN = main.getApiUtil().getMcNameFromDisc(user.getAsTag());
 
-        if(playerIGN.equals(null) || playerIGN.equals("")){
+        if (playerIGN == null || playerIGN.equals("")) {
             e.getChannel().sendMessage("You need to verify before applying.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
             e.getChannel().deleteMessageById(messageId).queue();
         }
@@ -79,8 +80,6 @@ public class ReactionListener extends ListenerAdapter {
 
         boolean meetsSlayer = false;
         boolean meetsSkill = false;
-
-        DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromDiscordGuild(e.getGuild());
 
         if (player.getGuildId().equals(currentDiscordServer.getHypixelGuild().getGuildId())) {
             e.getChannel().sendMessage("You are already in the guild.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
@@ -112,16 +111,16 @@ public class ReactionListener extends ListenerAdapter {
         }
         double playerScore = ((double) slayerExp.getTotalExp() / currentDiscordServer.getHypixelGuild().getSlayerReq() + (skillLevels.getAvgSkillLevel()) / currentDiscordServer.getHypixelGuild().getSkillReq()) / 2;
 
-        EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(main.getLangUtil().makePossessiveForm(player.getDisplayName()) + " application (Score " + Math.round(playerScore * 100) + ")").setColor(new Color((int) (117 * Math.min(playerScore,2)) /* Gets "redder" the higher score you have */, 48, 11));
+        EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(main.getLangUtil().makePossessiveForm(player.getDisplayName()) + " application (Score " + Math.round(playerScore * 100) + ")").setColor(new Color((int) (117 * Math.min(playerScore, 2)) /* Gets "redder" the higher score you have */, 48, 11));
 
         embedBuilder.setThumbnail("https://visage.surgeplay.com/bust/" + player.getUUID());
         embedBuilder.appendDescription("Slayer exp: " + main.getLangUtil().addNotation(slayerExp.getTotalExp()));
-        embedBuilder.appendDescription("\nAvg. skill level: " + main.getUtil().round(skillLevels.getAvgSkillLevel(),2));
+        embedBuilder.appendDescription("\nAvg. skill level: " + main.getUtil().round(skillLevels.getAvgSkillLevel(), 2));
         embedBuilder.setTimestamp(new Date().toInstant());
         ((TextChannel) e.getGuild().getChannels().stream().filter(channel -> channel.getName().contains("accepted-applications"))
-            .collect(Collectors.toList()).get(0))
-            .sendMessage(embedBuilder.build())
-            .queue(message -> message.addReaction("☑").queue());
+                .collect(Collectors.toList()).get(0))
+                .sendMessage(embedBuilder.build())
+                .queue(message -> message.addReaction("☑").queue());
 
         e.getChannel().sendMessage("The application was successfully created! It may take up to a day to get invited to the guild").complete().delete().queueAfter(30, TimeUnit.SECONDS);
         e.getChannel().deleteMessageById(messageId).queue();

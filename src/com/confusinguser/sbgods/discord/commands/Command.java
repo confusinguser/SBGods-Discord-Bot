@@ -37,9 +37,9 @@ public abstract class Command extends ListenerAdapter {
                 handleCommand(e, discordServer, e.getMessage().getContentRaw().split(" "));
             } catch (Throwable t) {
                 TextChannel textChannel = main.getDiscord().getJDA().getTextChannelById("713870866051498086");
+                main.logger.severe("Exception when handling command '" + e.getMessage().getContentRaw() + "': \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t));
                 if (textChannel != null)
                     textChannel.sendMessage("Exception when handling command '" + e.getMessage().getContentRaw() + "': \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t)).queue();
-                main.logger.severe("Exception when handling command '" + e.getMessage().getContentRaw() + "': \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t));
             }
             main.getUtil().setTyping(false, e.getChannel());
         });

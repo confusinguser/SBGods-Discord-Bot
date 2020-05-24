@@ -39,13 +39,10 @@ public class SettingsCommand extends Command {
         }
 
         if (args[1].contentEquals("dev")) { //for doing dev things... no-one should even know about it exept devs
-            boolean isDev=false;
-            for(String dev : main.DEVELOPERS){
-                if(dev.equals(e.getMessage().getId())){isDev = true;};
-            }
-            if(!isDev){
+            if (!main.isDeveloper(e.getAuthor().getId())) {
                 return;
             }
+
             if (args[2].contentEquals("addGApplyReact")) {
                 e.getChannel().retrievePinnedMessages().complete().get(0).addReaction("☑");
             }

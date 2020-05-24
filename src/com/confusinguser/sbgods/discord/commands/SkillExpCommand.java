@@ -165,8 +165,8 @@ public class SkillExpCommand extends Command {
 
                 StringBuilder footerBuilder = new StringBuilder();
                 embedBuilder.setFooter(footerBuilder
-                        .append("Carpentry: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getCarpentry()) + '\n')
-                        .append("Runecrafting: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getRunecrafting()))
+                        .append("Carpentry: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getCarpentry()))
+                        .append(", runecrafting: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getRunecrafting()))
                         .toString());
 
                 e.getChannel().sendMessage(embedBuilder.build()).queue();

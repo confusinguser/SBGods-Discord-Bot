@@ -23,7 +23,7 @@ public class SbgodsCommand extends Command {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
-        if (args.length == 1) {
+        if (args.length == 1 || e.getMember() == null) {
             e.getChannel().sendMessage("Invalid argument! Valid arguments: `version`, `update`, `stop`!").queue();
             return;
         }

@@ -162,8 +162,8 @@ public class SkillCommand extends Command {
 
                 StringBuilder footerBuilder = new StringBuilder();
                 embedBuilder.setFooter(footerBuilder
-                        .append("Carpentry: ").append(highestSkillLevels.getCarpentry() + '\n')
-                        .append("Runecrafting: ").append(highestSkillLevels.getRunecrafting())
+                        .append("Carpentry: ").append(highestSkillLevels.getCarpentry())
+                        .append(", runecrafting: ").append(highestSkillLevels.getRunecrafting())
                         .toString());
 
                 e.getChannel().sendMessage(embedBuilder.build()).queue();
