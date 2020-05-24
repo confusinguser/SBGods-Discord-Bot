@@ -77,10 +77,16 @@ public class ReactionListener extends ListenerAdapter {
             return;
         }
 
-        boolean meetsSlayer = true;
-        boolean meetsSkill = true;
+        boolean meetsSlayer = false;
+        boolean meetsSkill = false;
 
         DiscordServer currentDiscordServer = DiscordServer.getDiscordServerFromDiscordGuild(e.getGuild());
+
+        if (player.getGuildId().equals(currentDiscordServer.getHypixelGuild().getGuildId())) {
+            e.getChannel().sendMessage("You are already in the guild.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+            e.getChannel().deleteMessageById(messageId).queue();
+            return;
+        }
 
         if (slayerExp.getTotalExp() > currentDiscordServer.getHypixelGuild().getSlayerReq()) {
             meetsSlayer = true;
