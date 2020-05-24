@@ -51,7 +51,7 @@ public class ReactionListener extends ListenerAdapter {
         String playerIGN = main.getApiUtil().getMcNameFromDisc(user.getAsTag());
 
         if (playerIGN == null || playerIGN.equals("")) {
-            e.getChannel().sendMessage("You need to verify before applying.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+            e.getChannel().sendMessage(e.getUser().getAsMention() + " you need to verify before applying.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
             e.getChannel().deleteMessageById(messageId).queue();
         }
 
@@ -69,11 +69,11 @@ public class ReactionListener extends ListenerAdapter {
 
         if (!((TextChannel) e.getGuild().getChannels().stream().filter(channel -> channel.getName().contains("accepted-applications"))
                 .collect(Collectors.toList()).get(0)).getHistoryFromBeginning(100).complete().getRetrievedHistory().stream().filter(message -> message.getEmbeds().get(0).getTitle().contains(player.getDisplayName().toLowerCase() + " application")).collect(Collectors.toList()).isEmpty()) {
-            e.getChannel().sendMessage("You already have a pending application.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+            e.getChannel().sendMessage(e.getUser().getAsMention() + " you already have a pending application.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
             e.getChannel().deleteMessageById(messageId).queue();
         }
         if (skillLevels.isApproximate()) {
-            e.getChannel().sendMessage("You need to turn your skill API on before applying.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+            e.getChannel().sendMessage(e.getUser().getAsMention() + " you need to turn your skill API on before applying.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
             e.getChannel().deleteMessageById(messageId).queue();
             return;
         }
@@ -82,7 +82,7 @@ public class ReactionListener extends ListenerAdapter {
         boolean meetsSkill = false;
 
         if (player.getGuildId().equals(currentDiscordServer.getHypixelGuild().getGuildId())) {
-            e.getChannel().sendMessage("You are already in the guild.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+            e.getChannel().sendMessage(e.getUser().getAsMention() + " you are already in the guild.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
             e.getChannel().deleteMessageById(messageId).queue();
             return;
         }
@@ -97,15 +97,15 @@ public class ReactionListener extends ListenerAdapter {
         e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar(1.0, 20) + ")").queue();
 
         if (!meetsSkill && !meetsSlayer) {
-            e.getChannel().sendMessage("You dont meet the slayer requirement of " + currentDiscordServer.getHypixelGuild().getSlayerReq() + " slayer exp" + "\nor this skill requirement of " + currentDiscordServer.getHypixelGuild().getSkillReq() + " average skill level").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+            e.getChannel().sendMessage(e.getUser().getAsMention() + " you dont meet the slayer requirement of " + currentDiscordServer.getHypixelGuild().getSlayerReq() + " slayer exp" + "\nor this skill requirement of " + currentDiscordServer.getHypixelGuild().getSkillReq() + " average skill level").complete().delete().queueAfter(30, TimeUnit.SECONDS);
             e.getChannel().deleteMessageById(messageId).queue();
             return;
         } else if (!meetsSlayer) {
-            e.getChannel().sendMessage("You dont meet the slayer requirement of " + currentDiscordServer.getHypixelGuild().getSlayerReq() + " slayer exp").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+            e.getChannel().sendMessage(e.getUser().getAsMention() + " you dont meet the slayer requirement of " + currentDiscordServer.getHypixelGuild().getSlayerReq() + " slayer exp").complete().delete().queueAfter(30, TimeUnit.SECONDS);
             e.getChannel().deleteMessageById(messageId).queue();
             return;
         } else if (!meetsSkill) {
-            e.getChannel().sendMessage("You dont meet the skill requirement of " + currentDiscordServer.getHypixelGuild().getSkillReq() + " average skill level").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+            e.getChannel().sendMessage(e.getUser().getAsMention() + " you dont meet the skill requirement of " + currentDiscordServer.getHypixelGuild().getSkillReq() + " average skill level").complete().delete().queueAfter(30, TimeUnit.SECONDS);
             e.getChannel().deleteMessageById(messageId).queue();
             return;
         }
@@ -122,7 +122,7 @@ public class ReactionListener extends ListenerAdapter {
                 .sendMessage(embedBuilder.build())
                 .queue(message -> message.addReaction("☑").queue());
 
-        e.getChannel().sendMessage("The application was successfully created! It may take up to a day to get invited to the guild").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+        e.getChannel().sendMessage(e.getUser().getAsMention() + " the application was successfully created! It may take up to a day to get invited to the guild").complete().delete().queueAfter(30, TimeUnit.SECONDS);
         e.getChannel().deleteMessageById(messageId).queue();
     }
 }
