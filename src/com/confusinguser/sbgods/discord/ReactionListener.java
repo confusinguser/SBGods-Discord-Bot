@@ -110,7 +110,7 @@ public class ReactionListener extends ListenerAdapter {
             e.getChannel().deleteMessageById(messageId).queue();
             return;
         }
-        double playerScore = ((double) slayerExp.getTotalExp() / currentDiscordServer.getHypixelGuild().getSlayerReq() + (skillLevels.getAvgSkillLevel()) / currentDiscordServer.getHypixelGuild().getSkillReq()) / 2;
+        double playerScore = ((double) slayerExp.getTotalExp() / currentDiscordServer.getHypixelGuild().getSlayerReq() + ((double) main.getSBUtil().toSkillExp(skillLevels.getAvgSkillLevel())) / currentDiscordServer.getHypixelGuild().getSkillReq()) / 2;
 
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(main.getLangUtil().makePossessiveForm(player.getDisplayName()) + " application (Score " + Math.round(playerScore * 100) + ")").setColor(new Color((int) (117 * Math.min(playerScore,2)) /* Gets "redder" the higher score you have */, 48, 11));
 
