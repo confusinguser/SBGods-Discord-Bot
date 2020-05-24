@@ -1,14 +1,12 @@
 package com.confusinguser.sbgods.entities;
 
-import com.confusinguser.sbgods.SBGods;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public enum HypixelGuild {
     SBG("5cd01bdf77ce84cf1204cd61", 300000, 26, "Skyblock Gods", "SBG Guild Member", "SBG"),
     SBDG("5e4e6d0d8ea8c9feb3f0e44f", 1000, 10, "Skyblock Forceful", "SBF", "SBF Guild Member", "SBDG Guild Member", "Skyblock Demigods", "SBDG", "Skyblock Demi Gods");
-                                                    //Error was tryint to use SBGods.getInstance() before creation
+
     private final String guildId;
     private final int skillReq;
     private final int slayerReq;

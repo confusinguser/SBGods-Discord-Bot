@@ -97,6 +97,7 @@ public class LangUtil {
 
     /**
      * Makes a unicode progress bar with ■ and □
+     *
      * @param amountDone  A double between 0 and 1 representing the progress of the bar
      * @param lengthOfBar The total length of
      * @return
