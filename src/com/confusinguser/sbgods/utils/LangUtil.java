@@ -95,6 +95,13 @@ public class LangUtil {
         return returnValStr.replace(".0", "");
     }
 
+    /**
+     * Makes a unicode progress bar with ■ and □
+     *
+     * @param amountDone  A double between 0 and 1 representing the progress of the bar
+     * @param lengthOfBar The total length of
+     * @return
+     */
     public String getProgressBar(double amountDone, int lengthOfBar) {
         String returnVal = "";
         String progressChar = "■";

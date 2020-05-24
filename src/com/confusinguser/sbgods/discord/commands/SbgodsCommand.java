@@ -23,7 +23,7 @@ public class SbgodsCommand extends Command {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
-        if (args.length == 1) {
+        if (args.length == 1 || e.getMember() == null) {
             e.getChannel().sendMessage("Invalid argument! Valid arguments: `version`, `update`, `stop`!").queue();
             return;
         }
@@ -104,7 +104,7 @@ public class SbgodsCommand extends Command {
             System.exit(0);
             return;
         }
-        if(main.isDeveloper(e.getMember().getId())){
+        if (main.isDeveloper(e.getMember().getId())) {
             if (args[1].contentEquals("dev")) { //for doing dev things... no-one should even know about it exept devs
                 if (args[2].contentEquals("addGApplyReact")) {
                     e.getChannel().retrievePinnedMessages().complete().get(0).addReaction("☑").queue();

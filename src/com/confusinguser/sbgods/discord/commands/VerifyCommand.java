@@ -31,12 +31,17 @@ public class VerifyCommand extends Command {
                 return;
             }
             if (player.getDiscordTag().equalsIgnoreCase(e.getAuthor().getAsTag())) {
-                if (main.getUtil().verifyPlayer(e.getMember(), player.getDisplayName(), e.getGuild(), e.getChannel()) != 0) {
-                    e.getChannel().sendMessage("You are already verified!").queue();
+                int response = main.getUtil().verifyPlayer(e.getMember(), player.getDisplayName(), e.getGuild(), e.getChannel());
+                if (response == 0) {
+                    e.getChannel().sendMessage("You are already verified or you need to link your minecraft account with discord (see the welcome channel)").queue(); // TODO make this 2 different messages
+                    return;
+                } else if (response == 2) {
+                    e.getChannel().sendMessage("Bot is still loading the leaderboards! Try again in a few minutes").queue();
+                    return;
+                } else {
+                    main.logger.fine("Added " + currentDiscordServer.toString() + " verified role to " + e.getAuthor().getAsTag());
                     return;
                 }
-                main.logger.fine("Added " + currentDiscordServer.toString() + " verified role to " + e.getAuthor().getAsTag());
-                return;
             }
 
             // Send error message saying to link discord account with mc

@@ -1,7 +1,5 @@
 package com.confusinguser.sbgods.entities;
 
-import com.confusinguser.sbgods.SBGods;
-
 import java.util.HashMap;
 import java.util.Map;
 

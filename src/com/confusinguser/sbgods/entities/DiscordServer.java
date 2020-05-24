@@ -2,6 +2,7 @@ package com.confusinguser.sbgods.entities;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 public enum DiscordServer {
     SBGods("602137436490956820", "673619910324387885", HypixelGuild.SBG), // 5cd01bdf77ce84cf1204cd61
@@ -40,6 +41,7 @@ public enum DiscordServer {
         return botChannelId;
     }
 
+    @NotNull
     public HypixelGuild getHypixelGuild() {
         if (hypixelGuild == null) {
             return SBGods.hypixelGuild;
