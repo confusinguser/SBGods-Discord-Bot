@@ -39,7 +39,11 @@ public class SettingsCommand extends Command {
         }
 
         if (args[1].contentEquals("dev")) { //for doing dev things... no-one should even know about it exept devs
-            if(!e.getMember().hasPermission(Permission.MANAGE_SERVER)){
+            boolean isDev=false;
+            for(String dev : main.DEVELOPERS){
+                if(dev.equals(e.getMessage().getId())){isDev = true;};
+            }
+            if(!isDev){
                 return;
             }
             if (args[2].contentEquals("addGApplyReact")) {
