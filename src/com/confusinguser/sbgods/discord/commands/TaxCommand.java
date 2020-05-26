@@ -297,6 +297,49 @@ public class TaxCommand extends Command {
             return;
         }
 
+        if (args[1].equalsIgnoreCase("paidlist")) {
+            String messageId = e.getChannel().sendMessage("Loading (" + main.getLangUtil().getProgressBar(0.0, 20) + ")").complete().getId();
+
+            JSONObject taxData = main.getApiUtil().getTaxData();
+            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(0.9, 20) + ")").queue();
+
+            ArrayList<String> playerUuids = new ArrayList<>(taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").keySet());
+
+            ArrayList<TaxPayer> taxPayers = new ArrayList<>();
+            for (String playerUuid : playerUuids) {
+                JSONObject taxPayerJson = taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(playerUuid);
+
+                if (taxPayerJson != null) {
+                    if (taxPayerJson.getInt("owes") <= 0 && !taxPayerJson.getString("role").equalsIgnoreCase("no-tax")) {
+                        taxPayers.add(new TaxPayer(playerUuid, taxPayerJson.getString("name"), HypixelGuild.SBG.getGuildId(), taxPayerJson, main));
+                    }
+                }
+            }
+
+            taxPayers.sort((taxPayer, taxPayerOther) -> Integer.compare(taxPayerOther.getOwes(), taxPayer.getOwes()));
+
+            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(1.0, 20) + ")").queue();
+            e.getChannel().deleteMessageById(messageId).queue();
+
+            StringBuilder message = new StringBuilder();
+            for (TaxPayer taxPayer : taxPayers) {
+                message.append(main.getDiscord().escapeMarkdown(taxPayer.getName())).append(" owes **").append(taxPayer.getOwes()).append("**\n");
+            }
+
+            e.getChannel().deleteMessageById(messageId).queue();
+            if (message.toString().equals("")) {
+                e.getChannel().sendMessage("No one in the guild has paid any tax!").queue();
+                return;
+            }
+
+            List<String> responseList = main.getUtil().processMessageForDiscord(message.toString(), 2000);
+            for (String messageI : responseList) {
+                e.getChannel().sendMessage(new EmbedBuilder().appendDescription(messageI).build()).queue();
+            }
+
+            return;
+        }
+
         if (args[1].equalsIgnoreCase("setrole")) {
             if (args.length < 4) {
                 e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " setrole <IGN> <ROLE>`!").queue();

@@ -116,6 +116,10 @@ public enum HelpMessage {
             "tax owelist",
             "Lists everyone in the guild that owes tax."),
 
+    TAX_PAIDLIST("tax paidlist",
+            "tax paidlist",
+            "Lists everyone in the guild that has paid tax."),
+
     TAX_INFO("tax info",
             "tax info [IGN]",
             "Will show the tax info for a specific player."),
