@@ -81,7 +81,8 @@ public class TaxPayer {
         EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0xb8300b).setTitle(getName() + "'s Tax Status");
 
         embedBuilder.appendDescription("Role: **" + main.getLangUtil().toLowerCaseButFirstLetter(getRole()) + "**\n");
-        embedBuilder.appendDescription("Owes: **" + getOwes() + "**");
+        embedBuilder.appendDescription("Owes: **" + main.getLangUtil().addNotation(getOwes()) + "**\n");
+        embedBuilder.appendDescription("Exact Owes: **" + getOwes() + "**");
 
         return embedBuilder;
     }

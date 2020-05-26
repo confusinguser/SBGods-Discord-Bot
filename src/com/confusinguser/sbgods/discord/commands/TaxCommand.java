@@ -44,7 +44,7 @@ public class TaxCommand extends Command {
 
             e.getChannel().sendMessage("Your tax info:").queue();
             e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
-            e.getChannel().sendMessage("Other arguments you can use are: `owelist`, `info` and `setrole`, `paid (admin)`, `paidall (admin)`, `owe (admin)`, `oweall (admin)`!").queue();
+            e.getChannel().sendMessage("Other arguments you can use are: `owelist`, `paidlist`, `info` and `setrole`, `paid (admin)`, `paidall (admin)`, `owe (admin)`, `oweall (admin)`!").queue();
             return;
         }
 
@@ -59,13 +59,26 @@ public class TaxCommand extends Command {
                 return;
             }
 
+            int amount = 0;
+
+            try {
+                amount = -Integer.parseInt(args[3]);
+            }catch(NumberFormatException err) {
+                if (args[3].endsWith("k")) {
+                    amount = -Integer.parseInt(args[3].replace("k","")) * 1000;
+                }
+                if (args[3].endsWith("m")) {
+                    amount = -Integer.parseInt(args[3].replace("m","")) * 1000000;
+                }
+            }
+
             String messageId = e.getChannel().sendMessage("Loading (" + main.getLangUtil().getProgressBar(0.0, 20) + ")").complete().getId();
 
             Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
             e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(0.5, 20) + ")").queue();
             TaxPayer taxPayer = main.getApiUtil().getTaxPayer(thePlayer);
 
-            taxPayer.addOwes(-Integer.parseInt(args[3]));
+            taxPayer.addOwes(amount);
             taxPayer.sendDataToServer();
             e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(1.0, 20) + ")").queue();
 
@@ -86,7 +99,18 @@ public class TaxCommand extends Command {
                 return;
             }
 
-            int amount = -Integer.parseInt(args[2]);
+            int amount = 0;
+
+            try {
+                amount = -Integer.parseInt(args[2]);
+            }catch(NumberFormatException err) {
+                if (args[3].endsWith("k")) {
+                    amount = -Integer.parseInt(args[2].replace("k","")) * 1000;
+                }
+                if (args[3].endsWith("m")) {
+                    amount = -Integer.parseInt(args[2].replace("m","")) * 1000000;
+                }
+            }
             String role = "";
             if (args.length == 4) {
                 role = args[3];
@@ -159,7 +183,21 @@ public class TaxCommand extends Command {
 
             TaxPayer taxPayer = main.getApiUtil().getTaxPayer(thePlayer);
 
-            taxPayer.addOwes(Integer.parseInt(args[3]));
+
+            int amount = 0;
+
+            try {
+                amount = Integer.parseInt(args[3]);
+            }catch(NumberFormatException err) {
+                if (args[3].endsWith("k")) {
+                    amount = Integer.parseInt(args[3].replace("k","")) * 1000;
+                }
+                if (args[3].endsWith("m")) {
+                    amount = Integer.parseInt(args[3].replace("m","")) * 1000000;
+                }
+            }
+
+            taxPayer.addOwes(amount);
 
             taxPayer.sendDataToServer();
             e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(1.0, 20) + ")").queue();
@@ -184,7 +222,19 @@ public class TaxCommand extends Command {
                 return;
             }
             String role = "";
-            int amount = Integer.parseInt(args[2]);
+
+            int amount = 0;
+
+            try {
+                amount = Integer.parseInt(args[2]);
+            }catch(NumberFormatException err) {
+                if (args[3].endsWith("k")) {
+                    amount = Integer.parseInt(args[2].replace("k","")) * 1000;
+                }
+                if (args[3].endsWith("m")) {
+                    amount = Integer.parseInt(args[2].replace("m","")) * 1000000;
+                }
+            }
             if (args.length == 4) {
                 role = args[3].toLowerCase();
             }
@@ -280,7 +330,7 @@ public class TaxCommand extends Command {
 
             StringBuilder message = new StringBuilder();
             for (TaxPayer taxPayer : taxPayers) {
-                message.append(main.getDiscord().escapeMarkdown(taxPayer.getName())).append(" owes **").append(taxPayer.getOwes()).append("**\n");
+                message.append(main.getDiscord().escapeMarkdown(taxPayer.getName())).append(" owes **").append(main.getLangUtil().addNotation(taxPayer.getOwes())).append("**\n");
             }
 
             e.getChannel().deleteMessageById(messageId).queue();
@@ -323,7 +373,7 @@ public class TaxCommand extends Command {
 
             StringBuilder message = new StringBuilder();
             for (TaxPayer taxPayer : taxPayers) {
-                message.append(main.getDiscord().escapeMarkdown(taxPayer.getName())).append(" owes **").append(taxPayer.getOwes()).append("**\n");
+                message.append(main.getDiscord().escapeMarkdown(taxPayer.getName())).append(" owes **").append(main.getLangUtil().addNotation(taxPayer.getOwes())).append("**\n");
             }
 
             e.getChannel().deleteMessageById(messageId).queue();
@@ -359,6 +409,6 @@ public class TaxCommand extends Command {
             e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
             return;
         }
-        e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `info`, `setrole`!").queue();
+        e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `paidlist`, `info`, `setrole`!").queue();
     }
 }

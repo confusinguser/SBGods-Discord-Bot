@@ -69,6 +69,11 @@ public class LangUtil {
     }
 
     public String addNotation(double num) {
+        String prefix = "";
+        if(num < 0){
+            num *= -1;
+            prefix = "-";
+        }
         double returnVal;
         String[] notList = new String[]{"K", "M", "B"};
         String returnValStr = String.valueOf(num);
@@ -92,7 +97,7 @@ public class LangUtil {
                 checkNum *= 10;
             }
         }
-        return returnValStr.replace(".0", "");
+        return prefix + returnValStr.replace(".0", "");
     }
 
     /**

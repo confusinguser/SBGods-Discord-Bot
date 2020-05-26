@@ -23,8 +23,8 @@ public enum HelpMessage {
     DEATHS("deaths",
             "deaths player [IGN]",
             "Lists every death to show how pathetic the player is."), // Maybe a bit too offensive?
-
-    KILLS("kills",
+                                                                       //Soopy: Nahh, u can never be too offensive...    xD
+    KILLS("kills",                                              //edit it if you want lol
             "kills player [IGN]",
             "Lists the player's kills."),
 
@@ -108,7 +108,7 @@ public enum HelpMessage {
 
     TAX("tax",
             "tax [SUBCOMMAND]",
-            new String[]{"tax owelist", "tax info", "tax setrole", "tax paid", "tax paidall", "tax owe", "tax oweall"},
+            new String[]{"tax owelist", "tax paidlist", "tax info", "tax setrole", "tax paid", "tax paidall", "tax owe", "tax oweall"},
             "The main tax command.",
             "This will also show your tax info"),
 
