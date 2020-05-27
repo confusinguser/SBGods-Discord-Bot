@@ -12,12 +12,12 @@ import java.util.logging.*;
 
 public class SBGods {
     public static final String VERSION = "0.9.1.5";
-    public static final String VERSION_DESCRIPTION_MAJOR = ""; // Change this every major release: 0.9.6.3 -> 1.0 // Don't make bug fix major releases lmao
-    public static final String VERSION_DESCRIPTION_MINOR = "Added auto-roles"; // Change this every minor release: 0.8.11.5 -> 0.8.12 // Also, don't make bug fix minor releases, make them patches
+    public static final String VERSION_DESCRIPTION_MAJOR = ""; // Change this every major release: 0.9.6.3 -> 1.0
+    public static final String VERSION_DESCRIPTION_MINOR = "Added auto-roles"; // Change this every minor release: 0.8.11.5 -> 0.8.12
     public static final String VERSION_DESCRIPTION_PATCH = "Some QOL changes"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
     public static final String[] DEVELOPERS = {"244786205873405952", "497210228274757632"};
-    private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
-    //private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
+    //private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
+    private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
     private static SBGods instance;
     public final String[] keys = {"bc90572a-1547-41a5-8f28-d7664916a28d", "3963906e-ffb6-45b9-b07b-80ca9838eb20"};
     public final Logger logger = Logger.getLogger(this.getClass().getName());

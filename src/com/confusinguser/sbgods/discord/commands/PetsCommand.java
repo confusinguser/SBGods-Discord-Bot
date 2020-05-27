@@ -8,9 +8,7 @@ import com.confusinguser.sbgods.entities.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class PetsCommand extends Command {
 
@@ -49,7 +47,6 @@ public class PetsCommand extends Command {
         }
 
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " pets");
-        Random colorRandom = new Random();
 
         StringBuilder descriptionBuilder = embedBuilder.getDescriptionBuilder();
 
@@ -62,7 +59,7 @@ public class PetsCommand extends Command {
         }
 
         embedBuilder.setDescription(descriptionBuilder.toString());
-        embedBuilder.setColor(new Color(colorRandom.nextFloat(), colorRandom.nextFloat(), colorRandom.nextFloat()));
+        embedBuilder.setColor(0x056bad);
 
         e.getChannel().deleteMessageById(messageId).queue();
         e.getChannel().sendMessage(embedBuilder.build()).queue();

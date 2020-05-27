@@ -182,6 +182,8 @@ public class ApiUtil {
         jsonObject = jsonObject.getJSONObject("guild");
         JSONArray members = jsonObject.getJSONArray("members");
 
+        guild.setPlayerSize(members.length());
+
         for (int i = 0; i < members.length(); i++) {
             JSONObject currentMember = members.getJSONObject(i);
             String uuid = currentMember.getString("uuid");
@@ -664,7 +666,7 @@ public class ApiUtil {
         return new TaxPayer(player.getUUID(), player.getDisplayName(), player.getGuildId(), playerJson, main);
     }
 
-    public double getTotalMoneyInProfile(String profileUUID) {
+    public double getTotalCoinsInProfile(String profileUUID) {
         String response = main.getApiUtil().getResponse(main.getApiUtil().BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 600000);
         if (response == null) return 0;
         JSONObject jsonObject = new JSONObject(response);
@@ -681,6 +683,14 @@ public class ApiUtil {
             }
         }
         return totalMoney;
+    }
+
+    public double getTotalCoinsInPlayer(String playerUUID) {
+        double totalCoins = 0;
+        for (String profile : getPlayerFromUUID(playerUUID).getSkyblockProfiles()) {
+            totalCoins += getTotalCoinsInProfile(profile);
+        }
+        return totalCoins;
     }
 
     public SkyblockProfile getSkyblockProfileByProfileUUID(String profileUUID) {

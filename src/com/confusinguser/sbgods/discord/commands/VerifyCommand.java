@@ -26,21 +26,28 @@ public class VerifyCommand extends Command {
         if (args.length >= 2) {
             // Check if that is actual player ign
             Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
-            if(player == null || player.getDiscordTag() == null){
+            if (player == null || player.getDiscordTag() == null) {
                 e.getChannel().sendMessage(e.getAuthor().getAsMention() + " Could not find MC account " + args[1]).queue();
                 return;
             }
             if (player.getDiscordTag().equalsIgnoreCase(e.getAuthor().getAsTag())) {
-                int response = main.getUtil().verifyPlayer(e.getMember(), player.getDisplayName(), e.getGuild(), e.getChannel());
-                if (response == 0) {
-                    e.getChannel().sendMessage("You are already verified or you need to link your minecraft account with discord (see the welcome channel)").queue(); // TODO make this 2 different messages
-                    return;
-                } else if (response == 2) {
-                    e.getChannel().sendMessage("Bot is still loading the leaderboards! Try again in a few minutes").queue();
-                    return;
-                } else {
-                    main.logger.fine("Added " + currentDiscordServer.toString() + " verified role to " + e.getAuthor().getAsTag());
-                    return;
+                switch (main.getUtil().verifyPlayer(e.getMember(), player.getDisplayName(), e.getGuild(), e.getChannel())) {
+                    case 0:
+                        switch (currentDiscordServer) {
+                            case SBGods:
+                                e.getChannel().sendMessage("You are already verified or you need to link your minecraft account with discord (see <#711192630863855696> )").queue();
+                            case SBDGods:
+                                e.getChannel().sendMessage("You are already verified or you need to link your minecraft account with discord (see <#711462220852101170> )").queue();
+                            default:
+                                e.getChannel().sendMessage("You are already verified or you need to link your minecraft account with discord (see welcome channel )").queue();
+                        }
+                        return;
+                    case 2:
+                        e.getChannel().sendMessage("Bot is still loading the leaderboards! Try again in a few minutes").queue();
+                        return;
+                    default:
+                        main.logger.fine("Added " + currentDiscordServer.toString() + " verified role to " + e.getAuthor().getAsTag());
+                        return;
                 }
             }
 
