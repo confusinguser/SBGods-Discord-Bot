@@ -71,8 +71,9 @@ public class SkillExpCommand extends Command {
 
             StringBuilder response = new StringBuilder();
 
+            @SuppressWarnings("unchecked")
             List<Map.Entry<String, SkillLevels>> leaderboardList = usernameSkillExpHashMap.entrySet().stream()
-                    .sorted(Comparator.comparingDouble(entry -> entry.getValue().getAvgSkillLevel()))
+                    .sorted(Comparator.comparingDouble(entry -> ((Map.Entry<String, SkillLevels>) entry).getValue().getAvgSkillLevel()).reversed())
                     .collect(Collectors.toList())
                     .subList(0, topX - 1);
 
@@ -88,7 +89,7 @@ public class SkillExpCommand extends Command {
                 int totalAvgSkillExp = 0;
 
                 for (Map.Entry<String, SkillLevels> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry)).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getLangUtil().addCommas(currentEntry.getValue().getAvgSkillLevel())).append("\n\n");
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getLangUtil().addCommas(currentEntry.getValue().getAvgSkillLevel())).append("\n\n");
                     totalAvgSkillExp += currentEntry.getValue().getAvgSkillLevel();
                 }
                 if (topX == guildMemberUuids.size())

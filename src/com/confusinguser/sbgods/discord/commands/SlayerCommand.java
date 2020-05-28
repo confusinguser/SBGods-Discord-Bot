@@ -81,7 +81,7 @@ public class SlayerCommand extends Command {
             } else {
                 int totalSlayer = 0;
                 for (Entry<String, SlayerExp> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry)).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue().getTotalExp())).append("\n\n");
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue().getTotalExp())).append("\n\n");
                     totalSlayer += currentEntry.getValue().getTotalExp();
                 }
                 if (topX == guildMemberUuids.size())
