@@ -275,14 +275,19 @@ public class Util {
                 if(guildRanksChange.getJSONObject(playerJson.hashCode()).getString("uuid").equals(thePlayer.getUUID())){
                     guildRanksChange.remove(playerJson.hashCode());
 
-                    if(inSbgRank.equals("Member")
+                    main.logger.info("Player: " + thePlayer.getDisplayName());
+                    main.logger.info("CurrRank: " + inSbgRank);
+                    main.logger.info("NeedRank: " + inSbgNeededRank);
+                    main.logger.info("----------------------");
+
+                    if(/*inSbgRank.equals("Member")
                             || inSbgRank.equals("Elite")
                             || inSbgRank.equals("God")
                             || inSbgRank.equals("King")
-                            && !inSbgRank.equals(inSbgNeededRank)){
+                            &&*/ !inSbgRank.equals(inSbgNeededRank)){
                         JSONObject newPlayerJson = new JSONObject();
 
-                        newPlayerJson.put("uuid",thePlayer.getUUID());
+                        newPlayerJson.put("   uuid",thePlayer.getUUID());
                         newPlayerJson.put("name",thePlayer.getDisplayName());
                         newPlayerJson.put("currRank",inSbgRank);
                         newPlayerJson.put("needRank",inSbgNeededRank);
