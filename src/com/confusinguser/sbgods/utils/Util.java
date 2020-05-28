@@ -168,7 +168,7 @@ public class Util {
         String inSbgNeededRank = "null";
 
         if(guild != null) {
-            if (guild.equals(HypixelGuild.SBG)) {
+            if (guild == HypixelGuild.SBG) {
                 inSbg = true;
                 for (Player playerForEach : main.getApiUtil().getGuildMembers(guild)) {
                     if (playerForEach.getUUID().equals(thePlayer.getUUID())) {
@@ -270,8 +270,10 @@ public class Util {
 
         JSONArray guildRanksChange = main.getApiUtil().getGuildRanksChange();
         if(inSbg) {
-
+            main.logger.info("in sbg");
             for(Object playerJson : guildRanksChange.toList()){
+
+                main.logger.info(String.valueOf(playerJson.hashCode()));
                 if(guildRanksChange.getJSONObject(playerJson.hashCode()).getString("uuid").equals(thePlayer.getUUID())){
                     guildRanksChange.remove(playerJson.hashCode());
 
@@ -287,7 +289,7 @@ public class Util {
                             &&*/ !inSbgRank.equals(inSbgNeededRank)){
                         JSONObject newPlayerJson = new JSONObject();
 
-                        newPlayerJson.put("   uuid",thePlayer.getUUID());
+                        newPlayerJson.put("uuid",thePlayer.getUUID());
                         newPlayerJson.put("name",thePlayer.getDisplayName());
                         newPlayerJson.put("currRank",inSbgRank);
                         newPlayerJson.put("needRank",inSbgNeededRank);
