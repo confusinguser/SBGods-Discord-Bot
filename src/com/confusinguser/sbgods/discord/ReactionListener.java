@@ -126,7 +126,7 @@ public class ReactionListener extends ListenerAdapter {
             e.getChannel().sendMessage(e.getUser().getAsMention() + " the application was successfully created! It may take up to a day to get invited to the guild").complete().delete().queueAfter(30, TimeUnit.SECONDS);
             e.getChannel().deleteMessageById(messageId).queue();
 
-        }catch(Exception ex){
+        } catch (Exception ex) {
             main.logger.warning(ex.getMessage());
             e.getChannel().sendMessage(e.getUser().getAsMention() + " there was a error somewhere, get in contact with a bot dev to help fix the error.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
             e.getChannel().deleteMessageById(messageId).queue();

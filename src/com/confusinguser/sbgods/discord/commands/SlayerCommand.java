@@ -6,13 +6,12 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SlayerExp;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class SlayerCommand extends Command {
 
@@ -45,10 +44,10 @@ public class SlayerCommand extends Command {
             Map<String, SlayerExp> usernameSlayerExpHashMap = currentDiscordServer.getHypixelGuild().getSlayerExpMap();
 
             if (usernameSlayerExpHashMap.size() == 0) {
-                if (currentDiscordServer.getHypixelGuild().getSlayerProgress() == 0) {
+                if (currentDiscordServer.getHypixelGuild().getLeaderboardProgress() == 0) {
                     e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards have a higher priority)").queue();
                 } else {
-                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getSlayerProgress() + " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
+                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getLeaderboardProgress() + " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
                 }
                 return;
             }
@@ -69,17 +68,20 @@ public class SlayerCommand extends Command {
                 topX = 10;
             }
 
+            List<Entry<String, SlayerExp>> leaderboardList = usernameSlayerExpHashMap.entrySet().stream()
+                    .sorted(Comparator.comparingDouble(entry -> entry.getValue().getTotalExp()))
+                    .collect(Collectors.toList())
+                    .subList(0, topX - 1);
+
             StringBuilder response = new StringBuilder("**Slayer XP Leaderboard:**\n\n");
             if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
-                for (int i = 0; i < topX; i++) {
-                    Entry<String, SlayerExp> currentEntry = main.getUtil().getHighestKeyValuePairForSlayerExp(usernameSlayerExpHashMap, i);
+                for (Entry<String, SlayerExp> currentEntry : leaderboardList) {
                     response.append(currentEntry.getKey()).append("    ").append(main.getLangUtil().addNotation(main.getSBUtil().toSkillExp(main.getUtil().round(currentEntry.getValue().getTotalExp(), 2)))).append("\n");
                 }
             } else {
                 int totalSlayer = 0;
-                for (int i = 0; i < topX; i++) {
-                    Entry<String, SlayerExp> currentEntry = main.getUtil().getHighestKeyValuePairForSlayerExp(usernameSlayerExpHashMap, i);
-                    response.append("**#").append(Math.incrementExact(i)).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue().getTotalExp())).append("\n\n");
+                for (Entry<String, SlayerExp> currentEntry : leaderboardList) {
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry)).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue().getTotalExp())).append("\n\n");
                     totalSlayer += currentEntry.getValue().getTotalExp();
                 }
                 if (topX == guildMemberUuids.size())
@@ -88,6 +90,7 @@ public class SlayerCommand extends Command {
                     response.append("**Average slayer exp top #").append(topX).append(": ");
                 response.append(main.getLangUtil().addNotation(Math.round((double) totalSlayer / topX))).append("**");
             }
+
             String responseString = response.toString();
             // Split the message every 2000 characters in a nice looking way because of discord limitations
             List<String> responseList = main.getUtil().processMessageForDiscord(responseString, 2000);
@@ -108,34 +111,40 @@ public class SlayerCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("player")) {
-            String messageId = e.getChannel().sendMessage("...").complete().getId();
-
-            Player thePlayer;
             if (args.length >= 3) {
-                thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
-                if (thePlayer.getSkyblockProfiles().isEmpty()) {
-                    e.getChannel().editMessageById(messageId, "Player **" + args[2] + "** does not exist!").queue();
-                    return;
-                }
-
-                SlayerExp playerSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer.getUUID());
-
-                EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x51047d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " slayer xp");
-                embedBuilder.setDescription(embedBuilder.getDescriptionBuilder()
-                        .append("Total slayer xp: **").append(main.getLangUtil().addNotation(playerSlayerExp.getTotalExp())).append("**\n\n")
-                        .append("Zombie: **").append(main.getLangUtil().addNotation(playerSlayerExp.getZombie())).append("**\n")
-                        .append("Spider: **").append(main.getLangUtil().addNotation(playerSlayerExp.getSpider())).append("**\n")
-                        .append("Wolf: **").append(main.getLangUtil().addNotation(playerSlayerExp.getWolf())).append("**\n")
-                        .toString());
-
-                e.getChannel().deleteMessageById(messageId).queue();
-                e.getChannel().sendMessage(embedBuilder.build()).queue();
-            } else {
-                e.getChannel().editMessageById(messageId, "Invalid usage! Usage: *" + this.getName() + " player <IGN>*").queue();
+                player(args, e.getChannel());
             }
-            return;
         }
 
         e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
+    }
+
+    public void player(String[] args, MessageChannel channel) {
+        if (args.length >= 3) {
+            Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
+            if (thePlayer.getUUID() == null) {
+                channel.sendMessage("Player **" + args[2] + "** does not exist!").queue();
+                return;
+            }
+            if (thePlayer.getSkyblockProfiles().isEmpty()) {
+                channel.sendMessage("Player **" + args[2] + "** has never played Skyblock!").queue();
+                return;
+            }
+
+            SlayerExp playerSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer.getUUID());
+
+            EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x51047d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " slayer xp");
+            embedBuilder.setDescription(embedBuilder.getDescriptionBuilder()
+                    .append("Total slayer xp: **").append(main.getLangUtil().addNotation(playerSlayerExp.getTotalExp())).append("**\n\n")
+
+                    .append("Zombie: **").append(main.getLangUtil().addNotation(playerSlayerExp.getZombie())).append("**\n")
+                    .append("Spider: **").append(main.getLangUtil().addNotation(playerSlayerExp.getSpider())).append("**\n")
+                    .append("Wolf:   **").append(main.getLangUtil().addNotation(playerSlayerExp.getWolf())).append("**\n")
+                    .toString());
+
+            channel.sendMessage(embedBuilder.build()).queue();
+        } else {
+            channel.sendMessage("Invalid usage! Usage: `" + this.getName() + " player <IGN>`").queue();
+        }
     }
 }

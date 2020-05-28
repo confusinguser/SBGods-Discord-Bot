@@ -5,11 +5,10 @@ import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HelpMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-import java.awt.*;
 import java.util.Arrays;
-import java.util.Random;
 
 public class HelpCommand extends Command {
 
@@ -33,25 +32,20 @@ public class HelpCommand extends Command {
         }
 
         EmbedBuilder embedBuilder = new EmbedBuilder().setTitle("SBGods Discord Bot Help Page");
-        Random colorRandom = new Random();
-        embedBuilder = embedBuilder.setDescription(embedBuilder.getDescriptionBuilder()
-                .append("verify <IGN>: \t**Verify yourself**\n")
-                .append("slayer leaderboard [length / all]: \t**Shows slayer XP leaderboard**\n")
-                .append("slayer player <IGN>: \t**Shows a specific player's slayer XP**\n\n")
-                .append("skill leaderboard [length / all]:  \t**Shows average skill level leaderboard**\n")
-                .append("skill player <IGN>: \t**Shows a specific player's average skill level**\n\n")
-                .append("player <IGN>: \t**Shows the player's stats and position on the leaderboards**\n\n")
-                .append("pets <IGN>: \t**Shows a specific player's pets**\n\n")
-                .append("player <IGN>: \t**Shows stats of a specific player**\n\n")
-                .append("whatguild <IGN>: \t**Shows a specific player's guild**\n\n")
-                .append("tax: \t**Check how much tax a player owes**\n")
-                .append("tax info <IGN>: \t**Check how much tax a player owes**\n")
-                .append("tax owelist: \t**Shows a leaderboard with who owes the most**\n\n")
-                .append("ah <IGN>: \t**Shows the player's auctions**\n\n")
-                .append("help <COMMAND>: \t**Shows the help for a specific command**\n\n")
-                .toString())
-                .setColor(new Color(colorRandom.nextFloat(), colorRandom.nextFloat(), colorRandom.nextFloat()))
-                .setFooter("Version " + SBGods.VERSION);
+        embedBuilder.addBlankField(false);
+        embedBuilder.addField("**Use **`-help [COMMAND]`** to find out more about a command**", "", false);
+        StringBuilder description = new StringBuilder();
+
+        for (HelpMessage helpMessage : HelpMessage.values()) {
+            if (!helpMessage.getCommand().contains(" ") && !helpMessage.getCommand().equals("help") &&
+                    (!helpMessage.getHelpLines()[helpMessage.getHelpLines().length-1].equals("Requires to be a bot dev or server admin to use.") ||
+                            (e.getMember() != null && e.getMember().hasPermission(Permission.MANAGE_SERVER, Permission.MANAGE_ROLES)))) {
+                description.append(helpMessage.getUsage()).append(": \t**").append(helpMessage.getHelpLines()[0]).append("**\n\n");
+            }
+        }
+        embedBuilder.setDescription(description.toString());
+        embedBuilder.setColor(0xe3a702);
+        embedBuilder.setFooter("Version " + SBGods.VERSION);
 
         e.getChannel().sendMessage(embedBuilder.build()).queue();
     }

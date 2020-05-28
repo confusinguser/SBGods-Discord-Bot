@@ -4,9 +4,6 @@ import com.confusinguser.sbgods.SBGods;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
-import java.awt.*;
-import java.util.Random;
-
 public enum HelpMessage {
 
     //<editor-fold defaultstate="collapsed" desc="All -help [COMMAND] data">
@@ -22,9 +19,8 @@ public enum HelpMessage {
 
     DEATHS("deaths",
             "deaths player [IGN]",
-            "Lists every death to show how pathetic the player is."), // Maybe a bit too offensive?
-                                                                       //Soopy: Nahh, u can never be too offensive...    xD
-    KILLS("kills",                                              //edit it if you want lol
+            "Lists the player's kills."),
+    KILLS("kills",
             "kills player [IGN]",
             "Lists the player's kills."),
 
@@ -81,7 +77,7 @@ public enum HelpMessage {
             "Shows the guild's skill leaderboard."),
 
     SKILLEXP("skillexp",
-            "skill [SUBCOMMAND]",
+            "skillexp [SUBCOMMAND]",
             new String[]{"skillexp player [IGN]", "skillexp leaderboard [LENGTH | all]"},
             "The main skillexp command."),
 
@@ -148,7 +144,7 @@ public enum HelpMessage {
             "",
             "Requires to be a bot dev or server admin to use."),
 
-    TAX_OWEALL("tax",
+    TAX_OWEALL("tax oweall",
             "tax [SUBCOMMAND]",
             "Sets everyone as owing that amount of tax. (Additive)",
             "",
@@ -181,11 +177,25 @@ public enum HelpMessage {
             "verify [IGN]",
             "Will verify you based of the given ign.",
             "If no ign is given it will attempt to auto-get your ign.",
-            "Auto-getting someone's ign will not work 90% of the time."),
+            "Auto-getting someone's ign will not work if the person hasn't been requested by the bot before."),
 
     WHATGUILD("whatguild",
             "whatguild [IGN]",
-            "Lists the guild that the player is in");
+            "Lists the guild that the player is in"),
+
+    BANK("bank",
+            "bank [SUBCOMMAND]",
+            new String[]{"bank player [IGN]", "bank leaderboard [LENGTH | all]"},
+            "The main bank command."),
+
+    BANK_PLAYER("bank player",
+            "bank player [IGN]",
+            "Shows a player's coins and how much everyone in the coop has contributed."),
+
+    BANK_LEADERBOARD("bank leaderboard",
+            "bank leaderboard [LENGTH | all]",
+            "Shows the guild's coin leaderboard.");
+
     //</editor-fold>
 
     private final SBGods main = SBGods.getInstance();
@@ -199,6 +209,9 @@ public enum HelpMessage {
         this.command = command;
         this.usage = usage;
         this.subCommands = subCommands;
+        if (lines.length == 0) {
+            throw new IllegalArgumentException("Lines cannot be empty");
+        }
         this.helpLines = lines;
     }
 
@@ -238,8 +251,7 @@ public enum HelpMessage {
         EmbedBuilder embedBuilder = new EmbedBuilder();
 
         embedBuilder.setTitle("`" + command + "` command help.");
-        Random colorRandom = new Random();
-        embedBuilder.setColor(new Color(colorRandom.nextFloat(), colorRandom.nextFloat(), colorRandom.nextFloat()));
+        embedBuilder.setColor(ordinal() % 2 == 0 ? 0xad8105 : 0x050bad);
         embedBuilder.addField("Usage", "`" + main.getDiscord().commandPrefix + usage + "`", false);
         if (subCommands.length > 0) {
             embedBuilder.addField("Sub-commands", "`" + main.getDiscord().commandPrefix + String.join("`\n`" + main.getDiscord().commandPrefix, subCommands) + "`", false);

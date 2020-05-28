@@ -14,9 +14,9 @@ public enum HypixelGuild {
     private int playerSize = 125;
 
     private Map<String, SkillLevels> skillExpMap = new HashMap<>();
-    private Map<String, SlayerExp> slayerExpHashmap = new HashMap<>();
-    private int slayerProgress;
-    private int skillProgress;
+    private Map<String, SlayerExp> slayerExpMap = new HashMap<>();
+    private Map<String, Double> totalCoinsMap = new HashMap<>();
+    private int leaderboardProgress;
 
     HypixelGuild(String guildId, int slayerReq, int skillReq, String... names) {
         this.guildId = guildId;
@@ -49,16 +49,24 @@ public enum HypixelGuild {
         return skillExpMap;
     }
 
-    public void setAvgSkillLevelHashMap(Map<String, SkillLevels> skillExpMap) {
-        this.skillExpMap = skillExpMap;
+    public void setAvgSkillLevelMap(Map<String, SkillLevels> skillLevelMap) {
+        this.skillExpMap = skillLevelMap;
     }
 
     public Map<String, SlayerExp> getSlayerExpMap() {
-        return slayerExpHashmap;
+        return slayerExpMap;
     }
 
-    public void setSlayerExpHashMap(Map<String, SlayerExp> slayerExpMap) {
-        this.slayerExpHashmap = slayerExpMap;
+    public void setSlayerExpMap(Map<String, SlayerExp> slayerExpMap) {
+        this.slayerExpMap = slayerExpMap;
+    }
+
+    public Map<String, Double> getTotalCoinsMap() {
+        return totalCoinsMap;
+    }
+
+    public void setTotalCoinsMap(Map<String, Double> totalCoinsMap) {
+        this.totalCoinsMap = totalCoinsMap;
     }
 
     public boolean isAltNameIgnoreCase(String input) {
@@ -86,20 +94,12 @@ public enum HypixelGuild {
         return slayerReq;
     }
 
-    public int getSlayerProgress() {
-        return slayerProgress;
+    public int getLeaderboardProgress() {
+        return leaderboardProgress;
     }
 
-    public void setSlayerProgress(int slayerProgress) {
-        this.slayerProgress = slayerProgress;
-    }
-
-    public int getSkillProgress() {
-        return skillProgress;
-    }
-
-    public void setSkillProgress(int skillProgress) {
-        this.skillProgress = skillProgress;
+    public void setLeaderboardProgress(int leaderboardProgress) {
+        this.leaderboardProgress = leaderboardProgress;
     }
 
     public String getDisplayName() {

@@ -24,10 +24,10 @@ public class SlayerExp {
         this.totalExp = 0;
     }
 
-    public SlayerExp(Map<String, Integer> slayerHashMap) {
-        this.zombie = slayerHashMap.getOrDefault("zombie", 0);
-        this.spider = slayerHashMap.getOrDefault("spider", 0);
-        this.wolf = slayerHashMap.getOrDefault("wolf", 0);
+    public SlayerExp(Map<String, Integer> slayerMap) {
+        this.zombie = slayerMap.getOrDefault("zombie", 0);
+        this.spider = slayerMap.getOrDefault("spider", 0);
+        this.wolf = slayerMap.getOrDefault("wolf", 0);
         this.totalExp = zombie + spider + wolf;
     }
 

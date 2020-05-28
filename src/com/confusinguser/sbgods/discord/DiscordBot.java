@@ -41,12 +41,29 @@ public class DiscordBot {
         verifyAllCommand = new VerifyAllCommand(main, this);
         TaxCommand taxCommand = new TaxCommand(main, this);
         PlayerCommand playerCommand = new PlayerCommand(main, this);
-        CoopBankCommand coopBankCommand = new CoopBankCommand(main, this);
+        BankCommand bankCommand = new BankCommand(main, this);
 
         MessageListener messageListener = new MessageListener(main, this);
         ReactionListener reactionListener = new ReactionListener(main, this);
 
-        commands = new ArrayList<>(Arrays.asList(slayerCommand, skillCommand, skillExpCommand, helpCommand, sbgodsCommand, whatguildCommand, petsCommand, killsCommand, deathsCommand, ahCommand, verifyCommand, verifyAllCommand, taxCommand, playerCommand, coopBankCommand, messageListener, reactionListener));
+        commands = new ArrayList<>(Arrays.asList(
+                slayerCommand,
+                skillCommand,
+                skillExpCommand,
+                helpCommand,
+                sbgodsCommand,
+                whatguildCommand,
+                petsCommand,
+                killsCommand,
+                deathsCommand,
+                ahCommand,
+                verifyCommand,
+                verifyAllCommand,
+                taxCommand,
+                playerCommand,
+                messageListener,
+                reactionListener
+        ));
 
         JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT)
                 .setToken(token)

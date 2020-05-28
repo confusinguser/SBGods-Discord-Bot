@@ -59,16 +59,17 @@ public class TaxCommand extends Command {
                 return;
             }
 
-            int amount = 0;
-
+            int amount;
             try {
                 amount = -Integer.parseInt(args[3]);
-            }catch(NumberFormatException err) {
-                if (args[3].endsWith("k")) {
-                    amount = -Integer.parseInt(args[3].replace("k","")) * 1000;
-                }
-                if (args[3].endsWith("m")) {
-                    amount = -Integer.parseInt(args[3].replace("m","")) * 1000000;
+            } catch (NumberFormatException err) {
+                if (args[3].toLowerCase().endsWith("k")) {
+                    amount = -Integer.parseInt(args[3].toLowerCase().replace("k", "")) * 1000;
+                } else if (args[3].toLowerCase().endsWith("m")) {
+                    amount = -Integer.parseInt(args[3].toLowerCase().replace("m", "")) * 1000000;
+                } else {
+                    e.getChannel().sendMessage("Invalid amount! Usage: `" + discord.commandPrefix + name + " paid <IGN> <AMOUNT>`!").queue();
+                    return;
                 }
             }
 
@@ -103,12 +104,12 @@ public class TaxCommand extends Command {
 
             try {
                 amount = -Integer.parseInt(args[2]);
-            }catch(NumberFormatException err) {
+            } catch (NumberFormatException err) {
                 if (args[3].endsWith("k")) {
-                    amount = -Integer.parseInt(args[2].replace("k","")) * 1000;
+                    amount = -Integer.parseInt(args[2].replace("k", "")) * 1000;
                 }
                 if (args[3].endsWith("m")) {
-                    amount = -Integer.parseInt(args[2].replace("m","")) * 1000000;
+                    amount = -Integer.parseInt(args[2].replace("m", "")) * 1000000;
                 }
             }
             String role = "";
@@ -188,12 +189,12 @@ public class TaxCommand extends Command {
 
             try {
                 amount = Integer.parseInt(args[3]);
-            }catch(NumberFormatException err) {
+            } catch (NumberFormatException err) {
                 if (args[3].endsWith("k")) {
-                    amount = Integer.parseInt(args[3].replace("k","")) * 1000;
+                    amount = Integer.parseInt(args[3].replace("k", "")) * 1000;
                 }
                 if (args[3].endsWith("m")) {
-                    amount = Integer.parseInt(args[3].replace("m","")) * 1000000;
+                    amount = Integer.parseInt(args[3].replace("m", "")) * 1000000;
                 }
             }
 
@@ -204,7 +205,7 @@ public class TaxCommand extends Command {
 
             e.getChannel().deleteMessageById(messageId).queue();
 
-            e.getChannel().sendMessage("Success, this is the players current tax info:").queue();
+            e.getChannel().sendMessage("Success, this is the player's current tax info:").queue();
 
             e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
 
@@ -227,12 +228,12 @@ public class TaxCommand extends Command {
 
             try {
                 amount = Integer.parseInt(args[2]);
-            }catch(NumberFormatException err) {
+            } catch (NumberFormatException err) {
                 if (args[3].endsWith("k")) {
-                    amount = Integer.parseInt(args[2].replace("k","")) * 1000;
+                    amount = Integer.parseInt(args[2].replace("k", "")) * 1000;
                 }
                 if (args[3].endsWith("m")) {
-                    amount = Integer.parseInt(args[2].replace("m","")) * 1000000;
+                    amount = Integer.parseInt(args[2].replace("m", "")) * 1000000;
                 }
             }
             if (args.length == 4) {

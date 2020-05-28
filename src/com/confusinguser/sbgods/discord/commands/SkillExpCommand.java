@@ -9,8 +9,10 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class SkillExpCommand extends Command {
 
@@ -43,10 +45,10 @@ public class SkillExpCommand extends Command {
             Map<String, SkillLevels> usernameSkillExpHashMap = currentDiscordServer.getHypixelGuild().getSkillExpMap();
 
             if (usernameSkillExpHashMap.size() == 0) {
-                if (currentDiscordServer.getHypixelGuild().getSkillProgress() == 0) {
+                if (currentDiscordServer.getHypixelGuild().getLeaderboardProgress() == 0) {
                     e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards have a higher priority)").queue();
                 } else {
-                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getSkillProgress() + " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
+                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getLeaderboardProgress() + " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
                 }
                 return;
             }
@@ -69,10 +71,14 @@ public class SkillExpCommand extends Command {
 
             StringBuilder response = new StringBuilder();
 
+            List<Map.Entry<String, SkillLevels>> leaderboardList = usernameSkillExpHashMap.entrySet().stream()
+                    .sorted(Comparator.comparingDouble(entry -> entry.getValue().getAvgSkillLevel()))
+                    .collect(Collectors.toList())
+                    .subList(0, topX - 1);
+
             // print it like a spreadsheet
             if (spreadsheet) {
-                for (int i = 0; i < topX; i++) {
-                    Map.Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillExpHashMap, i, true);
+                for (Map.Entry<String, SkillLevels> currentEntry : leaderboardList) {
                     if (!currentEntry.getValue().isApproximate()) {
                         response.append(currentEntry.getKey()).append("    ").append(main.getSBUtil().toSkillExp(currentEntry.getValue().getAvgSkillLevel())).append("\n");
                     }
@@ -80,20 +86,16 @@ public class SkillExpCommand extends Command {
             } else {
                 response.append("**Average Skill XP leaderboard:**\n\n");
                 int totalAvgSkillExp = 0;
-                for (int i = 0; i < topX; i++) {
-                    Map.Entry<String, SkillLevels> currentEntry = main.getUtil().getHighestKeyValuePair(usernameSkillExpHashMap, i, true);
-                    response.append("**#").append(Math.incrementExact(i)).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getSBUtil().toSkillExp(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2)));
-                    if (currentEntry.getValue().isApproximate()) {
-                        response.append(" *(appr.)*");
-                    }
-                    response.append("\n\n");
+
+                for (Map.Entry<String, SkillLevels> currentEntry : leaderboardList) {
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry)).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getLangUtil().addCommas(currentEntry.getValue().getAvgSkillLevel())).append("\n\n");
                     totalAvgSkillExp += currentEntry.getValue().getAvgSkillLevel();
                 }
                 if (topX == guildMemberUuids.size())
-                    response.append("**Average guild skill xp: ");
+                    response.append("**Average guild slayer exp: ");
                 else
-                    response.append("**Average skill xp top #").append(topX).append(": ");
-                response.append(main.getSBUtil().toSkillExp(main.getUtil().round((double) totalAvgSkillExp / topX, 2))).append("**");
+                    response.append("**Average slayer exp top #").append(topX).append(": ");
+                response.append(main.getLangUtil().addNotation(Math.round((double) totalAvgSkillExp / topX))).append("**");
             }
 
             String responseString = response.toString();
@@ -141,7 +143,7 @@ public class SkillExpCommand extends Command {
                 }
 
                 EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x03731d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " skill xp");
-                StringBuilder descriptionBuilder = embedBuilder.getDescriptionBuilder();
+                StringBuilder descriptionBuilder = new StringBuilder();
 
                 if (highestSkillLevels.isApproximate()) {
                     descriptionBuilder.append("Approximate average skill xp: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getAvgSkillLevel())).append("\n\n");
@@ -150,13 +152,13 @@ public class SkillExpCommand extends Command {
                 }
 
                 descriptionBuilder
-                        .append("Farming: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getFarming()) + '\n')
-                        .append("Mining: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getMining()) + '\n')
-                        .append("Combat: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getCombat()) + '\n')
-                        .append("Foraging: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getForaging()) + '\n')
-                        .append("Fishing: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getFishing()) + '\n')
-                        .append("Enchanting: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getEnchanting()) + '\n');
-                if (highestSkillLevels.isApproximate())
+                        .append("Farming: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getFarming())).append('\n')
+                        .append("Mining: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getMining())).append('\n')
+                        .append("Combat: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getCombat())).append('\n')
+                        .append("Foraging: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getForaging())).append('\n')
+                        .append("Fishing: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getFishing())).append('\n')
+                        .append("Enchanting: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getEnchanting())).append('\n');
+                if (!highestSkillLevels.isApproximate())
                     descriptionBuilder.append("Taming: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getTaming())).append('\n');
                 descriptionBuilder.append("Alchemy: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getAlchemy())).append('\n');
 

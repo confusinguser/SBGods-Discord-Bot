@@ -2,9 +2,13 @@ package com.confusinguser.sbgods.utils;
 
 import com.confusinguser.sbgods.SBGods;
 
+import java.util.regex.Pattern;
+
 public class LangUtil {
 
     private final SBGods main;
+
+    private final Pattern addCommaPattern = Pattern.compile("\\d{1,3}(?=(\\d{3})+(?=\\.))");
 
     public LangUtil(SBGods main) {
         this.main = main;
@@ -70,7 +74,7 @@ public class LangUtil {
 
     public String addNotation(double num) {
         String prefix = "";
-        if(num < 0){
+        if (num < 0) {
             num *= -1;
             prefix = "-";
         }
@@ -101,11 +105,21 @@ public class LangUtil {
     }
 
     /**
+     * Adds commas to a number
+     *
+     * @param num The number (eg. 150385.6725)
+     * @return Returns the number but with commas (eg. 150,385.6725)
+     */
+    public String addCommas(double num) {
+        return addCommaPattern.matcher(String.valueOf(num)).replaceAll("$1,");
+    }
+
+    /**
      * Makes a unicode progress bar with ■ and □
      *
      * @param amountDone  A double between 0 and 1 representing the progress of the bar
-     * @param lengthOfBar The total length of
-     * @return
+     * @param lengthOfBar The total length of the progress bar
+     * @return The unicode progress bar using the arguments
      */
     public String getProgressBar(double amountDone, int lengthOfBar) {
         String returnVal = "";
@@ -139,5 +153,23 @@ public class LangUtil {
         }
 
         return output.toString();
+    }
+
+    /**
+     * @param notationString The string to get the integer from
+     * @return The integer, or -1 if {@code notationString} did not have a valid notation
+     */
+    public int notationToInt(String notationString) {
+        try {
+            return Integer.parseInt(notationString);
+        } catch (NumberFormatException err) {
+            if (notationString.toLowerCase().endsWith("k")) {
+                return Integer.parseInt(notationString.toLowerCase().replace("k", "")) * 1000;
+            } else if (notationString.toLowerCase().endsWith("m")) {
+                return Integer.parseInt(notationString.toLowerCase().replace("m", "")) * 1000000;
+            } else {
+                return -1;
+            }
+        }
     }
 }

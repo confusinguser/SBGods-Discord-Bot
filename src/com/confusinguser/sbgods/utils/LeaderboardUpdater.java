@@ -21,7 +21,7 @@ public class LeaderboardUpdater {
         this.main = main;
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             for (HypixelGuild hypixelGuild : HypixelGuild.values())
-                updateLeaderboardCacheForGuild(hypixelGuild);
+                updateLeaderboardCache(hypixelGuild);
         }, 0, 9, TimeUnit.MINUTES);
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             try {
@@ -30,56 +30,29 @@ public class LeaderboardUpdater {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-        }, 10, 720, TimeUnit.MINUTES); // Every 12h
+        }, 10, 360, TimeUnit.MINUTES); // Every 6h
     }
 
-    private void updateLeaderboardCacheForGuild(HypixelGuild guild) {
-        guild.setSlayerExpHashMap(getSlayerXPHashMap(guild));
-        guild.setAvgSkillLevelHashMap(getAvgSkillLevelHashMap(guild));
-    }
+    private void updateLeaderboardCache(HypixelGuild guild) {
+        Map<String, SkillLevels> skillLevelMap = new HashMap<>();
+        Map<String, SlayerExp> slayerExpMap = new HashMap<>();
+        Map<String, Double> totalCoinsMap = new HashMap<>();
 
-    private Map<String, SkillLevels> getAvgSkillLevelHashMap(HypixelGuild guild) {
-        Map<String, SkillLevels> usernameSkillLevels = new HashMap<>();
         ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
-        guild.setPlayerSize(guildMembers.size());
 
-        for (int i = 0; i < guildMembers.size(); i++) {
-            Player thePlayer = main.getApiUtil().getPlayerFromUUID(guildMembers.get(i).getUUID());
-
-            SkillLevels highestSkillLevels = new SkillLevels();
-            // Get avg. skill level of the profile that has the highest
-            for (String profile : thePlayer.getSkyblockProfiles()) {
-
-                SkillLevels skillLevels = main.getApiUtil().getProfileSkills(profile, thePlayer.getUUID());
-                if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
-                    highestSkillLevels = skillLevels;
-                }
-
-                if (highestSkillLevels.getAvgSkillLevel() == 0) {
-                    skillLevels = main.getApiUtil().getProfileSkillsAlternate(thePlayer.getUUID());
-
-                    if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
-                        highestSkillLevels = skillLevels;
-                    }
-                }
-            }
-            usernameSkillLevels.put(thePlayer.getDisplayName(), highestSkillLevels);
-            guild.setSkillProgress(i + 1);
+        int i = 0;
+        for (Player guildMember : guildMembers) {
+            Player thePlayer = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
+            SkillLevels highestSkillLevels = main.getApiUtil().getBestProfileSkillLevels(thePlayer.getUUID());
+            SlayerExp totalSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer.getUUID());
+            double totalCoins = main.getApiUtil().getTotalCoinsInPlayer(thePlayer.getUUID());
+            skillLevelMap.put(thePlayer.getDisplayName(), highestSkillLevels == null ? new SkillLevels() : highestSkillLevels);
+            slayerExpMap.put(thePlayer.getDisplayName(), totalSlayerExp);
+            totalCoinsMap.put(thePlayer.getDisplayName(), totalCoins);
+            guild.setLeaderboardProgress(i++);
         }
-        return usernameSkillLevels;
-    }
-
-    private Map<String, SlayerExp> getSlayerXPHashMap(HypixelGuild guild) {
-        Map<String, SlayerExp> usernameSlayerXP = new HashMap<>();
-        ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
-        guild.setPlayerSize(guildMembers.size());
-
-        for (int i = 0; i < guildMembers.size(); i++) {
-            String UUID = guildMembers.get(i).getUUID();
-            Player thePlayer = main.getApiUtil().getPlayerFromUUID(UUID);
-            usernameSlayerXP.put(thePlayer.getDisplayName(), main.getApiUtil().getPlayerSlayerExp(UUID));
-            guild.setSlayerProgress(i + 1);
-        }
-        return usernameSlayerXP;
+        guild.setSlayerExpMap(slayerExpMap);
+        guild.setAvgSkillLevelMap(skillLevelMap);
+        guild.setTotalCoinsMap(totalCoinsMap);
     }
 }
