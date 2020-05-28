@@ -13,6 +13,8 @@ public class Player {
     private final String UUID;
     private final String displayName;
     private final String discordTag;
+    private String guildRank = null;
+    private int guildJoined = 0;
     private final boolean online;
     private final SBGods main;
     private final List<String> skyblockProfiles;
@@ -35,6 +37,17 @@ public class Player {
         this.skyblockProfiles = skyblockProfiles;
     }
 
+    public Player(String uuid, SBGods main, String guildRank, int guildJoined) {
+        this.UUID = uuid;
+        this.displayName = null;
+        this.discordTag = null;
+        this.guildJoined = guildJoined;
+        this.guildRank = guildRank;
+        this.online = false;
+        this.main = main;
+        this.skyblockProfiles = null;
+    }
+
     public String getUUID() {
         return UUID;
     }
@@ -48,6 +61,14 @@ public class Player {
 
     public String getDisplayName() {
         return displayName;
+    }
+
+    public String getGuildRank() {
+        return guildRank;
+    }
+
+    public int getGuildJoined() {
+        return guildJoined;
     }
 
     public String getDiscordTag() {

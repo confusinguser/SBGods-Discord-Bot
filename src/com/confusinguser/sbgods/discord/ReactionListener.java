@@ -116,6 +116,7 @@ public class ReactionListener extends ListenerAdapter {
             embedBuilder.setThumbnail("https://visage.surgeplay.com/bust/" + player.getUUID());
             embedBuilder.appendDescription("Slayer exp: " + main.getLangUtil().addNotation(slayerExp.getTotalExp()));
             embedBuilder.appendDescription("\nAvg. skill level: " + main.getUtil().round(skillLevels.getAvgSkillLevel(), 2));
+            embedBuilder.appendDescription("\nDiscord: " + e.getUser().getAsMention());
             embedBuilder.setTimestamp(new Date().toInstant());
             ((TextChannel) e.getGuild().getChannels().stream().filter(channel -> channel.getName().contains("accepted-applications"))
                     .collect(Collectors.toList()).get(0))

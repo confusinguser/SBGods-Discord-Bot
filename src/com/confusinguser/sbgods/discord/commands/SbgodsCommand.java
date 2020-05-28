@@ -40,15 +40,9 @@ public class SbgodsCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("test") && currentDiscordServer.equals(DiscordServer.Test)) {
-            if (args.length == 3) {
-                for (Role role : e.getGuild().getRolesByName("Admin", true)) {
-                    e.getGuild().removeRoleFromMember(e.getMember(), role).queue();
-                }
-                return;
-            }
 
-            for (Role role : e.getGuild().getRolesByName("Admin", true)) {
-                e.getGuild().addRoleToMember(e.getMember(), role).queue();
+            for (Role role : e.getGuild().getRolesByName("Role name", true)) {
+                e.getGuild().addRoleToMember(e.getGuild().getMemberByTag("Player"), role).queue();
             }
             return;
         }

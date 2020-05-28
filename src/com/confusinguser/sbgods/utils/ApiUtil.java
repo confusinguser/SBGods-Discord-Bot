@@ -185,7 +185,9 @@ public class ApiUtil {
         for (int i = 0; i < members.length(); i++) {
             JSONObject currentMember = members.getJSONObject(i);
             String uuid = currentMember.getString("uuid");
-            output.add(new Player(uuid, null, null, false, null, main));
+            String guildRank = currentMember.getString("rank");
+            int guildJoined = currentMember.getInt("joined");
+            output.add(new Player(uuid, main, guildRank, guildJoined));
         }
 
         return output;
@@ -364,6 +366,7 @@ public class ApiUtil {
         HashMap<String, Integer> skillMap = new HashMap<>();
         for (String skill_type : Constants.alternate_skill_types) {
             try {
+                skillMap.put(main.getSBUtil().alternateToNormalSkillTypes(skill_type), main.getSBUtil().toSkillExp(jsonObject.getInt("skyblock_" + skill_type)));
                 skillMap.put(main.getSBUtil().alternateToNormalSkillTypes(skill_type), main.getSBUtil().toSkillExp(jsonObject.getInt("skyblock_" + skill_type)));
             } catch (JSONException e) {
                 skillMap.put(skill_type, 0);
@@ -632,6 +635,37 @@ public class ApiUtil {
 
         try {
             URL url = new URL("https://soopymc.my.to/api/sbgDiscord/updateTaxData.json?key=HoVoiuWfpdAjJhfTj0YN");
+
+            URLConnection con = url.openConnection();
+            HttpURLConnection http = (HttpURLConnection) con;
+            http.setRequestMethod("POST"); // PUT is another valid option
+            http.setDoOutput(true);
+
+            byte[] out = dataString.getBytes(StandardCharsets.UTF_8);
+            int length = out.length;
+
+            http.setFixedLengthStreamingMode(length);
+            http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            http.connect();
+            try (OutputStream os = http.getOutputStream()) {
+                os.write(out);
+            }
+
+        } catch (IOException e) {
+            main.logger.warning("Could not set tax data: " + e.getMessage() + e);
+        }
+    }
+    public JSONArray getGuildRanksChange() {
+        return new JSONObject(getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getGuildRanksChange.json?key=HoVoiuWfpdAjJhfTj0YN")).getJSONArray("data");
+    }
+
+    public void setGuildRanksChange(JSONArray data) {
+        IOException ioException = null;
+
+        String dataString = data.toString(4);
+
+        try {
+            URL url = new URL("https://soopymc.my.to/api/sbgDiscord/setGuildRanksChange.json?key=HoVoiuWfpdAjJhfTj0YN");
 
             URLConnection con = url.openConnection();
             HttpURLConnection http = (HttpURLConnection) con;

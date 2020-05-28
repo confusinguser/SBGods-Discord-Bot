@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class Util {
@@ -162,6 +163,21 @@ public class Util {
         }
         HypixelGuild guild = HypixelGuild.getGuildById(guildId);
 
+        boolean inSbg = false;
+        String inSbgRank = null;
+        String inSbgNeededRank = "null";
+
+        if(guild != null) {
+            if (guild.equals(HypixelGuild.SBG)) {
+                inSbg = true;
+                for (Player playerForEach : main.getApiUtil().getGuildMembers(guild)) {
+                    if (playerForEach.getUUID().equals(thePlayer.getUUID())) {
+                        inSbgRank = playerForEach.getGuildRank();
+                    }
+                }
+            }
+        }
+
         for (Role role : discord.getRoles().stream().filter(role -> guild != null && guild.isAltNameIgnoreCase(role.getName())).collect(Collectors.toList())) {
             try {
                 discord.addRoleToMember(member, role).queue();
@@ -190,6 +206,10 @@ public class Util {
                         discord.addRoleToMember(member, role).queue();
                     } catch (HierarchyException ignored) {
                     }
+
+                    if(inSbgNeededRank.equals("null")){
+                        inSbgNeededRank = "God";
+                    }
                 }
             } else {
                 for (Role role : discord.getRoles().stream()
@@ -206,6 +226,10 @@ public class Util {
                     try {
                         discord.addRoleToMember(member, role).queue();
                     } catch (HierarchyException ignored) {
+                    }
+
+                    if(inSbgNeededRank.equals("null")){
+                        inSbgNeededRank = "King";
                     }
                 }
             } else {
@@ -236,9 +260,49 @@ public class Util {
                         discord.removeRoleFromMember(member, role).queue();
                     } catch (HierarchyException ignored) {
                     }
+
+                    if(inSbgNeededRank.equals("null")){
+                        inSbgNeededRank = "Elite";
+                    }
                 }
             }
         }
+
+        JSONArray guildRanksChange = main.getApiUtil().getGuildRanksChange();
+        if(inSbg) {
+
+            for(Object playerJson : guildRanksChange.toList()){
+                if(guildRanksChange.getJSONObject(playerJson.hashCode()).getString("uuid").equals(thePlayer.getUUID())){
+                    guildRanksChange.remove(playerJson.hashCode());
+
+                    if(inSbgRank.equals("Member")
+                            || inSbgRank.equals("Elite")
+                            || inSbgRank.equals("God")
+                            || inSbgRank.equals("King")
+                            && !inSbgRank.equals(inSbgNeededRank)){
+                        JSONObject newPlayerJson = new JSONObject();
+
+                        newPlayerJson.put("uuid",thePlayer.getUUID());
+                        newPlayerJson.put("name",thePlayer.getDisplayName());
+                        newPlayerJson.put("currRank",inSbgRank);
+                        newPlayerJson.put("needRank",inSbgNeededRank);
+
+                        guildRanksChange.put(newPlayerJson);
+                    }
+                }
+            }
+
+        }else{
+
+            for(Object playerJson : guildRanksChange.toList()){
+                if(guildRanksChange.getJSONObject(playerJson.hashCode()).getString("uuid").equals(thePlayer.getUUID())){
+                    guildRanksChange.remove(playerJson.hashCode());
+                }
+            }
+
+        }
+        main.getApiUtil().setGuildRanksChange(guildRanksChange);
+
 
         if (sendMsg) {
             if (guild == null) {
