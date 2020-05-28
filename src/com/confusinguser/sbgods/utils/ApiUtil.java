@@ -657,6 +657,7 @@ public class ApiUtil {
             main.logger.warning("Could not set tax data: " + e.getMessage() + e);
         }
     }
+
     public JSONArray getGuildRanksChange() {
         return new JSONObject(getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getGuildRanksChange.json?key=HoVoiuWfpdAjJhfTj0YN")).getJSONArray("data");
     }

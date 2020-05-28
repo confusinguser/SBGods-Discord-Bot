@@ -13,11 +13,11 @@ public class Player {
     private final String UUID;
     private final String displayName;
     private final String discordTag;
-    private String guildRank = null;
-    private int guildJoined = 0;
     private final boolean online;
     private final SBGods main;
     private final List<String> skyblockProfiles;
+    private String guildRank = null;
+    private int guildJoined = 0;
 
     public Player(SBGods main) {
         this.UUID = null;

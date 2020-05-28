@@ -38,7 +38,7 @@ public class HelpCommand extends Command {
 
         for (HelpMessage helpMessage : HelpMessage.values()) {
             if (!helpMessage.getCommand().contains(" ") && !helpMessage.getCommand().equals("help") &&
-                    (!helpMessage.getHelpLines()[helpMessage.getHelpLines().length-1].equals("Requires to be a bot dev or server admin to use.") ||
+                    (!helpMessage.getHelpLines()[helpMessage.getHelpLines().length - 1].equals("Requires to be a bot dev or server admin to use.") ||
                             (e.getMember() != null && e.getMember().hasPermission(Permission.MANAGE_SERVER, Permission.MANAGE_ROLES)))) {
                 description.append(helpMessage.getUsage()).append(": \t**").append(helpMessage.getHelpLines()[0]).append("**\n\n");
             }
