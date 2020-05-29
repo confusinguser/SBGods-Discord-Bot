@@ -86,7 +86,7 @@ public class ReactionListener extends ListenerAdapter {
             boolean meetsSlayer = false;
             boolean meetsSkill = false;
 
-            if(!player.getGuildId().equals(null)) {
+            if(player.getGuildId() != (null)) {
                 if (player.getGuildId().equals(currentDiscordServer.getHypixelGuild().getGuildId())) {
                     e.getChannel().sendMessage(e.getUser().getAsMention() + " you are already in the guild.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
                     e.getChannel().deleteMessageById(messageId).queue();

@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class TaxCommand extends Command {
 
@@ -387,6 +388,41 @@ public class TaxCommand extends Command {
             for (String messageI : responseList) {
                 e.getChannel().sendMessage(new EmbedBuilder().appendDescription(messageI).build()).queue();
             }
+
+            return;
+        }
+
+        if (args[1].equalsIgnoreCase("prune")) {
+            String messageId = e.getChannel().sendMessage("Loading (" + main.getLangUtil().getProgressBar(0.0, 20) + ")").complete().getId();
+
+            JSONObject taxData = main.getApiUtil().getTaxData();
+            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(0.5, 20) + ")").queue();
+
+            ArrayList<String> playerUuids = new ArrayList<>(taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").keySet());
+
+            String[] SBGGuildMembers = (String[]) main.getApiUtil().getGuildMembers(HypixelGuild.SBG).stream().map(guildMember -> guildMember.getUUID()).toArray();
+
+            int playersRemoved = 0;
+            for (String playerUuid : playerUuids) {
+                boolean inGuild = false;
+
+                for(String player : SBGGuildMembers){
+                    if(player.equals(playerUuid)){
+                        inGuild = true;
+                    }
+                }
+                if(!inGuild){
+                    e.getChannel().sendMessage("Removed tax data about " + taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(playerUuid).getString("name")).complete().delete().queueAfter(30, TimeUnit.SECONDS);
+                    taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").remove(playerUuid);
+                    playersRemoved++;
+                }
+            }
+
+            //main.getApiUtil().setTaxData(taxData);
+
+            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(1.0, 20) + ")").queue();
+
+            e.getChannel().editMessageById(messageId, "Success, removed " + playersRemoved + " from the list");
 
             return;
         }
