@@ -135,7 +135,7 @@ public class ReactionListener extends ListenerAdapter {
         } catch (Exception ex) {
             main.logger.warning("Guild application failed for player " + e.getUser().getAsTag());
             main.logger.warning(ex.getMessage());
-            for(StackTraceElement msg : ex.getStackTrace()){
+            for (StackTraceElement msg : ex.getStackTrace()) {
                 main.logger.warning("AT: " + msg.getFileName() + " " + msg.getClassName() + " " + msg.getMethodName() + " line: " + msg.getLineNumber());
             }
             e.getChannel().sendMessage(e.getUser().getAsMention() + " there was a error somewhere, get in contact with a bot dev to help fix the error.").complete().delete().queueAfter(30, TimeUnit.SECONDS);

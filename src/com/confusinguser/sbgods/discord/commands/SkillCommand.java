@@ -70,8 +70,9 @@ public class SkillCommand extends Command {
                 topX = 10;
             }
 
-            List<Entry<String, SkillLevels>> leaderboardList = usernameSkillExpHashMap.entrySet().stream()
-                    .sorted(Comparator.comparingDouble(entry -> entry.getValue().getAvgSkillLevel()))
+            @SuppressWarnings("unchecked")
+            List<Map.Entry<String, SkillLevels>> leaderboardList = usernameSkillExpHashMap.entrySet().stream()
+                    .sorted(Comparator.comparingDouble(entry -> ((Map.Entry<String, SkillLevels>) entry).getValue().getAvgSkillLevel()).reversed())
                     .collect(Collectors.toList())
                     .subList(0, topX - 1);
 
@@ -85,7 +86,7 @@ public class SkillCommand extends Command {
             } else {
                 int totalAvgSkillLvl = 0;
                 for (Entry<String, SkillLevels> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry)).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2));
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2));
                     if (currentEntry.getValue().isApproximate()) {
                         response.append(" *(appr.)*");
                     }

@@ -75,13 +75,13 @@ public class BankCommand extends Command {
             StringBuilder response = new StringBuilder("**Total Coins Leaderboard:**\n\n");
             if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
                 for (Entry<String, Double> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry)).append("** *").append(currentEntry.getKey()).append(":* ").append(Math.round(currentEntry.getValue())).append("\n\n");
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey()).append(":* ").append(Math.round(currentEntry.getValue())).append("\n\n");
                 }
             } else {
                 int totalCoins = 0;
 
                 for (Entry<String, Double> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry)).append("** *").append(currentEntry.getKey()).append(":* ").append(Math.round(currentEntry.getValue())).append("\n\n");
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey()).append(":* ").append(Math.round(currentEntry.getValue())).append("\n\n");
                     totalCoins += currentEntry.getValue();
                 }
 
