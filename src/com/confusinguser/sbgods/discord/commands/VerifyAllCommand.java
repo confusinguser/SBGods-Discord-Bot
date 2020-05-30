@@ -64,14 +64,14 @@ public class VerifyAllCommand extends Command {
     }
 
     private void verifyAll(MessageChannel channel, Guild discord) {
-        String messageId = channel.sendMessage("Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(0.0, 30) + ")").complete().getId();
+        String messageId = channel.sendMessage("Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(0.0, 30) + ") [0/0]").complete().getId();
 
         int playersVerified = 0;
         int i = 0; // For loading animation
 
         for (Member member : discord.getMembers()) {
             i++;
-            channel.editMessageById(messageId, "Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(i / (double) discord.getMembers().size(), 30) + ")").queue();
+            channel.editMessageById(messageId, "Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(i / (double) discord.getMembers().size(), 30) + ") [" + i + "/" + discord.getMembers().size()).queue();
             String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag());
             if (!mcName.equals("")) {
                 int response = main.getUtil().verifyPlayer(member, mcName, discord, channel);

@@ -164,7 +164,7 @@ public class Util {
 
         boolean inSbg = false;
         String inSbgRank = null;
-        String inSbgNeededRank = "null";
+        String inSbgNeededRank = "Member";
 
         if (guild != null) {
             if (guild == HypixelGuild.SBG) {
@@ -206,7 +206,7 @@ public class Util {
                     } catch (HierarchyException ignored) {
                     }
 
-                    if (inSbgNeededRank.equals("null")) {
+                    if (inSbgNeededRank.equals("Member")) {
                         inSbgNeededRank = "God";
                     }
                 }
@@ -227,7 +227,7 @@ public class Util {
                     } catch (HierarchyException ignored) {
                     }
 
-                    if (inSbgNeededRank.equals("null")) {
+                    if (inSbgNeededRank.equals("Member")) {
                         inSbgNeededRank = "King";
                     }
                 }
@@ -249,6 +249,9 @@ public class Util {
                     } catch (HierarchyException ignored) {
                     }
                 }
+                if (inSbgNeededRank.equals("Member")) {
+                    inSbgNeededRank = "Elite";
+                }
             } else {
                 for (Role role : discord.getRoles().stream()
                         .filter(role -> role.getName().toLowerCase().equals("elite") ||
@@ -259,51 +262,40 @@ public class Util {
                         discord.removeRoleFromMember(member, role).queue();
                     } catch (HierarchyException ignored) {
                     }
-
-                    if (inSbgNeededRank.equals("null")) {
-                        inSbgNeededRank = "Elite";
-                    }
                 }
             }
         }
 
         JSONArray guildRanksChange = main.getApiUtil().getGuildRanksChange();
+
+
+        for (int i = 0; i<guildRanksChange.length();i++) {
+            if (guildRanksChange.getJSONObject(i).getString("uuid").equals(thePlayer.getUUID())) {
+                guildRanksChange.remove(i);
+            }
+        }
+
         if (inSbg) {
-            main.logger.info("in sbg");
-            for (Object playerJson : guildRanksChange.toList()) {
+//            main.logger.info("in sbg");
+//
+//            main.logger.info("Player: " + thePlayer.getDisplayName());
+//            main.logger.info("CurrRank: " + inSbgRank);
+//            main.logger.info("NeedRank: " + inSbgNeededRank);
+//            main.logger.info("----------------------");
 
-                main.logger.info(String.valueOf(playerJson.hashCode()));
-                if (guildRanksChange.getJSONObject(playerJson.hashCode()).getString("uuid").equals(thePlayer.getUUID())) {
-                    guildRanksChange.remove(playerJson.hashCode());
-
-                    main.logger.info("Player: " + thePlayer.getDisplayName());
-                    main.logger.info("CurrRank: " + inSbgRank);
-                    main.logger.info("NeedRank: " + inSbgNeededRank);
-                    main.logger.info("----------------------");
-
-                    if (/*inSbgRank.equals("Member")
+            if (inSbgRank.equals("Member")
                             || inSbgRank.equals("Elite")
                             || inSbgRank.equals("God")
                             || inSbgRank.equals("King")
-                            &&*/ !inSbgRank.equals(inSbgNeededRank)) {
-                        JSONObject newPlayerJson = new JSONObject();
+                            && !inSbgRank.equals(inSbgNeededRank)) {
+                JSONObject newPlayerJson = new JSONObject();
 
-                        newPlayerJson.put("uuid", thePlayer.getUUID());
-                        newPlayerJson.put("name", thePlayer.getDisplayName());
-                        newPlayerJson.put("currRank", inSbgRank);
-                        newPlayerJson.put("needRank", inSbgNeededRank);
+                newPlayerJson.put("uuid", thePlayer.getUUID());
+                newPlayerJson.put("name", thePlayer.getDisplayName());
+                newPlayerJson.put("currRank", inSbgRank);
+                newPlayerJson.put("needRank", inSbgNeededRank);
 
-                        guildRanksChange.put(newPlayerJson);
-                    }
-                }
-            }
-
-        } else {
-
-            for (Object playerJson : guildRanksChange.toList()) {
-                if (guildRanksChange.getJSONObject(playerJson.hashCode()).getString("uuid").equals(thePlayer.getUUID())) {
-                    guildRanksChange.remove(playerJson.hashCode());
-                }
+                guildRanksChange.put(newPlayerJson);
             }
 
         }
