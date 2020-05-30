@@ -206,10 +206,6 @@ public class Util {
                     } catch (HierarchyException ignored) {
                     }
                 }
-
-                if (inSbgNeededRank.equals("Member")) {
-                    inSbgNeededRank = "God";
-                }
             } else {
                 for (Role role : discord.getRoles().stream()
                         .filter(role -> role.getName().toLowerCase().equals("skyblock god \uD83D\uDE4F"))
@@ -226,9 +222,6 @@ public class Util {
                         discord.addRoleToMember(member, role).queue();
                     } catch (HierarchyException ignored) {
                     }
-                }
-                if (inSbgNeededRank.equals("Member")) {
-                    inSbgNeededRank = "King";
                 }
             } else {
                 for (Role role : discord.getRoles().stream()
@@ -248,9 +241,6 @@ public class Util {
                     } catch (HierarchyException ignored) {
                     }
                 }
-                if (inSbgNeededRank.equals("Member")) {
-                    inSbgNeededRank = "Elite";
-                }
             } else {
                 for (Role role : discord.getRoles().stream()
                         .filter(role -> role.getName().toLowerCase().equals("elite") ||
@@ -263,7 +253,21 @@ public class Util {
                     }
                 }
             }
+
+            if(guild.getGuildId().equals(HypixelGuild.SBG.getGuildId())){ //highestLeaderboardPos is one higher than it needs to be so it is only less than not less than or equal to
+                if(highestLeaderboardPos < 45){
+                    inSbgNeededRank = "Elite";
+                }
+                if(highestLeaderboardPos < 15){
+                    inSbgNeededRank = "King";
+                }
+                if(highestLeaderboardPos < 5){
+                    inSbgNeededRank = "God";
+                }
+            }
         }
+
+
 
         JSONArray guildRanksChange = main.getApiUtil().getGuildRanksChange();
 
@@ -281,7 +285,7 @@ public class Util {
             //main.logger.info("CurrRank: " + inSbgRank);
             //main.logger.info("NeedRank: " + inSbgNeededRank);
 
-            if (!inSbgRank.equals(inSbgNeededRank)) {
+            if (!inSbgRank.contains(inSbgNeededRank)) {
                 if(inSbgRank.contains("Member") || inSbgRank.contains("Elite") || inSbgRank.contains("King") || inSbgRank.contains("God")) {
                     JSONObject newPlayerJson = new JSONObject();
 

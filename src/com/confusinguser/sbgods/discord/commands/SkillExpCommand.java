@@ -75,7 +75,7 @@ public class SkillExpCommand extends Command {
             List<Map.Entry<String, SkillLevels>> leaderboardList = usernameSkillExpHashMap.entrySet().stream()
                     .sorted(Comparator.comparingDouble(entry -> ((Map.Entry<String, SkillLevels>) entry).getValue().getAvgSkillLevel()).reversed())
                     .collect(Collectors.toList())
-                    .subList(0, topX - 1);
+                    .subList(0, topX );
 
             // print it like a spreadsheet
             if (spreadsheet) {
