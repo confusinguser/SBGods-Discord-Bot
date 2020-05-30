@@ -69,7 +69,7 @@ public class SlayerCommand extends Command {
             }
 
             List<Entry<String, SlayerExp>> leaderboardList = usernameSlayerExpHashMap.entrySet().stream()
-                    .sorted(Comparator.comparingDouble(entry -> entry.getValue().getTotalExp()))
+                    .sorted(Comparator.comparingDouble(entry -> -entry.getValue().getTotalExp()))
                     .collect(Collectors.toList())
                     .subList(0, topX - 1);
 
