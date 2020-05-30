@@ -202,8 +202,6 @@ public class Util {
                     } catch (HierarchyException ignored) {
                     }
                 }
-
-                rankGiven = "God";
             } else {
                 for (Role role : discord.getRoles().stream()
                         .filter(role -> role.getName().toLowerCase().equals("skyblock god \uD83D\uDE4F"))
@@ -220,9 +218,6 @@ public class Util {
                         discord.addRoleToMember(member, role).queue();
                     } catch (HierarchyException ignored) {
                     }
-                }
-                if (rankGiven.equals("Member")) {
-                    rankGiven = "King";
                 }
             } else {
                 for (Role role : discord.getRoles().stream()
@@ -242,9 +237,6 @@ public class Util {
                     } catch (HierarchyException ignored) {
                     }
                 }
-                if (rankGiven.equals("Member")) {
-                    rankGiven = "Elite";
-                }
             } else {
                 for (Role role : discord.getRoles().stream()
                         .filter(role -> role.getName().toLowerCase().equals("elite") ||
@@ -257,6 +249,18 @@ public class Util {
                     }
                 }
             }
+
+            if (guild != null && guild.getGuildId().equals(HypixelGuild.SBG.getGuildId())) { //highestLeaderboardPos is one higher than it needs to be so it is only less than not less than or equal to
+                if (highestLeaderboardPos < 45) {
+                    rankGiven = "Elite";
+                }
+                if (highestLeaderboardPos < 15) {
+                    rankGiven = "King";
+                }
+                if (highestLeaderboardPos < 5) {
+                    rankGiven = "God";
+                }
+            }
         }
 
         JSONArray guildRanksChange = main.getApiUtil().getGuildRanksChange();
@@ -267,17 +271,15 @@ public class Util {
             }
         }
 
-        if (thePlayer.getGuildId().equals(HypixelGuild.SBG.getGuildId())) {
-            if (!thePlayer.getGuildRank().equals(rankGiven)) {
-                JSONObject newPlayerJson = new JSONObject();
+        if (!thePlayer.getGuildRank().contains(rankGiven) && thePlayer.getGuildRank() != null) {
+            JSONObject newPlayerJson = new JSONObject();
 
-                newPlayerJson.put("uuid", thePlayer.getUUID());
-                newPlayerJson.put("name", thePlayer.getDisplayName());
-                newPlayerJson.put("currRank", thePlayer.getGuildRank());
-                newPlayerJson.put("needRank", rankGiven);
+            newPlayerJson.put("uuid", thePlayer.getUUID());
+            newPlayerJson.put("name", thePlayer.getDisplayName());
+            newPlayerJson.put("currRank", thePlayer.getGuildRank());
+            newPlayerJson.put("needRank", rankGiven);
 
-                guildRanksChange.put(newPlayerJson);
-            }
+            guildRanksChange.put(newPlayerJson);
         }
 
         main.getApiUtil().setGuildRanksChange(guildRanksChange);

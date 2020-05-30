@@ -94,8 +94,7 @@ public class LangUtil {
                     returnVal = Math.floor(returnVal);
                     returnVal = (returnVal / Math.pow(10, o)) * 10;
                     returnValStr = +main.getUtil().round(returnVal, o - 1) + notValue;
-                    if (returnValStr.endsWith(".00") || returnValStr.endsWith(".0")) {
-                        returnValStr = returnValStr.replace(".00", "");
+                    if (returnValStr.endsWith("0")) {
                         returnValStr = returnValStr.replace(".0", "");
                     }
                 }

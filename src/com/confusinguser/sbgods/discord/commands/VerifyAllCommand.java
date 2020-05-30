@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
+import org.json.JSONArray;
 
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -64,6 +65,8 @@ public class VerifyAllCommand extends Command {
     }
 
     private void verifyAll(MessageChannel channel, Guild discord) {
+        main.getApiUtil().setGuildRanksChange(new JSONArray());
+
         String messageId = channel.sendMessage("Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(0.0, 30) + ") [0/0]").complete().getId();
 
         int playersVerified = 0;
