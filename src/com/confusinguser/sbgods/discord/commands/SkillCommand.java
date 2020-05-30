@@ -70,9 +70,8 @@ public class SkillCommand extends Command {
                 topX = 10;
             }
 
-            @SuppressWarnings("unchecked")
             List<Map.Entry<String, SkillLevels>> leaderboardList = usernameSkillExpHashMap.entrySet().stream()
-                    .sorted(Comparator.comparingDouble(entry -> ((Map.Entry<String, SkillLevels>) entry).getValue().getAvgSkillLevel()).reversed())
+                    .sorted(Comparator.comparingDouble(entry -> -entry.getValue().getAvgSkillLevel()))
                     .collect(Collectors.toList())
                     .subList(0, topX - 1);
 

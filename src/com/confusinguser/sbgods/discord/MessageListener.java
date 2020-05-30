@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 public class MessageListener extends ListenerAdapter {
 
-    SBGods main;
-    DiscordBot discord;
+    final SBGods main;
+    final DiscordBot discord;
 
     public MessageListener(SBGods main, DiscordBot discord) {
         this.main = main;

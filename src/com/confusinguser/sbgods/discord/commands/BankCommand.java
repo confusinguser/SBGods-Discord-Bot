@@ -68,7 +68,7 @@ public class BankCommand extends Command {
             }
 
             List<Entry<String, Double>> leaderboardList = usernameTotalCoinsMap.entrySet().stream()
-                    .sorted(Comparator.comparingDouble(Entry::getValue))
+                    .sorted(Comparator.comparingDouble(entry -> -entry.getValue()))
                     .collect(Collectors.toList())
                     .subList(0, topX - 1);
 

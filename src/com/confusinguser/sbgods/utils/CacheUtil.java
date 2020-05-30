@@ -41,7 +41,7 @@ public class CacheUtil {
     public Response getCachedResponse(String url, long cacheTime) {
         long currentTime = new Date().getTime();
 
-        for (int i = 0; i<cache.size();i++) {
+        for (int i = 0; i < cache.size(); i++) {
             Response response = cache.get(i);
             if (currentTime - (response.getTimeStamp()) > MAX_CACHE_TIME) {
                 cache.remove(response);

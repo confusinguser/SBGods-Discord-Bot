@@ -17,35 +17,43 @@ public class Player {
     private final SBGods main;
     private final List<String> skyblockProfiles;
     private String guildRank = null;
-    private int guildJoined = 0;
 
-    public Player(SBGods main) {
+    public Player() {
         this.UUID = null;
         this.displayName = null;
         this.discordTag = null;
         this.online = false;
-        this.main = main;
+        this.main = SBGods.getInstance();
         this.skyblockProfiles = new ArrayList<>();
     }
 
-    public Player(String uuid, String displayName, String discordTag, boolean online, List<String> skyblockProfiles, SBGods main) {
+    public Player(String uuid, String displayName, String discordTag, boolean online, List<String> skyblockProfiles) {
         this.UUID = uuid;
         this.displayName = displayName;
         this.discordTag = discordTag;
         this.online = online;
-        this.main = main;
+        this.main = SBGods.getInstance();
         this.skyblockProfiles = skyblockProfiles;
     }
 
-    public Player(String uuid, SBGods main, String guildRank, int guildJoined) {
+    public Player(String uuid, String guildRank, int guildJoined) {
         this.UUID = uuid;
         this.displayName = null;
         this.discordTag = null;
-        this.guildJoined = guildJoined;
         this.guildRank = guildRank;
         this.online = false;
-        this.main = main;
+        this.main = SBGods.getInstance();
         this.skyblockProfiles = null;
+    }
+
+    public Player(String uuid, String displayName, String discordTag, boolean online, List<String> skyblockProfiles, String guildRank) {
+        this.UUID = uuid;
+        this.displayName = displayName;
+        this.discordTag = discordTag;
+        this.online = online;
+        this.main = SBGods.getInstance();
+        this.skyblockProfiles = skyblockProfiles;
+        this.guildRank = guildRank;
     }
 
     public String getUUID() {
@@ -65,10 +73,6 @@ public class Player {
 
     public String getGuildRank() {
         return guildRank;
-    }
-
-    public int getGuildJoined() {
-        return guildJoined;
     }
 
     public String getDiscordTag() {
@@ -109,5 +113,9 @@ public class Player {
         List<Map.Entry<String, SlayerExp>> list = new ArrayList<>(guild.getSlayerExpMap().entrySet());
         list.sort(Comparator.comparingDouble(entry -> -entry.getValue().getTotalExp()));
         return list.stream().map(Map.Entry::getKey).collect(Collectors.toList()).indexOf(getDisplayName());
+    }
+
+    public static Player mergePlayerAndGuildMemer(Player player, Player guildMember) {
+        return new Player(player.UUID, player.displayName, player.discordTag, player.online, player.skyblockProfiles, guildMember.guildRank);
     }
 }

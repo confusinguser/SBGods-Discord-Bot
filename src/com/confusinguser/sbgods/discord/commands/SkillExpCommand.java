@@ -71,9 +71,8 @@ public class SkillExpCommand extends Command {
 
             StringBuilder response = new StringBuilder();
 
-            @SuppressWarnings("unchecked")
             List<Map.Entry<String, SkillLevels>> leaderboardList = usernameSkillExpHashMap.entrySet().stream()
-                    .sorted(Comparator.comparingDouble(entry -> ((Map.Entry<String, SkillLevels>) entry).getValue().getAvgSkillLevel()).reversed())
+                    .sorted(Comparator.comparingDouble(entry -> -entry.getValue().getAvgSkillLevel()))
                     .collect(Collectors.toList())
                     .subList(0, topX - 1);
 

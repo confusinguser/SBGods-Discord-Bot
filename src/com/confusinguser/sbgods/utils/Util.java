@@ -162,17 +162,10 @@ public class Util {
         }
         HypixelGuild guild = HypixelGuild.getGuildById(guildId);
 
-        boolean inSbg = false;
-        String inSbgRank = null;
-        String inSbgNeededRank = "Member";
-
-        if (guild != null) {
-            if (guild == HypixelGuild.SBG) {
-                inSbg = true;
-                for (Player playerForEach : main.getApiUtil().getGuildMembers(guild)) {
-                    if (playerForEach.getUUID().equals(thePlayer.getUUID())) {
-                        inSbgRank = playerForEach.getGuildRank();
-                    }
+        if (guild == HypixelGuild.SBG) {
+            for (Player guildMember : main.getApiUtil().getGuildMembers(guild)) {
+                if (guildMember.getUUID().equals(thePlayer.getUUID())) {
+                    thePlayer = Player.mergePlayerAndGuildMemer(thePlayer, guildMember);
                 }
             }
         }
@@ -191,6 +184,9 @@ public class Util {
             }
         }
 
+
+        String rankGiven = "Member";
+
         // Give Elite, SBK and SBG rank
         HypixelGuild hypixelGuild = HypixelGuild.getGuildById(guildId);
         DiscordServer discordServer = DiscordServer.getDiscordServerFromDiscordGuild(discord);
@@ -207,9 +203,7 @@ public class Util {
                     }
                 }
 
-                if (inSbgNeededRank.equals("Member")) {
-                    inSbgNeededRank = "God";
-                }
+                rankGiven = "God";
             } else {
                 for (Role role : discord.getRoles().stream()
                         .filter(role -> role.getName().toLowerCase().equals("skyblock god \uD83D\uDE4F"))
@@ -227,8 +221,8 @@ public class Util {
                     } catch (HierarchyException ignored) {
                     }
                 }
-                if (inSbgNeededRank.equals("Member")) {
-                    inSbgNeededRank = "King";
+                if (rankGiven.equals("Member")) {
+                    rankGiven = "King";
                 }
             } else {
                 for (Role role : discord.getRoles().stream()
@@ -248,8 +242,8 @@ public class Util {
                     } catch (HierarchyException ignored) {
                     }
                 }
-                if (inSbgNeededRank.equals("Member")) {
-                    inSbgNeededRank = "Elite";
+                if (rankGiven.equals("Member")) {
+                    rankGiven = "Elite";
                 }
             } else {
                 for (Role role : discord.getRoles().stream()
@@ -267,39 +261,26 @@ public class Util {
 
         JSONArray guildRanksChange = main.getApiUtil().getGuildRanksChange();
 
-
-        for (int i = 0; i<guildRanksChange.length();i++) {
+        for (int i = 0; i < guildRanksChange.length(); i++) {
             if (guildRanksChange.getJSONObject(i).getString("uuid").equals(thePlayer.getUUID())) {
                 guildRanksChange.remove(i);
             }
         }
 
-        if (inSbg) {
-            //main.logger.info("in sbg");
+        if (thePlayer.getGuildId().equals(HypixelGuild.SBG.getGuildId())) {
+            if (!thePlayer.getGuildRank().equals(rankGiven)) {
+                JSONObject newPlayerJson = new JSONObject();
 
-            //main.logger.info("Player: " + thePlayer.getDisplayName());
-            //main.logger.info("CurrRank: " + inSbgRank);
-            //main.logger.info("NeedRank: " + inSbgNeededRank);
+                newPlayerJson.put("uuid", thePlayer.getUUID());
+                newPlayerJson.put("name", thePlayer.getDisplayName());
+                newPlayerJson.put("currRank", thePlayer.getGuildRank());
+                newPlayerJson.put("needRank", rankGiven);
 
-            if (!inSbgRank.equals(inSbgNeededRank)) {
-                if(inSbgRank.contains("Member") || inSbgRank.contains("Elite") || inSbgRank.contains("King") || inSbgRank.contains("God")) {
-                    JSONObject newPlayerJson = new JSONObject();
-
-                    //main.logger.info("Adding Rank change to file...");
-
-                    newPlayerJson.put("uuid", thePlayer.getUUID());
-                    newPlayerJson.put("name", thePlayer.getDisplayName());
-                    newPlayerJson.put("currRank", inSbgRank);
-                    newPlayerJson.put("needRank", inSbgNeededRank);
-
-                    guildRanksChange.put(newPlayerJson);
-                }
+                guildRanksChange.put(newPlayerJson);
             }
-            //main.logger.info("----------------------");
-
         }
-        main.getApiUtil().setGuildRanksChange(guildRanksChange);
 
+        main.getApiUtil().setGuildRanksChange(guildRanksChange);
 
         if (sendMsg) {
             if (guild == null) {
@@ -337,9 +318,7 @@ public class Util {
         return stripColorCodesRegex.matcher(input).replaceAll("");
     }
 
-    /**
-     * For recursiveness
-     */
+    // For recursiveness
     public File getFileToUse(String fileName) {
         File file = new File(fileName);
         if (file.exists()) {

@@ -189,7 +189,7 @@ public class ApiUtil {
             String uuid = currentMember.getString("uuid");
             String guildRank = currentMember.getString("rank");
             int guildJoined = currentMember.getInt("joined");
-            output.add(new Player(uuid, main, guildRank, guildJoined));
+            output.add(new Player(uuid, guildRank, guildJoined));
         }
 
         return output;
@@ -215,7 +215,7 @@ public class ApiUtil {
 
     public Player getPlayerFromUUID(String UUID) {
         String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&uuid=" + UUID, 300000);
-        if (response == null) return new Player(main);
+        if (response == null) return new Player();
 
         JSONObject jsonObject = new JSONObject(response);
         String username;
@@ -229,7 +229,7 @@ public class ApiUtil {
             profiles = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
             online = jsonObject.getJSONObject("player").getLong("lastLogin") > jsonObject.getJSONObject("player").getLong("lastLogout");
         } catch (JSONException e) {
-            return new Player(main);
+            return new Player();
         }
         try {
             // Does not necessarily exist while the other things above have to.
@@ -239,12 +239,12 @@ public class ApiUtil {
             discord = "";
         }
 
-        return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()), main);
+        return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()));
     }
 
     public Player getPlayerFromUsername(String name) {
         String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&name=" + name, 300000);
-        if (response == null) return new Player(main);
+        if (response == null) return new Player();
 
         JSONObject jsonObject = new JSONObject(response);
         String username;
@@ -258,7 +258,7 @@ public class ApiUtil {
             profiles = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
             online = jsonObject.getJSONObject("player").getLong("lastLogin") > jsonObject.getJSONObject("player").getLong("lastLogout");
         } catch (JSONException e) {
-            return new Player(main);
+            return new Player();
         }
         try {
             // Does not necessarily exist while the other things above have to.
@@ -268,7 +268,7 @@ public class ApiUtil {
             discord = "";
         }
 
-        return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()), main);
+        return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()));
     }
 
 
@@ -663,8 +663,6 @@ public class ApiUtil {
     }
 
     public void setGuildRanksChange(JSONArray data) {
-        IOException ioException = null;
-
         String dataString = data.toString(4);
 
         try {
@@ -686,7 +684,7 @@ public class ApiUtil {
             }
 
         } catch (IOException e) {
-            main.logger.warning("Could not set tax data: " + e.getMessage() + e);
+            main.logger.warning(main.getLangUtil().beautifyStackTrace(e.getStackTrace(), e));
         }
     }
 

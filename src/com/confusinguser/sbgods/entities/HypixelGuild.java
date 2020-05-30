@@ -35,6 +35,7 @@ public enum HypixelGuild {
     }
 
     public static HypixelGuild getGuildById(String id) {
+        if (id == null) return null;
         for (HypixelGuild guild : values()) {
             if (guild.getGuildId().contentEquals(id)) return guild;
         }

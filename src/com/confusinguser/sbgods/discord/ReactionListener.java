@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 
 public class ReactionListener extends ListenerAdapter {
 
-    SBGods main;
-    DiscordBot discord;
+    final SBGods main;
+    final DiscordBot discord;
 
     public ReactionListener(SBGods main, DiscordBot discord) {
         this.main = main;
@@ -72,8 +72,8 @@ public class ReactionListener extends ListenerAdapter {
         e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar(0.75, 20) + ")").queue();
 
         try {
-            if (!((TextChannel) e.getGuild().getChannels().stream().filter(channel -> channel.getName().contains("accepted-applications"))
-                    .collect(Collectors.toList()).get(0)).getHistoryFromBeginning(100).complete().getRetrievedHistory().stream().filter(message -> message.getEmbeds().get(0).getTitle().contains(player.getDisplayName().toLowerCase() + " application")).collect(Collectors.toList()).isEmpty()) {
+            if (!(((TextChannel) e.getGuild().getChannels().stream().filter(channel -> channel.getName().contains("accepted-applications"))
+                    .collect(Collectors.toList()).get(0)).getHistoryFromBeginning(100).complete().getRetrievedHistory().stream().filter(message -> message.getEmbeds().get(0).getTitle().contains(player.getDisplayName().toLowerCase() + " application")).count() == 0)) {
                 e.getChannel().sendMessage(e.getUser().getAsMention() + " you already have a pending application.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
                 e.getChannel().deleteMessageById(messageId).queue();
             }
@@ -86,7 +86,7 @@ public class ReactionListener extends ListenerAdapter {
             boolean meetsSlayer = false;
             boolean meetsSkill = false;
 
-            if(player.getGuildId() != (null)) {
+            if (player.getGuildId() != (null)) {
                 if (player.getGuildId().equals(currentDiscordServer.getHypixelGuild().getGuildId())) {
                     e.getChannel().sendMessage(e.getUser().getAsMention() + " you are already in the guild.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
                     e.getChannel().deleteMessageById(messageId).queue();
@@ -103,7 +103,7 @@ public class ReactionListener extends ListenerAdapter {
             e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar(1.0, 20) + ")").queue();
 
             if (!meetsSkill && !meetsSlayer) {
-                e.getChannel().sendMessage(e.getUser().getAsMention() + " you dont meet the slayer requirement of " + currentDiscordServer.getHypixelGuild().getSlayerReq() + " slayer exp" + "\nor this skill requirement of " + currentDiscordServer.getHypixelGuild().getSkillReq() + " average skill level").complete().delete().queueAfter(30, TimeUnit.SECONDS);
+                e.getChannel().sendMessage(e.getUser().getAsMention() + " you dont meet the slayer requirement of " + currentDiscordServer.getHypixelGuild().getSlayerReq() + " slayer exp" + "\nor the skill requirement of " + currentDiscordServer.getHypixelGuild().getSkillReq() + " average skill level").complete().delete().queueAfter(30, TimeUnit.SECONDS);
                 e.getChannel().deleteMessageById(messageId).queue();
                 return;
             } else if (!meetsSlayer) {
@@ -140,7 +140,6 @@ public class ReactionListener extends ListenerAdapter {
             }
             e.getChannel().sendMessage(e.getUser().getAsMention() + " there was a error somewhere, get in contact with a bot dev to help fix the error.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
             e.getChannel().deleteMessageById(messageId).queue();
-            return;
         }
     }
 }

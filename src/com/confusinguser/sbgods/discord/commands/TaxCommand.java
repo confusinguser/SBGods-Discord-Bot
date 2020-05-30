@@ -416,13 +416,14 @@ public class TaxCommand extends Command {
             for (String playerUuid : playerUuids) {
                 boolean inGuild = false;
 
-                for(Player player : SBGGuildMembers){
-                    if(player.getUUID().equals(playerUuid)){
+                for (Player player : SBGGuildMembers) {
+                    if (player.getUUID().equals(playerUuid)) {
                         inGuild = true;
+                        break;
                     }
                 }
 
-                if(!inGuild){
+                if (!inGuild) {
                     e.getChannel().sendMessage("Removed tax data about " + taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(playerUuid).getString("name")).complete().delete().queueAfter(30, TimeUnit.SECONDS);
                     taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").remove(playerUuid);
                     playersRemoved++;
