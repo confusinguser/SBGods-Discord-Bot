@@ -249,16 +249,17 @@ public class Util {
                     }
                 }
             }
-
-            if (guild != null && guild.getGuildId().equals(HypixelGuild.SBG.getGuildId())) { //highestLeaderboardPos is one higher than it needs to be so it is only less than not less than or equal to
-                if (highestLeaderboardPos < 45) {
-                    rankGiven = "Elite";
-                }
-                if (highestLeaderboardPos < 15) {
-                    rankGiven = "King";
-                }
-                if (highestLeaderboardPos < 5) {
-                    rankGiven = "God";
+            if (guild != null) {
+                if (guild.getGuildId().equals(HypixelGuild.SBG.getGuildId())) { //highestLeaderboardPos is one higher than it needs to be so it is only less than not less than or equal to
+                    if (highestLeaderboardPos < 45) {
+                        rankGiven = "Elite";
+                    }
+                    if (highestLeaderboardPos < 15) {
+                        rankGiven = "King";
+                    }
+                    if (highestLeaderboardPos < 5) {
+                        rankGiven = "God";
+                    }
                 }
             }
         }
@@ -271,15 +272,18 @@ public class Util {
             }
         }
 
-        if (guild != null && guild.getGuildId().equals(HypixelGuild.SBG.getGuildId()) && thePlayer.getGuildRank() != null && !thePlayer.getGuildRank().contains(rankGiven)) {
-            JSONObject newPlayerJson = new JSONObject();
+        if(guild != null && thePlayer.getGuildRank() != null) { //gotta check for null BEFORE checking guild.getguildid
+            if (guild.getGuildId().equals(HypixelGuild.SBG.getGuildId()) && !thePlayer.getGuildRank().contains(rankGiven)
+                    && (thePlayer.getGuildRank().contains("Member") || thePlayer.getGuildRank().contains("Elite") || thePlayer.getGuildRank().contains("King") || thePlayer.getGuildRank().contains("God"))) {
+                JSONObject newPlayerJson = new JSONObject();
 
-            newPlayerJson.put("uuid", thePlayer.getUUID());
-            newPlayerJson.put("name", thePlayer.getDisplayName());
-            newPlayerJson.put("currRank", thePlayer.getGuildRank());
-            newPlayerJson.put("needRank", rankGiven);
+                newPlayerJson.put("uuid", thePlayer.getUUID());
+                newPlayerJson.put("name", thePlayer.getDisplayName());
+                newPlayerJson.put("currRank", thePlayer.getGuildRank());
+                newPlayerJson.put("needRank", rankGiven);
 
-            guildRanksChange.put(newPlayerJson);
+                guildRanksChange.put(newPlayerJson);
+            }
         }
 
         main.getApiUtil().setGuildRanksChange(guildRanksChange);
