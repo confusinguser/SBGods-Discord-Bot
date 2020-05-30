@@ -93,10 +93,11 @@ public class LangUtil {
                     returnVal = num / checkNum * 100;
                     returnVal = Math.floor(returnVal);
                     returnVal = (returnVal / Math.pow(10, o)) * 10;
-                    returnValStr = +main.getUtil().round(returnVal, o - 1) + notValue;
+                    returnValStr = ""+main.getUtil().round(returnVal, o - 1);
                     if (returnValStr.endsWith("0")) {
                         returnValStr = returnValStr.replace(".0", "");
                     }
+                    returnValStr += notValue;
                 }
                 checkNum *= 10;
             }
