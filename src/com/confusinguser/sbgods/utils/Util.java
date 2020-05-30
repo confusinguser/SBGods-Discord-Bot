@@ -271,7 +271,7 @@ public class Util {
             }
         }
 
-        if (!thePlayer.getGuildRank().contains(rankGiven) && thePlayer.getGuildRank() != null) {
+        if (guild != null && guild.getGuildId().equals(HypixelGuild.SBG.getGuildId()) && thePlayer.getGuildRank() != null && !thePlayer.getGuildRank().contains(rankGiven)) {
             JSONObject newPlayerJson = new JSONObject();
 
             newPlayerJson.put("uuid", thePlayer.getUUID());
