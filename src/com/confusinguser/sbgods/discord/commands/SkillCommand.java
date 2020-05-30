@@ -73,7 +73,7 @@ public class SkillCommand extends Command {
             List<Map.Entry<String, SkillLevels>> leaderboardList = usernameSkillExpHashMap.entrySet().stream()
                     .sorted(Comparator.comparingDouble(entry -> -entry.getValue().getAvgSkillLevel()))
                     .collect(Collectors.toList())
-                    .subList(0, topX - 1);
+                    .subList(0, topX);
 
             StringBuilder response = new StringBuilder("**Average Skill Level Leaderboard:**\n\n");
             if (spreadsheet) {

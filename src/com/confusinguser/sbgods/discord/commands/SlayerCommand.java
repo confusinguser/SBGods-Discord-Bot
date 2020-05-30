@@ -71,7 +71,7 @@ public class SlayerCommand extends Command {
             List<Entry<String, SlayerExp>> leaderboardList = usernameSlayerExpHashMap.entrySet().stream()
                     .sorted(Comparator.comparingDouble(entry -> -entry.getValue().getTotalExp()))
                     .collect(Collectors.toList())
-                    .subList(0, topX - 1);
+                    .subList(0, topX);
 
             StringBuilder response = new StringBuilder("**Slayer XP Leaderboard:**\n\n");
             if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {

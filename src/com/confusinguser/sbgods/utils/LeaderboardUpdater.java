@@ -6,9 +6,8 @@ import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SlayerExp;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -42,6 +41,7 @@ public class LeaderboardUpdater {
 
 
         int i = 0;
+
         for (Player guildMember : guildMembers) {
             Player thePlayer = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
             SkillLevels highestSkillLevels = main.getApiUtil().getBestProfileSkillLevels(thePlayer.getUUID());
@@ -52,6 +52,7 @@ public class LeaderboardUpdater {
             totalCoinsMap.put(thePlayer.getDisplayName(), totalCoins);
             guild.setLeaderboardProgress(i++);
         }
+
         guild.setSlayerExpMap(slayerExpMap);
         guild.setAvgSkillLevelMap(skillLevelMap);
         guild.setTotalCoinsMap(totalCoinsMap);
