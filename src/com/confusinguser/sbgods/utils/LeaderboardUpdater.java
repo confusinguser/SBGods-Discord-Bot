@@ -40,6 +40,7 @@ public class LeaderboardUpdater {
 
         ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
 
+
         int i = 0;
         for (Player guildMember : guildMembers) {
             Player thePlayer = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());

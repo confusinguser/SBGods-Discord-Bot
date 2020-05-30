@@ -205,10 +205,10 @@ public class Util {
                         discord.addRoleToMember(member, role).queue();
                     } catch (HierarchyException ignored) {
                     }
+                }
 
-                    if (inSbgNeededRank.equals("Member")) {
-                        inSbgNeededRank = "God";
-                    }
+                if (inSbgNeededRank.equals("Member")) {
+                    inSbgNeededRank = "God";
                 }
             } else {
                 for (Role role : discord.getRoles().stream()
@@ -226,10 +226,9 @@ public class Util {
                         discord.addRoleToMember(member, role).queue();
                     } catch (HierarchyException ignored) {
                     }
-
-                    if (inSbgNeededRank.equals("Member")) {
-                        inSbgNeededRank = "King";
-                    }
+                }
+                if (inSbgNeededRank.equals("Member")) {
+                    inSbgNeededRank = "King";
                 }
             } else {
                 for (Role role : discord.getRoles().stream()
@@ -276,27 +275,27 @@ public class Util {
         }
 
         if (inSbg) {
-//            main.logger.info("in sbg");
-//
-//            main.logger.info("Player: " + thePlayer.getDisplayName());
-//            main.logger.info("CurrRank: " + inSbgRank);
-//            main.logger.info("NeedRank: " + inSbgNeededRank);
-//            main.logger.info("----------------------");
+            //main.logger.info("in sbg");
 
-            if (inSbgRank.equals("Member")
-                            || inSbgRank.equals("Elite")
-                            || inSbgRank.equals("God")
-                            || inSbgRank.equals("King")
-                            && !inSbgRank.equals(inSbgNeededRank)) {
-                JSONObject newPlayerJson = new JSONObject();
+            //main.logger.info("Player: " + thePlayer.getDisplayName());
+            //main.logger.info("CurrRank: " + inSbgRank);
+            //main.logger.info("NeedRank: " + inSbgNeededRank);
 
-                newPlayerJson.put("uuid", thePlayer.getUUID());
-                newPlayerJson.put("name", thePlayer.getDisplayName());
-                newPlayerJson.put("currRank", inSbgRank);
-                newPlayerJson.put("needRank", inSbgNeededRank);
+            if (!inSbgRank.equals(inSbgNeededRank)) {
+                if(inSbgRank.contains("Member") || inSbgRank.contains("Elite") || inSbgRank.contains("King") || inSbgRank.contains("God")) {
+                    JSONObject newPlayerJson = new JSONObject();
 
-                guildRanksChange.put(newPlayerJson);
+                    //main.logger.info("Adding Rank change to file...");
+
+                    newPlayerJson.put("uuid", thePlayer.getUUID());
+                    newPlayerJson.put("name", thePlayer.getDisplayName());
+                    newPlayerJson.put("currRank", inSbgRank);
+                    newPlayerJson.put("needRank", inSbgNeededRank);
+
+                    guildRanksChange.put(newPlayerJson);
+                }
             }
+            //main.logger.info("----------------------");
 
         }
         main.getApiUtil().setGuildRanksChange(guildRanksChange);

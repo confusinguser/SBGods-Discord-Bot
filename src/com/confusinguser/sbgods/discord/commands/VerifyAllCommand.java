@@ -71,7 +71,7 @@ public class VerifyAllCommand extends Command {
 
         for (Member member : discord.getMembers()) {
             i++;
-            channel.editMessageById(messageId, "Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(i / (double) discord.getMembers().size(), 30) + ") [" + i + "/" + discord.getMembers().size()).queue();
+            channel.editMessageById(messageId, "Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(i / (double) discord.getMembers().size(), 30) + ") [" + i + "/" + discord.getMembers().size() + "]").queue();
             String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag());
             if (!mcName.equals("")) {
                 int response = main.getUtil().verifyPlayer(member, mcName, discord, channel);
