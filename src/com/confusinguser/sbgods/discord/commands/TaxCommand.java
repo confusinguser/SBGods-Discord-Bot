@@ -45,7 +45,7 @@ public class TaxCommand extends Command {
 
             e.getChannel().sendMessage("Your tax info:").queue();
             e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
-            e.getChannel().sendMessage("Other arguments you can use are: `owelist`, `paidlist`, `info` and `setrole`, `paid (admin)`, `paidall (admin)`, `owe (admin)`, `oweall (admin)`!").queue();
+            e.getChannel().sendMessage("Other arguments you can use are: `owelist`, `paidlist`, `info` and `setrole (admin)`, `paid (admin)`, `paidall (admin)`, `owe (admin)`, `oweall (admin)`!").queue();
             return;
         }
 
