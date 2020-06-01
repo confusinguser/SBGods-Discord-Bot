@@ -23,7 +23,7 @@ public abstract class Command extends ListenerAdapter {
             return;
         }
 
-        main.logger.info(e.getAuthor().getName() + " ran command: " + e.getMessage().getContentRaw());
+        main.logger.info(e.getAuthor().getName() + " on " + DiscordServer.getDiscordServerFromEvent(e).name() + " ran command: " + e.getMessage().getContentRaw());
 
         DiscordServer discordServer = DiscordServer.getDiscordServerFromEvent(e);
         if (discordServer == null) {

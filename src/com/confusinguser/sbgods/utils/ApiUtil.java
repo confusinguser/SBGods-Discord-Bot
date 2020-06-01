@@ -377,6 +377,55 @@ public class ApiUtil {
         return new SkillLevels(skillMap, true);
     }
 
+    public SkillExp getProfileSkillExp(String profileUUID, String playerUUID) {
+
+        String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 300000);
+        if (response == null) return new SkillExp();
+
+        JSONObject jsonObject = new JSONObject(response);
+
+        try {
+            jsonObject = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(playerUUID);
+        } catch (JSONException e) {
+            return new SkillExp();
+        }
+
+        HashMap<String, Integer> skillArray = new HashMap<>();
+        for (String skill_type : Constants.skill_types) {
+            try {
+                skillArray.put(skill_type, (int) Math.floor(jsonObject.getDouble("experience_skill_" + skill_type)));
+            } catch (JSONException e) {
+                skillArray.put(skill_type, 0);
+            }
+        }
+        return new SkillExp(skillArray, false);
+    }
+
+    public SkillExp getProfileSkillExpAlternate(String playerUUID) {
+
+        String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&uuid=" + playerUUID, 300000);
+        if (response == null) return new SkillExp();
+
+        JSONObject jsonObject = new JSONObject(response);
+
+        try {
+            jsonObject = jsonObject.getJSONObject("player").getJSONObject("achievements");
+        } catch (JSONException e) {
+            return new SkillExp();
+        }
+
+        HashMap<String, Integer> skillMap = new HashMap<>();
+        for (String skill_type : Constants.alternate_skill_types) {
+            try {
+                skillMap.put(main.getSBUtil().alternateToNormalSkillTypes(skill_type), main.getSBUtil().toSkillExp(jsonObject.getInt("skyblock_" + skill_type)));
+                skillMap.put(main.getSBUtil().alternateToNormalSkillTypes(skill_type), main.getSBUtil().toSkillExp(jsonObject.getInt("skyblock_" + skill_type)));
+            } catch (JSONException e) {
+                skillMap.put(skill_type, 0);
+            }
+        }
+        return new SkillExp(skillMap, true);
+    }
+
     public String getGuildFromUUID(String UUID) {
 
         String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&player=" + UUID, 300000);
@@ -516,6 +565,32 @@ public class ApiUtil {
             SkillLevels skillLevels = getProfileSkillsAlternate(thePlayer.getUUID());
 
             if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
+                highestSkillLevels = skillLevels;
+            }
+        }
+        return highestSkillLevels;
+    }
+
+    public SkillExp getBestProfileSkillExp(String uuid) {
+        Player thePlayer = getPlayerFromUUID(uuid);
+
+        if (thePlayer.getSkyblockProfiles().isEmpty()) {
+            return null;
+        }
+
+        SkillExp highestSkillLevels = new SkillExp();
+        for (String profile : thePlayer.getSkyblockProfiles()) {
+            SkillExp skillLevels = getProfileSkillExp(profile, thePlayer.getUUID());
+
+            if (highestSkillLevels.getTotalSkillExp() < skillLevels.getTotalSkillExp()) {
+                highestSkillLevels = skillLevels;
+            }
+        }
+
+        if (highestSkillLevels.getTotalSkillExp() == 0) {
+            SkillExp skillLevels = getProfileSkillExpAlternate(thePlayer.getUUID());
+
+            if (highestSkillLevels.getTotalSkillExp() < skillLevels.getTotalSkillExp()) {
                 highestSkillLevels = skillLevels;
             }
         }
@@ -667,6 +742,36 @@ public class ApiUtil {
 
         try {
             URL url = new URL("https://soopymc.my.to/api/sbgDiscord/setGuildRanksChange.json?key=HoVoiuWfpdAjJhfTj0YN");
+
+            URLConnection con = url.openConnection();
+            HttpURLConnection http = (HttpURLConnection) con;
+            http.setRequestMethod("POST"); // PUT is another valid option
+            http.setDoOutput(true);
+
+            byte[] out = dataString.getBytes(StandardCharsets.UTF_8);
+            int length = out.length;
+
+            http.setFixedLengthStreamingMode(length);
+            http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            http.connect();
+            try (OutputStream os = http.getOutputStream()) {
+                os.write(out);
+            }
+
+        } catch (IOException e) {
+            main.logger.warning(main.getLangUtil().beautifyStackTrace(e.getStackTrace(), e));
+        }
+    }
+
+    public JSONArray getEventData() {
+        return new JSONObject(getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getEventData.json?key=HoVoiuWfpdAjJhfTj0YN")).getJSONArray("data");
+    }
+
+    public void setEventData(JSONArray data) {
+        String dataString = data.toString(4);
+
+        try {
+            URL url = new URL("https://soopymc.my.to/api/sbgDiscord/setEventData.json?key=HoVoiuWfpdAjJhfTj0YN");
 
             URLConnection con = url.openConnection();
             HttpURLConnection http = (HttpURLConnection) con;

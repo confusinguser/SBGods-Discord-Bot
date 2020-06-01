@@ -263,33 +263,36 @@ public class Util {
                     if (highestLeaderboardPos < 5) {
                         rankGiven = "God";
                     }
+
+                    JSONArray guildRanksChange = main.getApiUtil().getGuildRanksChange();
+
+                    for (int i = 0; i < guildRanksChange.length(); i++) {
+                        if (guildRanksChange.getJSONObject(i).getString("uuid").equals(thePlayer.getUUID())) {
+                            guildRanksChange.remove(i);
+                        }
+                    }
+
+                    if(guild != null && thePlayer.getGuildRank() != null) { //gotta check for null BEFORE checking guild.getguildid
+                        if (guild.getGuildId().equals(HypixelGuild.SBG.getGuildId()) && !thePlayer.getGuildRank().contains(rankGiven)
+                                && (thePlayer.getGuildRank().contains("Member") || thePlayer.getGuildRank().contains("Elite") || thePlayer.getGuildRank().contains("King") || thePlayer.getGuildRank().contains("God"))) {
+                            JSONObject newPlayerJson = new JSONObject();
+
+                            newPlayerJson.put("uuid", thePlayer.getUUID());
+                            newPlayerJson.put("name", thePlayer.getDisplayName());
+                            newPlayerJson.put("currRank", thePlayer.getGuildRank());
+                            newPlayerJson.put("needRank", rankGiven);
+
+                            guildRanksChange.put(newPlayerJson);
+                        }
+                    }
+
+                    main.getApiUtil().setGuildRanksChange(guildRanksChange);
                 }
             }
         }
 
-        JSONArray guildRanksChange = main.getApiUtil().getGuildRanksChange();
 
-        for (int i = 0; i < guildRanksChange.length(); i++) {
-            if (guildRanksChange.getJSONObject(i).getString("uuid").equals(thePlayer.getUUID())) {
-                guildRanksChange.remove(i);
-            }
-        }
 
-        if(guild != null && thePlayer.getGuildRank() != null) { //gotta check for null BEFORE checking guild.getguildid
-            if (guild.getGuildId().equals(HypixelGuild.SBG.getGuildId()) && !thePlayer.getGuildRank().contains(rankGiven)
-                    && (thePlayer.getGuildRank().contains("Member") || thePlayer.getGuildRank().contains("Elite") || thePlayer.getGuildRank().contains("King") || thePlayer.getGuildRank().contains("God"))) {
-                JSONObject newPlayerJson = new JSONObject();
-
-                newPlayerJson.put("uuid", thePlayer.getUUID());
-                newPlayerJson.put("name", thePlayer.getDisplayName());
-                newPlayerJson.put("currRank", thePlayer.getGuildRank());
-                newPlayerJson.put("needRank", rankGiven);
-
-                guildRanksChange.put(newPlayerJson);
-            }
-        }
-
-        main.getApiUtil().setGuildRanksChange(guildRanksChange);
 
         if (sendMsg) {
             if (guild == null) {

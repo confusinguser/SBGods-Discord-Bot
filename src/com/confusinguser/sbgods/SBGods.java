@@ -16,8 +16,8 @@ public class SBGods {
     public static final String VERSION_DESCRIPTION_MINOR = "Added auto-roles"; // Change this every minor release: 0.8.11.5 -> 0.8.12
     public static final String VERSION_DESCRIPTION_PATCH = "Fixed bugs and performance issues"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
     public static final String[] DEVELOPERS = {"244786205873405952", "497210228274757632"};
-    private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
-    //private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
+    //private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
+    private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
     private static SBGods instance;
     public final String[] keys = {"bc90572a-1547-41a5-8f28-d7664916a28d", "3963906e-ffb6-45b9-b07b-80ca9838eb20",//ConfusingUser's keys
             "a269efda-d93f-4521-a7a1-b793166d9ca3", "7673c96b-95b0-429d-81b6-031d9e249c75", "fbb3bea4-0f61-4b5f-a656-502403a3e7c5", "13d28584-99db-4473-a068-467498fcaa8b"};//Soopy's keys
