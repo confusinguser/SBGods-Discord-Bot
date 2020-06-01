@@ -103,7 +103,7 @@ public class SlayerCommand extends Command {
                     if (spreadsheet) {
                         e.getChannel().sendMessage("```arm\n" + message + "```").queue();
                     } else {
-                        e.getChannel().sendMessage("\u200E" + message).queue();
+                        e.getChannel().sendMessage(new EmbedBuilder().setDescription(message).build()).queue();
                     }
                 }
             }

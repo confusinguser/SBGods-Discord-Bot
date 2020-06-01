@@ -11,9 +11,9 @@ import java.util.Date;
 import java.util.logging.*;
 
 public class SBGods {
-    public static final String VERSION = "0.9.1.7";
+    public static final String VERSION = "0.9.2.0";
     public static final String VERSION_DESCRIPTION_MAJOR = ""; // Change this every major release: 0.9.6.3 -> 1.0
-    public static final String VERSION_DESCRIPTION_MINOR = "Added auto-roles"; // Change this every minor release: 0.8.11.5 -> 0.8.12
+    public static final String VERSION_DESCRIPTION_MINOR = "Added event capability"; // Change this every minor release: 0.8.11.5 -> 0.8.12
     public static final String VERSION_DESCRIPTION_PATCH = "Fixed bugs and performance issues"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
     public static final String[] DEVELOPERS = {"244786205873405952", "497210228274757632"};
     private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
