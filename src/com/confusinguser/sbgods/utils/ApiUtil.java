@@ -221,13 +221,15 @@ public class ApiUtil {
         String username;
         String uuid;
         String discord;
-        boolean online;
+        int lastLogin;
+        int lastLogout;
         JSONObject profiles;
         try {
             uuid = jsonObject.getJSONObject("player").getString("uuid");
             username = jsonObject.getJSONObject("player").getString("displayname");
             profiles = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
-            online = jsonObject.getJSONObject("player").getLong("lastLogin") > jsonObject.getJSONObject("player").getLong("lastLogout");
+            lastLogin = jsonObject.getJSONObject("player").getInt("lastLogin");
+            lastLogout = jsonObject.getJSONObject("player").getInt("lastLogout");
         } catch (JSONException e) {
             return new Player();
         }
@@ -239,7 +241,7 @@ public class ApiUtil {
             discord = "";
         }
 
-        return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()));
+        return new Player(uuid, username, discord, lastLogin, lastLogout, new ArrayList<>(profiles.keySet()));
     }
 
     public Player getPlayerFromUsername(String name) {
@@ -250,13 +252,15 @@ public class ApiUtil {
         String username;
         String uuid;
         String discord;
-        boolean online;
+        int lastLogin;
+        int lastLogout;
         JSONObject profiles;
         try {
             uuid = jsonObject.getJSONObject("player").getString("uuid");
             username = jsonObject.getJSONObject("player").getString("displayname");
             profiles = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
-            online = jsonObject.getJSONObject("player").getLong("lastLogin") > jsonObject.getJSONObject("player").getLong("lastLogout");
+            lastLogin = jsonObject.getJSONObject("player").getInt("lastLogin");
+            lastLogout = jsonObject.getJSONObject("player").getInt("lastLogout");
         } catch (JSONException e) {
             return new Player();
         }
@@ -268,7 +272,7 @@ public class ApiUtil {
             discord = "";
         }
 
-        return new Player(uuid, username, discord, online, new ArrayList<>(profiles.keySet()));
+        return new Player(uuid, username, discord, lastLogin, lastLogout, new ArrayList<>(profiles.keySet()));
     }
 
 

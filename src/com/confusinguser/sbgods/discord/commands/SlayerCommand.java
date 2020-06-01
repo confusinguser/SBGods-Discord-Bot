@@ -81,13 +81,13 @@ public class SlayerCommand extends Command {
             } else {
                 int totalSlayer = 0;
                 for (Entry<String, SlayerExp> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue().getTotalExp())).append("\n\n");
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue().getTotalExp())).append("\n");
                     totalSlayer += currentEntry.getValue().getTotalExp();
                 }
                 if (topX == guildMemberUuids.size())
-                    response.append("**Average guild slayer exp: ");
+                    response.append("\n**Average guild slayer exp: ");
                 else
-                    response.append("**Average slayer exp top #").append(topX).append(": ");
+                    response.append("\n**Average slayer exp top #").append(topX).append(": ");
                 response.append(main.getLangUtil().addNotation(Math.round((double) totalSlayer / topX))).append("**");
             }
 
@@ -98,7 +98,7 @@ public class SlayerCommand extends Command {
             for (int j = 0; j < responseList.size(); j++) {
                 String message = responseList.get(j);
                 if (j == 0 && !spreadsheet) {
-                    e.getChannel().sendMessage(message).queue();
+                    e.getChannel().sendMessage(new EmbedBuilder().setDescription(message).build()).queue();
                 } else {
                     if (spreadsheet) {
                         e.getChannel().sendMessage("```arm\n" + message + "```").queue();

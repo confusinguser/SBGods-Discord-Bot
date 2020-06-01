@@ -15,6 +15,8 @@ public class Player {
     private final String discordTag;
     private final boolean online;
     private final SBGods main;
+    private final int lastLogin;
+    private final int lastLogout;
     private final List<String> skyblockProfiles;
     private String guildRank = null;
 
@@ -23,15 +25,19 @@ public class Player {
         this.displayName = null;
         this.discordTag = null;
         this.online = false;
+        this.lastLogin = 0;
+        this.lastLogout = 0;
         this.main = SBGods.getInstance();
         this.skyblockProfiles = new ArrayList<>();
     }
 
-    public Player(String uuid, String displayName, String discordTag, boolean online, List<String> skyblockProfiles) {
+    public Player(String uuid, String displayName, String discordTag, int lastLogin, int lastLogout, List<String> skyblockProfiles) {
         this.UUID = uuid;
         this.displayName = displayName;
         this.discordTag = discordTag;
-        this.online = online;
+        this.online = lastLogin>lastLogout;
+        this.lastLogin = lastLogin;
+        this.lastLogout = lastLogout;
         this.main = SBGods.getInstance();
         this.skyblockProfiles = skyblockProfiles;
     }
@@ -42,15 +48,19 @@ public class Player {
         this.discordTag = null;
         this.guildRank = guildRank;
         this.online = false;
+        this.lastLogin = 0;
+        this.lastLogout = 0;
         this.main = SBGods.getInstance();
         this.skyblockProfiles = null;
     }
 
-    public Player(String uuid, String displayName, String discordTag, boolean online, List<String> skyblockProfiles, String guildRank) {
+    public Player(String uuid, String displayName, String discordTag, int lastLogin, int lastLogout, List<String> skyblockProfiles, String guildRank) {
         this.UUID = uuid;
         this.displayName = displayName;
         this.discordTag = discordTag;
-        this.online = online;
+        this.online = lastLogin>lastLogout;
+        this.lastLogin = lastLogin;
+        this.lastLogout = lastLogout;
         this.main = SBGods.getInstance();
         this.skyblockProfiles = skyblockProfiles;
         this.guildRank = guildRank;
@@ -77,6 +87,14 @@ public class Player {
 
     public String getDiscordTag() {
         return discordTag;
+    }
+
+    public int getLastLogin() {
+        return lastLogin;
+    }
+
+    public int getLastLogout() {
+        return lastLogout;
     }
 
     public boolean isOnline() {
@@ -115,7 +133,7 @@ public class Player {
         return list.stream().map(Map.Entry::getKey).collect(Collectors.toList()).indexOf(getDisplayName());
     }
 
-    public static Player mergePlayerAndGuildMemer(Player player, Player guildMember) {
-        return new Player(player.UUID, player.displayName, player.discordTag, player.online, player.skyblockProfiles, guildMember.guildRank);
+    public static Player mergePlayerAndGuildMember(Player player, Player guildMember) {
+        return new Player(player.UUID, player.displayName, player.discordTag, player.lastLogin, player.lastLogout, player.skyblockProfiles, guildMember.guildRank);
     }
 }

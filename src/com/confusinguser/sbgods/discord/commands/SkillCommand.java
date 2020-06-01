@@ -89,13 +89,13 @@ public class SkillCommand extends Command {
                     if (currentEntry.getValue().isApproximate()) {
                         response.append(" *(appr.)*");
                     }
-                    response.append("\n\n");
+                    response.append("\n");
                     totalAvgSkillLvl += currentEntry.getValue().getAvgSkillLevel();
                 }
                 if (topX == guildMemberUuids.size())
-                    response.append("**Average guild skill level: ");
+                    response.append("\n**Average guild skill level: ");
                 else
-                    response.append("**Average skill level top #").append(topX).append(": ");
+                    response.append("\n**Average skill level top #").append(topX).append(": ");
                 response.append(main.getUtil().round((double) totalAvgSkillLvl / topX, 2)).append("**");
             }
 
@@ -105,7 +105,7 @@ public class SkillCommand extends Command {
             for (int j = 0; j < responseList.size(); j++) {
                 String message = responseList.get(j);
                 if (j == 0 && !spreadsheet) {
-                    e.getChannel().sendMessage(message).queue();
+                    e.getChannel().sendMessage(new EmbedBuilder().setDescription(message).build()).queue();
                 } else {
                     if (spreadsheet) {
                         e.getChannel().sendMessage("```arm\n" + message + "```").queue();

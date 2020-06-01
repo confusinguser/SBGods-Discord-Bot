@@ -165,7 +165,7 @@ public class Util {
         if (guild == HypixelGuild.SBG) {
             for (Player guildMember : main.getApiUtil().getGuildMembers(guild)) {
                 if (guildMember.getUUID().equals(thePlayer.getUUID())) {
-                    thePlayer = Player.mergePlayerAndGuildMemer(thePlayer, guildMember);
+                    thePlayer = Player.mergePlayerAndGuildMember(thePlayer, guildMember);
                 }
             }
         }
