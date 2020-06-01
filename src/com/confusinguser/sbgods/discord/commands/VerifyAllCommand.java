@@ -65,7 +65,9 @@ public class VerifyAllCommand extends Command {
     }
 
     private void verifyAll(MessageChannel channel, Guild discord) {
-        main.getApiUtil().setGuildRanksChange(new JSONArray());
+        if(discord.getId().equals(DiscordServer.SBGods.getServerId())) {
+            main.getApiUtil().setGuildRanksChange(new JSONArray());
+        }
 
         String messageId = channel.sendMessage("Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(0.0, 30) + ") [0/0]").complete().getId();
 
@@ -74,7 +76,7 @@ public class VerifyAllCommand extends Command {
 
         for (Member member : discord.getMembers()) {
             i++;
-            if(i%5==0) {//only once every 2 times (to stop from overloading discord queue)
+            if(i%10==0) {//only once every 10 times (to stop from overloading discord queue)
                 channel.editMessageById(messageId, "Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(i / (double) discord.getMembers().size(), 30) + ") [" + i + "/" + discord.getMembers().size() + "]").queue();
             }
             String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag());
