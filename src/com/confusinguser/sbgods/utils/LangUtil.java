@@ -2,6 +2,7 @@ package com.confusinguser.sbgods.utils;
 
 import com.confusinguser.sbgods.SBGods;
 
+import java.text.DecimalFormat;
 import java.util.regex.Pattern;
 
 public class LangUtil {
@@ -9,9 +10,11 @@ public class LangUtil {
     private final SBGods main;
 
     private final Pattern addCommaPattern = Pattern.compile("\\d{1,3}(?=(\\d{3})+(?=\\.))");
+    private final DecimalFormat df = new DecimalFormat("#");
 
     public LangUtil(SBGods main) {
         this.main = main;
+        df.setMaximumFractionDigits(16);
     }
 
     public String makePossessiveForm(String text) {
@@ -80,7 +83,7 @@ public class LangUtil {
         }
         double returnVal;
         String[] notList = new String[]{"K", "M", "B"};
-        String returnValStr = String.valueOf(num);
+        String returnValStr = df.format(num);
         long checkNum = 1000;
 
         String notValue;
