@@ -81,23 +81,23 @@ public class BankCommand extends Command {
                 int totalCoins = 0;
 
                 for (Entry<String, Double> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey()).append(":* ").append(Math.round(currentEntry.getValue())).append("\n\n");
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue())).append("\n\n");
                     totalCoins += currentEntry.getValue();
                 }
 
                 // Print average coins
                 if (topX == guildMemberUuids.size())
-                    response.append("**Average guild coins: ");
+                    response.append("**Average coins per player: ");
                 else
-                    response.append("**Average coins top #").append(topX).append(": ");
-                response.append(main.getUtil().round((double) totalCoins / topX, 2)).append("**").append('\n');
+                    response.append("**Average coins per player top #").append(topX).append(": ");
+                response.append(main.getLangUtil().addNotation((double) totalCoins / topX)).append("**").append('\n');
 
                 // Print total coins
                 if (topX == guildMemberUuids.size())
                     response.append("**Total coins of people in the guild: ");
                 else
                     response.append("**Total coins of top #").append(topX).append(": ");
-                response.append(totalCoins).append("**");
+                response.append(main.getLangUtil().addNotation(totalCoins)).append("**");
             }
 
             String responseString = response.toString();
@@ -168,13 +168,16 @@ public class BankCommand extends Command {
                         });
 
                 profileEmbed.setTitle(title.toString().substring(0, title.length() - 2));
-                profileEmbed.addField("Total money", main.getLangUtil().addNotation(skyblockProfile.getBalance()) + " coins", false);
+                profileEmbed.addField("Total coins", main.getLangUtil().addNotation(skyblockProfile.getBalance()) + " coins", false);
                 profileEmbed.addField("Members", description.toString(), false);
                 e.getChannel().sendMessage(profileEmbed.build()).queue();
             }
             if (!bankingApi) {
                 e.getChannel().sendMessage("Banking API is off for all profiles").queue();
             }
+            return;
         }
+
+        e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
     }
 }

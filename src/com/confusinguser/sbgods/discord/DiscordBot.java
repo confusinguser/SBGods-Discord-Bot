@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EventListener;
 import java.util.stream.Collectors;
 
 public class DiscordBot {
@@ -63,6 +62,7 @@ public class DiscordBot {
                 verifyAllCommand,
                 taxCommand,
                 playerCommand,
+                bankCommand,
                 eventCommand,
                 messageListener,
                 reactionListener
