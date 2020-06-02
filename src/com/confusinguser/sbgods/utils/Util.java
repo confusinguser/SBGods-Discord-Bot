@@ -192,101 +192,102 @@ public class Util {
             if (highestLeaderboardPos == -2) {
                 return 2;
             }
-            if (highestLeaderboardPos > -1) {
-                String rankGiven = "Member";
+            String rankGiven = "Member";
 
-                // Give Elite, SBK and SBG rank
-                if (hypixelGuild != null && discordServer != null && hypixelGuild == discordServer.getHypixelGuild()) {
-                    if (highestLeaderboardPos < 5) {
-                        for (Role role : discord.getRolesByName("Skyblock God \uD83D\uDE4F" /* \uD83D\uDE4F = 🙏 */, true)) {
-                            try {
-                                discord.addRoleToMember(member, role).queue();
-                            } catch (HierarchyException ignored) {
-                            }
-                        }
-                    } else {
-                        for (Role role : discord.getRoles().stream()
-                                .filter(role -> role.getName().toLowerCase().equals("skyblock god \uD83D\uDE4F"))
-                                .collect(Collectors.toList())) {
-                            try {
-                                discord.removeRoleFromMember(member, role).queue();
-                            } catch (HierarchyException ignored) {
-                            }
+            // Give Elite, SBK and SBG rank
+            if (hypixelGuild != null && discordServer != null && hypixelGuild == discordServer.getHypixelGuild()) {
+                if (highestLeaderboardPos < 5) {
+                    for (Role role : discord.getRolesByName("Skyblock God \uD83D\uDE4F" /* \uD83D\uDE4F = 🙏 */, true)) {
+                        try {
+                            discord.addRoleToMember(member, role).queue();
+                        } catch (HierarchyException ignored) {
                         }
                     }
-                    if (highestLeaderboardPos < 15) {
-                        for (Role role : discord.getRolesByName("Skyblock King \uD83D\uDC51" /* \uD83D\uDC51 = 👑 */, true)) {
-                            try {
-                                discord.addRoleToMember(member, role).queue();
-                            } catch (HierarchyException ignored) {
-                            }
-                        }
-                    } else {
-                        for (Role role : discord.getRoles().stream()
-                                .filter(role -> role.getName().toLowerCase().equals("skyblock king \uD83D\uDC51") ||
-                                        role.getName().toLowerCase().equals("skyblock god \uD83D\uDE4F"))
-                                .collect(Collectors.toList())) {
-                            try {
-                                discord.removeRoleFromMember(member, role).queue();
-                            } catch (HierarchyException ignored) {
-                            }
+                } else {
+                    for (Role role : discord.getRoles().stream()
+                            .filter(role -> role.getName().toLowerCase().equals("skyblock god \uD83D\uDE4F"))
+                            .collect(Collectors.toList())) {
+                        try {
+                            discord.removeRoleFromMember(member, role).queue();
+                        } catch (HierarchyException ignored) {
                         }
                     }
-                    if (highestLeaderboardPos < 45 && hypixelGuild != HypixelGuild.SBDG) {
-                        for (Role role : discord.getRolesByName("Elite", true)) {
-                            try {
-                                discord.addRoleToMember(member, role).queue();
-                            } catch (HierarchyException ignored) {
-                            }
-                        }
-                    } else {
-                        for (Role role : discord.getRoles().stream()
-                                .filter(role -> role.getName().toLowerCase().equals("elite") ||
-                                        role.getName().toLowerCase().equals("skyblock king \uD83D\uDC51") ||
-                                        role.getName().toLowerCase().equals("skyblock god \uD83D\uDE4F"))
-                                .collect(Collectors.toList())) {
-                            try {
-                                discord.removeRoleFromMember(member, role).queue();
-                            } catch (HierarchyException ignored) {
-                            }
+                }
+                if (highestLeaderboardPos < 15) {
+                    for (Role role : discord.getRolesByName("Skyblock King \uD83D\uDC51" /* \uD83D\uDC51 = 👑 */, true)) {
+                        try {
+                            discord.addRoleToMember(member, role).queue();
+                        } catch (HierarchyException ignored) {
                         }
                     }
-                    if (guild != null) {
-                        if (guild.getGuildId().equals(HypixelGuild.SBG.getGuildId())) { //highestLeaderboardPos is one higher than it needs to be so it is only less than not less than or equal to
-                            if (highestLeaderboardPos < 45) {
-                                rankGiven = "Elite";
-                            }
-                            if (highestLeaderboardPos < 15) {
-                                rankGiven = "King";
-                            }
-                            if (highestLeaderboardPos < 5) {
-                                rankGiven = "God";
-                            }
-
-                            JSONArray guildRanksChange = main.getApiUtil().getGuildRanksChange();
-
-                            for (int i = 0; i < guildRanksChange.length(); i++) {
-                                if (guildRanksChange.getJSONObject(i).getString("uuid").equals(thePlayer.getUUID())) {
-                                    guildRanksChange.remove(i);
-                                }
-                            }
-
-                            if(guild != null && thePlayer.getGuildRank() != null) { //gotta check for null BEFORE checking guild.getguildid
-                                if (guild.getGuildId().equals(HypixelGuild.SBG.getGuildId()) && !thePlayer.getGuildRank().contains(rankGiven)
-                                        && (thePlayer.getGuildRank().contains("Member") || thePlayer.getGuildRank().contains("Elite") || thePlayer.getGuildRank().contains("King") || thePlayer.getGuildRank().contains("God"))) {
-                                    JSONObject newPlayerJson = new JSONObject();
-
-                                    newPlayerJson.put("uuid", thePlayer.getUUID());
-                                    newPlayerJson.put("name", thePlayer.getDisplayName());
-                                    newPlayerJson.put("currRank", thePlayer.getGuildRank());
-                                    newPlayerJson.put("needRank", rankGiven);
-
-                                    guildRanksChange.put(newPlayerJson);
-                                }
-                            }
-
-                            main.getApiUtil().setGuildRanksChange(guildRanksChange);
+                } else {
+                    for (Role role : discord.getRoles().stream()
+                            .filter(role -> role.getName().toLowerCase().equals("skyblock king \uD83D\uDC51") ||
+                                    role.getName().toLowerCase().equals("skyblock god \uD83D\uDE4F"))
+                            .collect(Collectors.toList())) {
+                        try {
+                            discord.removeRoleFromMember(member, role).queue();
+                        } catch (HierarchyException ignored) {
                         }
+                    }
+                }
+                if (highestLeaderboardPos < 45 && hypixelGuild != HypixelGuild.SBDG) {
+                    for (Role role : discord.getRolesByName("Elite", true)) {
+                        try {
+                            discord.addRoleToMember(member, role).queue();
+                        } catch (HierarchyException ignored) {
+                        }
+                    }
+                } else {
+                    for (Role role : discord.getRoles().stream()
+                            .filter(role -> role.getName().toLowerCase().equals("elite") ||
+                                    role.getName().toLowerCase().equals("skyblock king \uD83D\uDC51") ||
+                                    role.getName().toLowerCase().equals("skyblock god \uD83D\uDE4F"))
+                            .collect(Collectors.toList())) {
+                        try {
+                            discord.removeRoleFromMember(member, role).queue();
+                        } catch (HierarchyException ignored) {
+                        }
+                    }
+                }
+                if (guild != null) {
+                    if (guild.getGuildId().equals(HypixelGuild.SBG.getGuildId())) { //highestLeaderboardPos is one higher than it needs to be so it is only less than not less than or equal to
+                        if (highestLeaderboardPos < 45) {
+                            rankGiven = "Elite";
+                        }
+                        if (highestLeaderboardPos < 15) {
+                            rankGiven = "King";
+                        }
+                        if (highestLeaderboardPos < 5) {
+                            rankGiven = "God";
+                        }
+                        if (highestLeaderboardPos < 0) {
+                            rankGiven = "Member";
+                        }
+
+                        JSONArray guildRanksChange = main.getApiUtil().getGuildRanksChange();
+
+                        for (int i = 0; i < guildRanksChange.length(); i++) {
+                            if (guildRanksChange.getJSONObject(i).getString("uuid").equals(thePlayer.getUUID())) {
+                                guildRanksChange.remove(i);
+                            }
+                        }
+
+                        if(guild != null && thePlayer.getGuildRank() != null) { //gotta check for null BEFORE checking guild.getguildid
+                            if (guild.getGuildId().equals(HypixelGuild.SBG.getGuildId()) && !thePlayer.getGuildRank().contains(rankGiven)
+                                    && (thePlayer.getGuildRank().contains("Member") || thePlayer.getGuildRank().contains("Elite") || thePlayer.getGuildRank().contains("King") || thePlayer.getGuildRank().contains("God"))) {
+                                JSONObject newPlayerJson = new JSONObject();
+
+                                newPlayerJson.put("uuid", thePlayer.getUUID());
+                                newPlayerJson.put("name", thePlayer.getDisplayName());
+                                newPlayerJson.put("currRank", thePlayer.getGuildRank());
+                                newPlayerJson.put("needRank", rankGiven);
+
+                                guildRanksChange.put(newPlayerJson);
+                            }
+                        }
+
+                        main.getApiUtil().setGuildRanksChange(guildRanksChange);
                     }
                 }
             }
