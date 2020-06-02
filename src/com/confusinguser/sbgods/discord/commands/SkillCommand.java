@@ -49,7 +49,7 @@ public class SkillCommand extends Command {
                 if (currentDiscordServer.getHypixelGuild().getLeaderboardProgress() == 0) {
                     e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards have a higher priority)").queue();
                 } else {
-                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getLeaderboardProgress() + " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
+                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getLeaderboardProgress()+ " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
                 }
                 return;
             }
@@ -57,10 +57,10 @@ public class SkillCommand extends Command {
             int topX;
             if (args.length >= 3) {
                 if (args[2].equalsIgnoreCase("all")) {
-                    topX = guildMemberUuids.size();
+                    topX = guildMemberUuids.size()-1;
                 } else {
                     try {
-                        topX = Math.min(guildMemberUuids.size(), Integer.parseInt(args[2]));
+                        topX = Math.min(guildMemberUuids.size()-1, Integer.parseInt(args[2]));
                     } catch (NumberFormatException exception) {
                         e.getChannel().sendMessage("**" + args[2] + "** is not a valid number!").queue();
                         return;

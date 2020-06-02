@@ -102,6 +102,9 @@ public enum HypixelGuild {
     public void setLeaderboardProgress(int leaderboardProgress) {
         this.leaderboardProgress = leaderboardProgress;
     }
+    public void setLeaderboardProgress(int[] leaderboardProgress) {
+        this.leaderboardProgress = leaderboardProgress[0];
+    }
 
     public String getDisplayName() {
         return names[0];
