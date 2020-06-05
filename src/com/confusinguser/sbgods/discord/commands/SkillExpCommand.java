@@ -56,10 +56,10 @@ public class SkillExpCommand extends Command {
             int topX;
             if (args.length >= 3) {
                 if (args[2].equalsIgnoreCase("all")) {
-                    topX = guildMemberUuids.size();
+                    topX = usernameSkillExpHashMap.size();
                 } else {
                     try {
-                        topX = Math.min(guildMemberUuids.size(), Integer.parseInt(args[2]));
+                        topX = Math.min(usernameSkillExpHashMap.size(), Integer.parseInt(args[2]));
                     } catch (NumberFormatException exception) {
                         e.getChannel().sendMessage("**" + args[2] + "** is not a valid number!").queue();
                         return;

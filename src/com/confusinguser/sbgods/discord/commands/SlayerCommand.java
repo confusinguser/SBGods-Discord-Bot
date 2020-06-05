@@ -55,10 +55,10 @@ public class SlayerCommand extends Command {
             int topX;
             if (args.length > 2) {
                 if (args[2].equalsIgnoreCase("all")) {
-                    topX = guildMemberUuids.size();
+                    topX = usernameSlayerExpHashMap.size();
                 } else {
                     try {
-                        topX = Math.min(guildMemberUuids.size(), Integer.parseInt(args[2]));
+                        topX = Math.min(usernameSlayerExpHashMap.size(), Integer.parseInt(args[2]));
                     } catch (NumberFormatException exception) {
                         e.getChannel().sendMessage("**" + args[2] + "** is not a valid number!").queue();
                         return;
