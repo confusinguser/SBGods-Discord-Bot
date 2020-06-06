@@ -31,15 +31,27 @@ public class VerifyListCommand extends Command {
 
         String discordMessage="";
 
+        int index=0;
+        String messageId = e.getChannel().sendMessage("Loading (" + main.getLangUtil().getProgressBar(0.0, 20) + ")").complete().getId();
 
         for(Member member : e.getGuild().getMembers()) {
-
+            if(index % 5 == 0){
+                e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar( ((double) index)/ ((double) e.getGuild().getMembers().size()), 20) + ")").queue();
+            }
             String tag=member.getUser().getAsTag();
             String mcName=main.getApiUtil().getMcNameFromDisc(tag);
-            Player player=main.getApiUtil().getPlayerFromUsername(mcName);
-            String mcGuild=main.getApiUtil().getGuildFromUUID(player.getUUID());
-            discordMessage+=tag + " (IGN: " + mcName + ") [Guild: " + mcGuild + "]\n";
+            Player player=null;
+            if(mcName != null){
+                player=main.getApiUtil().getPlayerFromUsername(mcName);
+            }
+            String mcGuild=null;
+            if(player.getUUID() != null){
+                mcGuild=main.getApiUtil().getGuildFromUUID(player.getUUID());
+            }
+            discordMessage+=tag + "    (IGN: " + ((mcName == "") ? ("Not Verified") : (mcName)) + ")    [Guild: " + ((mcGuild == "") ? ("No Guild") : (mcGuild)) + "]\n";
+            index++;
         }
+        e.getChannel().deleteMessageById(messageId).queue();
 
         // Split the message every 2000 characters in a nice looking way because of discord limitations
         List<String> responseList = main.getUtil().processMessageForDiscord(discordMessage, 2000);

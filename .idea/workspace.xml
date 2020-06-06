@@ -25,63 +25,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cb221f9d-7993-4b2f-b46f-15fc27747575" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/confusinguser/sbgods/discord/commands/VerifyListCommand.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/SBGods$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/SBGods$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/SBGods_Discord_Bot/SBGods-Discord-Bot.jar" beforeDir="false" afterPath="$PROJECT_DIR$/out/artifacts/SBGods_Discord_Bot/SBGods-Discord-Bot.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/SBGods.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/SBGods.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/Start.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/Start.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/DiscordBot.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/DiscordBot.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/MessageListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/MessageListener.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/ReactionListener.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/ReactionListener.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/AhCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/AhCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/BankCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/BankCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/Command.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/Command.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/DeathsCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/DeathsCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/EventCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/EventCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/HelpCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/HelpCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/KillsCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/KillsCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/PetsCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/PetsCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/PlayerCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/PlayerCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/SbgodsCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/SbgodsCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/SettingsCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/SettingsCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/SkillCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/SkillCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/SkillExpCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/SkillExpCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/SlayerCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/SlayerCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/TaxCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/TaxCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/VerifyAllCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/VerifyAllCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/VerifyCommand$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/VerifyCommand$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/VerifyCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/VerifyCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/WhatguildCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/WhatguildCommand.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/AhItem.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/AhItem.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/DiscordServer.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/DiscordServer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/HelpMessage.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/HelpMessage.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/HypixelGuild.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/HypixelGuild.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/Pet.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/Pet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/PetTier.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/PetTier.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/Player.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/Player.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/PlayerAH.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/PlayerAH.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/Response.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/Response.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/SkillExp.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/SkillExp.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/SkillLevels.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/SkillLevels.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/SkyblockProfile.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/SkyblockProfile.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/SlayerExp.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/SlayerExp.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/TaxPayer.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/TaxPayer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/banking/BankTransaction.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/banking/BankTransaction.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/banking/TransactionType.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/entities/banking/TransactionType.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/ApiUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/ApiUtil.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/CacheUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/CacheUtil.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/Constants.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/Constants.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/JsonApiUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/JsonApiUtil.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/LangUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/LangUtil.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/LeaderboardUpdater$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/LeaderboardUpdater$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/VerifyListCommand.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/discord/commands/VerifyListCommand.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/LeaderboardUpdater.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/LeaderboardUpdater.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/SBUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/SBUtil.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/Util.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/SBGods-Discord-Bot/com/confusinguser/sbgods/utils/Util.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/confusinguser/sbgods/discord/DiscordBot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/confusinguser/sbgods/discord/DiscordBot.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/confusinguser/sbgods/discord/commands/AhCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/confusinguser/sbgods/discord/commands/AhCommand.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/confusinguser/sbgods/discord/commands/SbgodsCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/confusinguser/sbgods/discord/commands/SbgodsCommand.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/confusinguser/sbgods/SBGods.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/confusinguser/sbgods/SBGods.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/confusinguser/sbgods/discord/commands/VerifyListCommand.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/confusinguser/sbgods/discord/commands/VerifyListCommand.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -112,7 +63,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="project.structure.last.edited" value="Artifacts" />
+    <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="restartRequiresConfirmation" value="false" />
@@ -167,6 +118,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
@@ -176,6 +128,10 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="671" y="368" width="388" height="202" key="#Custom_Plugin_Repositories/0.0.1920.1080/-1440.253.1440.900@0.0.1920.1080" timestamp="1589700978068" />
+    <state x="384" y="141" key="#Project_Structure" timestamp="1591450245455">
+      <screen x="0" y="0" width="1792" height="1120" />
+    </state>
+    <state x="384" y="141" key="#Project_Structure/0.0.1792.1120@0.0.1792.1120" timestamp="1591450245455" />
     <state x="690" y="295" key="#com.intellij.codeInsight.editorActions.RestoreReferencesDialog" timestamp="1590256094090">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -216,54 +172,58 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="666" y="281" key="FileChooserDialogImpl/0.0.1920.1080/-1440.253.1440.900@0.0.1920.1080" timestamp="1589801975143" />
-    <state width="1750" height="318" key="GridCell.Tab.0.bottom" timestamp="1591449605797">
+    <state width="1750" height="318" key="GridCell.Tab.0.bottom" timestamp="1591452698252">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
-    <state width="1750" height="318" key="GridCell.Tab.0.bottom/0.0.1792.1120@0.0.1792.1120" timestamp="1591449605797" />
+    <state width="1750" height="318" key="GridCell.Tab.0.bottom/0.0.1792.1120@0.0.1792.1120" timestamp="1591452698252" />
     <state width="1397" height="146" key="GridCell.Tab.0.bottom/0.0.1920.1080/-1440.253.1440.900@-1440.253.1440.900" timestamp="1589620820881" />
     <state width="1877" height="112" key="GridCell.Tab.0.bottom/0.0.1920.1080/-1440.253.1440.900@0.0.1920.1080" timestamp="1591423549421" />
-    <state width="1750" height="318" key="GridCell.Tab.0.center" timestamp="1591449605796">
+    <state width="1750" height="318" key="GridCell.Tab.0.center" timestamp="1591452698252">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
-    <state width="1750" height="318" key="GridCell.Tab.0.center/0.0.1792.1120@0.0.1792.1120" timestamp="1591449605796" />
+    <state width="1750" height="318" key="GridCell.Tab.0.center/0.0.1792.1120@0.0.1792.1120" timestamp="1591452698252" />
     <state width="1397" height="146" key="GridCell.Tab.0.center/0.0.1920.1080/-1440.253.1440.900@-1440.253.1440.900" timestamp="1589620820880" />
     <state width="1877" height="112" key="GridCell.Tab.0.center/0.0.1920.1080/-1440.253.1440.900@0.0.1920.1080" timestamp="1591423549420" />
-    <state width="1750" height="318" key="GridCell.Tab.0.left" timestamp="1591449605796">
+    <state width="1750" height="318" key="GridCell.Tab.0.left" timestamp="1591452698251">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
-    <state width="1750" height="318" key="GridCell.Tab.0.left/0.0.1792.1120@0.0.1792.1120" timestamp="1591449605796" />
+    <state width="1750" height="318" key="GridCell.Tab.0.left/0.0.1792.1120@0.0.1792.1120" timestamp="1591452698251" />
     <state width="1397" height="146" key="GridCell.Tab.0.left/0.0.1920.1080/-1440.253.1440.900@-1440.253.1440.900" timestamp="1589620820880" />
     <state width="1877" height="112" key="GridCell.Tab.0.left/0.0.1920.1080/-1440.253.1440.900@0.0.1920.1080" timestamp="1591423549420" />
-    <state width="1750" height="318" key="GridCell.Tab.0.right" timestamp="1591449605797">
+    <state width="1750" height="318" key="GridCell.Tab.0.right" timestamp="1591452698252">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
-    <state width="1750" height="318" key="GridCell.Tab.0.right/0.0.1792.1120@0.0.1792.1120" timestamp="1591449605797" />
+    <state width="1750" height="318" key="GridCell.Tab.0.right/0.0.1792.1120@0.0.1792.1120" timestamp="1591452698252" />
     <state width="1397" height="146" key="GridCell.Tab.0.right/0.0.1920.1080/-1440.253.1440.900@-1440.253.1440.900" timestamp="1589620820880" />
     <state width="1877" height="112" key="GridCell.Tab.0.right/0.0.1920.1080/-1440.253.1440.900@0.0.1920.1080" timestamp="1591423549420" />
-    <state width="1877" height="363" key="GridCell.Tab.1.bottom" timestamp="1590674587668">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state width="1750" height="392" key="GridCell.Tab.1.bottom" timestamp="1591452034708">
+      <screen x="0" y="0" width="1792" height="1120" />
     </state>
+    <state width="1750" height="392" key="GridCell.Tab.1.bottom/0.0.1792.1120@0.0.1792.1120" timestamp="1591452034708" />
     <state width="1877" height="363" key="GridCell.Tab.1.bottom/0.0.1920.1080/-1440.253.1440.900@0.0.1920.1080" timestamp="1590674587668" />
-    <state width="1877" height="363" key="GridCell.Tab.1.center" timestamp="1590674587667">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state width="1750" height="392" key="GridCell.Tab.1.center" timestamp="1591452034703">
+      <screen x="0" y="0" width="1792" height="1120" />
     </state>
+    <state width="1750" height="392" key="GridCell.Tab.1.center/0.0.1792.1120@0.0.1792.1120" timestamp="1591452034703" />
     <state width="1877" height="363" key="GridCell.Tab.1.center/0.0.1920.1080/-1440.253.1440.900@0.0.1920.1080" timestamp="1590674587667" />
-    <state width="1877" height="363" key="GridCell.Tab.1.left" timestamp="1590674587667">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state width="1750" height="392" key="GridCell.Tab.1.left" timestamp="1591452034700">
+      <screen x="0" y="0" width="1792" height="1120" />
     </state>
+    <state width="1750" height="392" key="GridCell.Tab.1.left/0.0.1792.1120@0.0.1792.1120" timestamp="1591452034700" />
     <state width="1877" height="363" key="GridCell.Tab.1.left/0.0.1920.1080/-1440.253.1440.900@0.0.1920.1080" timestamp="1590674587667" />
-    <state width="1877" height="363" key="GridCell.Tab.1.right" timestamp="1590674587668">
-      <screen x="0" y="0" width="1920" height="1080" />
+    <state width="1750" height="392" key="GridCell.Tab.1.right" timestamp="1591452034707">
+      <screen x="0" y="0" width="1792" height="1120" />
     </state>
+    <state width="1750" height="392" key="GridCell.Tab.1.right/0.0.1792.1120@0.0.1792.1120" timestamp="1591452034707" />
     <state width="1877" height="363" key="GridCell.Tab.1.right/0.0.1920.1080/-1440.253.1440.900@0.0.1920.1080" timestamp="1590674587668" />
     <state x="540" y="283" key="IDE.errors.dialog" timestamp="1589723331202">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="540" y="283" key="IDE.errors.dialog/0.0.1920.1080/-1440.253.1440.900@0.0.1920.1080" timestamp="1589723331202" />
-    <state x="411" y="119" width="1040" height="850" key="SettingsEditor" timestamp="1591445137847">
+    <state x="411" y="119" width="1040" height="850" key="SettingsEditor" timestamp="1591450266441">
       <screen x="0" y="0" width="1792" height="1120" />
     </state>
-    <state x="411" y="119" key="SettingsEditor/0.0.1792.1120@0.0.1792.1120" timestamp="1591445137847" />
+    <state x="411" y="119" key="SettingsEditor/0.0.1792.1120@0.0.1792.1120" timestamp="1591450266441" />
     <state x="440" y="115" width="1040" height="850" key="SettingsEditor/0.0.1920.1080/-1440.253.1440.900@0.0.1920.1080" timestamp="1590248994743" />
     <state x="-1440" y="253" width="1456" height="892" key="dock-window-1" timestamp="1589570517381">
       <screen x="-1440" y="253" width="1440" height="900" />
@@ -279,7 +239,7 @@
     <state x="623" y="235" width="672" height="678" key="search.everywhere.popup/0.0.1920.1080/-1440.253.1440.900@0.0.1920.1080" timestamp="1590674072739" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/SBGods_Discord_Bot$Start.ic" NAME="Start Coverage Results" MODIFIED="1591348002047" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+    <SUITE FILE_PATH="coverage/SBGods_Discord_Bot$Start.ic" NAME="Start Coverage Results" MODIFIED="1591450326251" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
       <FILTER>com.confusinguser.sbgods.*</FILTER>
     </SUITE>
   </component>
