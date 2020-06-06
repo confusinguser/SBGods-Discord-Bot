@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="libs">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/JDA-4.1.1_101-withDependencies.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/slf4j-nop-1.7.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/libs/json-20190722.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

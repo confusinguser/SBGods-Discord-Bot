@@ -439,6 +439,43 @@ public class TaxCommand extends Command {
             return;
         }
 
+        if (args[1].equalsIgnoreCase("clearowes")) {
+            if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+                e.getChannel().sendMessage("You do not have permission to use this command!").queue();
+                return;
+            }
+            String messageId = e.getChannel().sendMessage("Loading (" + main.getLangUtil().getProgressBar(0.0, 20) + ")").complete().getId();
+
+            JSONObject taxData = main.getApiUtil().getTaxData();
+            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(0.5, 20) + ")").queue();
+
+            ArrayList<String> playerUuids = new ArrayList<>(taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").keySet());
+
+            ArrayList<Player> SBGGuildMembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
+
+            int playersUpdated = 0;
+            for (String playerUuid : playerUuids) {
+
+                long currOwes = taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(playerUuid).getLong("owes");
+
+                if (currOwes > 0) {
+                    e.getChannel().sendMessage("Removed tax owes data about " + taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(playerUuid).getString("name")).complete().delete().queueAfter(30, TimeUnit.SECONDS);
+
+                    taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(playerUuid).put("owes",0);
+
+                    playersUpdated++;
+                }
+            }
+
+            main.getApiUtil().setTaxData(taxData);
+
+            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(1.0, 20) + ")").queue();
+
+            e.getChannel().editMessageById(messageId, "Success, removed " + playersUpdated + " players tax owes data").queue();
+
+            return;
+        }
+
         if (args[1].equalsIgnoreCase("setrole")) {
             if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
