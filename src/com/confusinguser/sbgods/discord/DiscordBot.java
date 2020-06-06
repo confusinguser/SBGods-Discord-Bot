@@ -43,6 +43,7 @@ public class DiscordBot {
         PlayerCommand playerCommand = new PlayerCommand(main, this);
         BankCommand bankCommand = new BankCommand(main, this);
         EventCommand eventCommand = new EventCommand(main, this);
+        VerifyListCommand verifyListCommand = new VerifyListCommand(main, this);
 
         MessageListener messageListener = new MessageListener(main, this);
         ReactionListener reactionListener = new ReactionListener(main, this);
@@ -65,7 +66,8 @@ public class DiscordBot {
                 bankCommand,
                 eventCommand,
                 messageListener,
-                reactionListener
+                reactionListener,
+                verifyListCommand
         ));
 
         JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT)
@@ -77,7 +79,7 @@ public class DiscordBot {
             jdaBuilder.addEventListeners(listener);
         }
         jda = jdaBuilder.build();
-        jda.getPresence().setActivity(Activity.playing("Use " + commandPrefix + "help to get started. \nMade by ConfusingUser#5712 & Soopyboo32#3042"));
+        jda.getPresence().setActivity(Activity.playing("Use " + commandPrefix + "help to get started. \nMade by ConfusingUser#5712 & Soopyboo32#3042 & Leyrox#4105"));
         main.logger.info("Bot ready to take commands on " + Arrays.stream(main.getActiveServers()).map(DiscordServer::toString).collect(Collectors.joining(", ")));
     }
 
