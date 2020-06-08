@@ -29,11 +29,6 @@ public class SlayerCommand extends Command {
             return;
         }
 
-        if (args.length == 1) {
-            e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
-            return;
-        }
-
         boolean spreadsheet = false;
         if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
             spreadsheet = true;
@@ -110,17 +105,19 @@ public class SlayerCommand extends Command {
             return;
         }
 
-        if (args[1].equalsIgnoreCase("player")) {
-            if (args.length >= 3) {
-                player(args, e.getChannel());
-            }
+        if (args.length >= 2) {
+            player(args, e.getChannel());
+            e.getTextChannel().sendMessage("You can also use `-slayer leaderboard`").queue();
+            return;
+        }else{
+            player(new String[]{"-slayer",main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag())}, e.getChannel());
+            return;
         }
 
-        e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
     }
 
     public void player(String[] args, MessageChannel channel) {
-        if (args.length >= 3) {
+        if (args.length >= 2) {
             Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
             if (thePlayer.getUUID() == null) {
                 channel.sendMessage("Player **" + args[2] + "** does not exist!").queue();
@@ -144,7 +141,7 @@ public class SlayerCommand extends Command {
 
             channel.sendMessage(embedBuilder.build()).queue();
         } else {
-            channel.sendMessage("Invalid usage! Usage: `" + this.getName() + " player <IGN>`").queue();
+            channel.sendMessage("Invalid usage! Usage: `" + this.getName() + " <IGN>`").queue();
         }
     }
 }

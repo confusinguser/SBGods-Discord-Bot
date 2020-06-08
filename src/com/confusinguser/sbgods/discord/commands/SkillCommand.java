@@ -6,6 +6,7 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
@@ -28,11 +29,6 @@ public class SkillCommand extends Command {
     public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
         if (currentDiscordServer.getBotChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getBotChannelId())) {
             e.getChannel().sendMessage("Skill commands cannot be ran in this channel!").queue();
-            return;
-        }
-
-        if (args.length <= 1) {
-            e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
             return;
         }
 
@@ -117,68 +113,69 @@ public class SkillCommand extends Command {
             return;
         }
 
-        if (args[1].equalsIgnoreCase("player")) {
-            if (args.length >= 3) {
-                Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
+        if (args.length >= 2) {
+            sendPlayerSkillStats(e.getTextChannel(),args[2]);
+            e.getTextChannel().sendMessage("You can also use `-skill leaderboard`").queue();
+            return;
+        } else {
+            sendPlayerSkillStats(e.getTextChannel(),main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag()));
+            return;
+        }
+    }
 
-                if (thePlayer.getSkyblockProfiles().isEmpty()) {
-                    e.getChannel().sendMessage("Player **" + args[2] + "** does not exist!").queue();
-                    return;
-                }
+    private void sendPlayerSkillStats(TextChannel chan, String playerName){
+        Player thePlayer = main.getApiUtil().getPlayerFromUsername(playerName);
 
-                SkillLevels highestSkillLevels = new SkillLevels();
-                for (String profile : thePlayer.getSkyblockProfiles()) {
-                    SkillLevels skillLevels = main.getApiUtil().getProfileSkills(profile, thePlayer.getUUID());
-
-                    if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
-                        highestSkillLevels = skillLevels;
-                    }
-                }
-
-                if (highestSkillLevels.getAvgSkillLevel() == 0) {
-                    SkillLevels skillLevels = main.getApiUtil().getProfileSkillsAlternate(thePlayer.getUUID());
-
-                    if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
-                        highestSkillLevels = skillLevels;
-                    }
-                }
-
-                EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x03731d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " skill levels");
-                StringBuilder descriptionBuilder = embedBuilder.getDescriptionBuilder();
-
-                if (highestSkillLevels.isApproximate()) {
-                    descriptionBuilder.append("Approximate average skill level: **").append(main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3)).append("**\n\n");
-                } else {
-                    descriptionBuilder.append("Average skill level: **").append(main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3)).append("**\n\n");
-                }
-
-                descriptionBuilder
-                        .append("Farming: **").append(highestSkillLevels.getFarming()).append("**\n")
-                        .append("Mining: **").append(highestSkillLevels.getMining()).append("**\n")
-                        .append("Combat: **").append(highestSkillLevels.getCombat()).append("**\n")
-                        .append("Foraging: **").append(highestSkillLevels.getForaging()).append("**\n")
-                        .append("Fishing: **").append(highestSkillLevels.getFishing()).append("**\n")
-                        .append("Enchanting: **").append(highestSkillLevels.getEnchanting()).append("**\n");
-                if (!highestSkillLevels.isApproximate())
-                    descriptionBuilder.append("Taming: **").append(highestSkillLevels.getTaming()).append("**\n");
-                descriptionBuilder.append("Alchemy: **").append(highestSkillLevels.getAlchemy()).append("**\n");
-
-                embedBuilder.setDescription(descriptionBuilder.toString());
-
-                StringBuilder footerBuilder = new StringBuilder();
-                embedBuilder.setFooter(footerBuilder
-                        .append("Carpentry: ").append(highestSkillLevels.getCarpentry())
-                        .append(", runecrafting: ").append(highestSkillLevels.getRunecrafting())
-                        .toString());
-
-                e.getChannel().sendMessage(embedBuilder.build()).queue();
-
-            } else {
-                e.getChannel().sendMessage("Invalid usage! Usage: *" + getName() + " player <IGN>*").queue();
-            }
+        if (thePlayer.getSkyblockProfiles().isEmpty()) {
+            chan.sendMessage("Player **" + playerName + "** does not exist!").queue();
             return;
         }
 
-        e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
+        SkillLevels highestSkillLevels = new SkillLevels();
+        for (String profile : thePlayer.getSkyblockProfiles()) {
+            SkillLevels skillLevels = main.getApiUtil().getProfileSkills(profile, thePlayer.getUUID());
+
+            if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
+                highestSkillLevels = skillLevels;
+            }
+        }
+
+        if (highestSkillLevels.getAvgSkillLevel() == 0) {
+            SkillLevels skillLevels = main.getApiUtil().getProfileSkillsAlternate(thePlayer.getUUID());
+
+            if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
+                highestSkillLevels = skillLevels;
+            }
+        }
+
+        EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x03731d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " skill levels");
+        StringBuilder descriptionBuilder = embedBuilder.getDescriptionBuilder();
+
+        if (highestSkillLevels.isApproximate()) {
+            descriptionBuilder.append("Approximate average skill level: **").append(main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3)).append("**\n\n");
+        } else {
+            descriptionBuilder.append("Average skill level: **").append(main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3)).append("**\n\n");
+        }
+
+        descriptionBuilder
+                .append("Farming: **").append(highestSkillLevels.getFarming()).append("**\n")
+                .append("Mining: **").append(highestSkillLevels.getMining()).append("**\n")
+                .append("Combat: **").append(highestSkillLevels.getCombat()).append("**\n")
+                .append("Foraging: **").append(highestSkillLevels.getForaging()).append("**\n")
+                .append("Fishing: **").append(highestSkillLevels.getFishing()).append("**\n")
+                .append("Enchanting: **").append(highestSkillLevels.getEnchanting()).append("**\n");
+        if (!highestSkillLevels.isApproximate())
+            descriptionBuilder.append("Taming: **").append(highestSkillLevels.getTaming()).append("**\n");
+        descriptionBuilder.append("Alchemy: **").append(highestSkillLevels.getAlchemy()).append("**\n");
+
+        embedBuilder.setDescription(descriptionBuilder.toString());
+
+        StringBuilder footerBuilder = new StringBuilder();
+        embedBuilder.setFooter(footerBuilder
+                .append("Carpentry: ").append(highestSkillLevels.getCarpentry())
+                .append(", runecrafting: ").append(highestSkillLevels.getRunecrafting())
+                .toString());
+
+        chan.sendMessage(embedBuilder.build()).queue();
     }
 }

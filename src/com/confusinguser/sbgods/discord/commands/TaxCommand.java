@@ -236,10 +236,10 @@ public class TaxCommand extends Command {
             try {
                 amount = Integer.parseInt(args[2]);
             } catch (NumberFormatException err) {
-                if (args[3].endsWith("k")) {
+                if (args[2].endsWith("k")) {
                     amount = Integer.parseInt(args[2].replace("k", "")) * 1000;
                 }
-                if (args[3].endsWith("m")) {
+                if (args[2].endsWith("m")) {
                     amount = Integer.parseInt(args[2].replace("m", "")) * 1000000;
                 }
             }
