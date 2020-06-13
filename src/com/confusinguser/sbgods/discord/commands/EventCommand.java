@@ -255,24 +255,36 @@ public class EventCommand extends Command {
 
                 SlayerExp slayer = main.getApiUtil().getPlayerSlayerExp(player.getUUID());
 
-                playerProgress.put("slayerTotal",slayer.getTotalExp()-memberData.getInt("slayerTotal"));
-                playerProgress.put("slayerZombie",slayer.getZombie()-memberData.getInt("slayerZombie"));
+                playerProgress.put("slayerZombie",(slayer.getZombie()-memberData.getInt("slayerZombie"))/2);
                 playerProgress.put("slayerSpider",slayer.getSpider()-memberData.getInt("slayerSpider"));
                 playerProgress.put("slayerWolf",slayer.getWolf()-memberData.getInt("slayerWolf"));
+                playerProgress.put("slayerTotal",playerProgress.getInt("slayerZombie") + playerProgress.getInt("slayerSpider") + playerProgress.getInt("slayerWolf"));
 
                 SkillExp skillExp = main.getApiUtil().getBestProfileSkillExp(player.getUUID());
 
-                playerProgress.put("skillTotal",skillExp.getTotalSkillExp()-memberData.getInt("skillTotal"));
-                playerProgress.put("skillAlchemy",skillExp.getAlchemy()-memberData.getInt("skillAlchemy"));
+                int totalSkillProgress = 0;
+                playerProgress.put("skillAlchemy",(skillExp.getAlchemy()-memberData.getInt("skillAlchemy"))/4);
+                totalSkillProgress+=playerProgress.getInt("skillAlchemy");
                 playerProgress.put("skillCarpentry",skillExp.getCarpentry()-memberData.getInt("skillCarpentry"));
+                totalSkillProgress+=playerProgress.getInt("skillCarpentry");
                 playerProgress.put("skillCombat",skillExp.getCombat()-memberData.getInt("skillCombat"));
+                totalSkillProgress+=playerProgress.getInt("skillCombat");
                 playerProgress.put("skillEnchanting",skillExp.getEnchanting()-memberData.getInt("skillEnchanting"));
+                totalSkillProgress+=playerProgress.getInt("skillEnchanting");
                 playerProgress.put("skillFarming",skillExp.getFarming()-memberData.getInt("skillFarming"));
+                totalSkillProgress+=playerProgress.getInt("skillFarming");
                 playerProgress.put("skillFishing",skillExp.getFishing()-memberData.getInt("skillFishing"));
+                totalSkillProgress+=playerProgress.getInt("skillFishing");
                 playerProgress.put("skillForaging",skillExp.getForaging()-memberData.getInt("skillForaging"));
+                totalSkillProgress+=playerProgress.getInt("skillForaging");
                 playerProgress.put("skillMining",skillExp.getMining()-memberData.getInt("skillMining"));
+                totalSkillProgress+=playerProgress.getInt("skillMining");
                 playerProgress.put("skillRunecrafting",skillExp.getRunecrafting()-memberData.getInt("skillRunecrafting"));
+                totalSkillProgress+=playerProgress.getInt("skillRunecrafting");
                 playerProgress.put("skillTaming",skillExp.getTaming()-memberData.getInt("skillTaming"));
+                totalSkillProgress+=playerProgress.getInt("skillTaming");
+
+                playerProgress.put("skillTotal",totalSkillProgress);
 
                 memberData.put("playerProgress",playerProgress);
             }else{

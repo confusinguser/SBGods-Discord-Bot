@@ -106,10 +106,10 @@ public class TaxCommand extends Command {
             try {
                 amount = -Integer.parseInt(args[2]);
             } catch (NumberFormatException err) {
-                if (args[3].endsWith("k")) {
+                if (args[2].endsWith("k")) {
                     amount = -Integer.parseInt(args[2].replace("k", "")) * 1000;
                 }
-                if (args[3].endsWith("m")) {
+                if (args[2].endsWith("m")) {
                     amount = -Integer.parseInt(args[2].replace("m", "")) * 1000000;
                 }
             }
@@ -256,8 +256,9 @@ public class TaxCommand extends Command {
 
             for (Player guildMember : guildMembers) {
                 i++;
-
-                e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(i / (double) guildMembers.size(), 30) + ")").queue();
+                if(i%10==0) {
+                    e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(i / (double) guildMembers.size(), 30) + ")").queue();
+                }
 
                 if (!taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").has(guildMember.getUUID())) {
                     Player player = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());

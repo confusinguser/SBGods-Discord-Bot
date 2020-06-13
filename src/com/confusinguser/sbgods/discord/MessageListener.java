@@ -24,10 +24,10 @@ public class MessageListener extends ListenerAdapter {
             return;
         }
         if (e.getChannel().getName().contains("verif") && e.getMember() != null &&
-                !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+                (!e.getMember().hasPermission(Permission.MANAGE_SERVER) || e.getAuthor().isBot() )) {
             e.getMessage().delete().queueAfter(30, TimeUnit.SECONDS);
         } else if (e.getMessage().getMentions(Message.MentionType.USER).stream().anyMatch((mention) -> discord.getJDA().getSelfUser().getId().equals(mention.getId()))) {
-            e.getChannel().sendMessage("Yeah I'm here did someone say my name?");
+            e.getChannel().sendMessage("Yeah I'm here did someone say my name?").queue();
         }
     }
 }
