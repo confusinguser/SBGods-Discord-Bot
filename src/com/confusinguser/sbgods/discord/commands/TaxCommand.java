@@ -256,7 +256,7 @@ public class TaxCommand extends Command {
 
             for (Player guildMember : guildMembers) {
                 i++;
-                if(i%10==0) {
+                if (i % 10 == 0) {
                     e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(i / (double) guildMembers.size(), 30) + ")").queue();
                 }
 
@@ -462,7 +462,7 @@ public class TaxCommand extends Command {
                 if (currOwes > 0) {
                     e.getChannel().sendMessage("Removed tax owes data about " + taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(playerUuid).getString("name")).complete().delete().queueAfter(30, TimeUnit.SECONDS);
 
-                    taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(playerUuid).put("owes",0);
+                    taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(playerUuid).put("owes", 0);
 
                     playersUpdated++;
                 }

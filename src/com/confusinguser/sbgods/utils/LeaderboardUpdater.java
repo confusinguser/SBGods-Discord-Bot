@@ -6,8 +6,10 @@ import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SlayerExp;
 
-import java.util.*;
-import java.util.concurrent.ExecutorService;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -70,24 +72,21 @@ public class LeaderboardUpdater {
 
         final int[] i = {0};
 
-        List<Thread> threads = new ArrayList<Thread>();
+        List<Thread> threads = new ArrayList<>();
 
         for (Player guildMember : guildMembers) {
-            Runnable target = new Runnable() {
-                @Override
-                public void run() {
-                    Player thePlayer = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
-                    SkillLevels highestSkillLevels = main.getApiUtil().getBestProfileSkillLevels(thePlayer.getUUID());
-                    SlayerExp totalSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer.getUUID());
-                    double totalCoins = main.getApiUtil().getTotalCoinsInPlayer(thePlayer.getUUID());
-                    skillLevelMap.put(thePlayer.getDisplayName(), highestSkillLevels == null ? new SkillLevels() : highestSkillLevels);
-                    slayerExpMap.put(thePlayer.getDisplayName(), totalSlayerExp);
-                    totalCoinsMap.put(thePlayer.getDisplayName(), totalCoins);
-                    guild.setLeaderboardProgress(i[0]++);
-                }
+            Runnable target = () -> {
+                Player thePlayer = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
+                SkillLevels highestSkillLevels = main.getApiUtil().getBestProfileSkillLevels(thePlayer.getUUID());
+                SlayerExp totalSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer.getUUID());
+                double totalCoins = main.getApiUtil().getTotalCoinsInPlayer(thePlayer.getUUID());
+                skillLevelMap.put(thePlayer.getDisplayName(), highestSkillLevels == null ? new SkillLevels() : highestSkillLevels);
+                slayerExpMap.put(thePlayer.getDisplayName(), totalSlayerExp);
+                totalCoinsMap.put(thePlayer.getDisplayName(), totalCoins);
+                guild.setLeaderboardProgress(i[0]++);
             };
             threads.add(new Thread(target));
-            threads.get(threads.size()-1).start();
+            threads.get(threads.size() - 1).start();
         }
 
         for (Thread thread : threads) {
