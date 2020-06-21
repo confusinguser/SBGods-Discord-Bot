@@ -22,39 +22,43 @@ public class VerifyListCommand extends Command {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
-        if(e.getMember() !=null && !e.getMember().hasPermission(Permission.MANAGE_ROLES)) {
+        if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_ROLES)) {
 
             e.getChannel().sendMessage("You don't have permissions to perform that command!").queue();
             return;
 
         }
 
-        String discordMessage="";
-
-        int index=0;
+        StringBuilder discordMessage = new StringBuilder();
         String messageId = e.getChannel().sendMessage("Loading (" + main.getLangUtil().getProgressBar(0.0, 20) + ")").complete().getId();
 
-        for(Member member : e.getGuild().getMembers()) {
-            if(index % 5 == 0){
-                e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar( ((double) index)/ ((double) e.getGuild().getMembers().size()), 20) + ")").queue();
+        List<Member> discordMembers = e.getGuild().getMembers();
+        for (int i = 0; i < discordMembers.size(); i++) {
+            Member member = discordMembers.get(i);
+            if (i % 5 == 0) {
+                e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar((double) i / e.getGuild().getMembers().size(), 20) + ")").queue();
             }
-            String tag=member.getUser().getAsTag();
-            String mcName=main.getApiUtil().getMcNameFromDisc(tag);
-            Player player=null;
-            if(mcName != null){
-                player=main.getApiUtil().getPlayerFromUsername(mcName);
+            String tag = member.getUser().getAsTag();
+            String mcName = main.getApiUtil().getMcNameFromDisc(tag);
+            if (mcName == null || mcName.equals("")) {
+                discordMessage.append(tag).append("    (IGN: Not Verified)    [Guild: Unknown Guild]\n");
+                continue;
             }
-            String mcGuild=null;
-            if(player.getUUID() != null){
-                mcGuild=main.getApiUtil().getGuildFromUUID(player.getUUID());
+            Player player = main.getApiUtil().getPlayerFromUsername(mcName);
+
+            String mcGuild = main.getApiUtil().getGuildFromUUID(player.getUUID());
+            if (mcGuild == null) {
+                discordMessage.append(tag).append("    (IGN: ").append(mcName).append(")    [Guild: Unknown Guild]\n");
+                continue;
             }
-            discordMessage+=tag + "    (IGN: " + ((mcName == "") ? ("Not Verified") : (mcName)) + ")    [Guild: " + ((mcGuild == "") ? ("No Guild") : (mcGuild)) + "]\n";
-            index++;
+
+            discordMessage.append(tag).append("    (IGN: ").append(mcName).append(")    [Guild: ").append(mcGuild.equals("") ? "No Guild" : mcGuild).append("]\n");
+            i++;
         }
         e.getChannel().deleteMessageById(messageId).queue();
 
         // Split the message every 2000 characters in a nice looking way because of discord limitations
-        List<String> responseList = main.getUtil().processMessageForDiscord(discordMessage, 2000);
+        List<String> responseList = main.getUtil().processMessageForDiscord(discordMessage.toString(), 2000);
         for (String message : responseList) {
 
             e.getChannel().sendMessage(new EmbedBuilder().setDescription(message).build()).queue();

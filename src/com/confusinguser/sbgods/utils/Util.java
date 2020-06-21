@@ -195,7 +195,7 @@ public class Util {
             String rankGiven = "Member";
 
             // Give Elite, SBK and SBG rank
-            if (hypixelGuild != null && discordServer != null && hypixelGuild == discordServer.getHypixelGuild()) {
+            if (hypixelGuild == discordServer.getHypixelGuild()) {
                 if (highestLeaderboardPos < 5) {
                     for (Role role : discord.getRolesByName("Skyblock God \uD83D\uDE4F" /* \uD83D\uDE4F = 🙏 */, true)) {
                         try {
@@ -273,9 +273,8 @@ public class Util {
                             }
                         }
 
-                        if(guild != null && thePlayer.getGuildRank() != null) { //gotta check for null BEFORE checking guild.getguildid
-                            if (guild.getGuildId().equals(HypixelGuild.SBG.getGuildId()) && !thePlayer.getGuildRank().contains(rankGiven)
-                                    && (thePlayer.getGuildRank().contains("Member") || thePlayer.getGuildRank().contains("Elite") || thePlayer.getGuildRank().contains("King") || thePlayer.getGuildRank().contains("God"))) {
+                        if (thePlayer.getGuildRank() != null) { //gotta check for null BEFORE checking guild.getguildid
+                            if (!thePlayer.getGuildRank().contains(rankGiven) && (thePlayer.getGuildRank().contains("Member") || thePlayer.getGuildRank().contains("Elite") || thePlayer.getGuildRank().contains("King") || thePlayer.getGuildRank().contains("God"))) {
                                 JSONObject newPlayerJson = new JSONObject();
 
                                 newPlayerJson.put("uuid", thePlayer.getUUID());
@@ -292,9 +291,6 @@ public class Util {
                 }
             }
         }
-
-
-
 
 
         if (sendMsg) {

@@ -35,7 +35,7 @@ public class Player {
         this.UUID = uuid;
         this.displayName = displayName;
         this.discordTag = discordTag;
-        this.online = lastLogin>lastLogout;
+        this.online = lastLogin > lastLogout;
         this.lastLogin = lastLogin;
         this.lastLogout = lastLogout;
         this.main = SBGods.getInstance();
@@ -58,12 +58,16 @@ public class Player {
         this.UUID = uuid;
         this.displayName = displayName;
         this.discordTag = discordTag;
-        this.online = lastLogin>lastLogout;
+        this.online = lastLogin > lastLogout;
         this.lastLogin = lastLogin;
         this.lastLogout = lastLogout;
         this.main = SBGods.getInstance();
         this.skyblockProfiles = skyblockProfiles;
         this.guildRank = guildRank;
+    }
+
+    public static Player mergePlayerAndGuildMember(Player player, Player guildMember) {
+        return new Player(player.UUID, player.displayName, player.discordTag, player.lastLogin, player.lastLogout, player.skyblockProfiles, guildMember.guildRank);
     }
 
     public String getUUID() {
@@ -131,9 +135,5 @@ public class Player {
         List<Map.Entry<String, SlayerExp>> list = new ArrayList<>(guild.getSlayerExpMap().entrySet());
         list.sort(Comparator.comparingDouble(entry -> -entry.getValue().getTotalExp()));
         return list.stream().map(Map.Entry::getKey).collect(Collectors.toList()).indexOf(getDisplayName());
-    }
-
-    public static Player mergePlayerAndGuildMember(Player player, Player guildMember) {
-        return new Player(player.UUID, player.displayName, player.discordTag, player.lastLogin, player.lastLogout, player.skyblockProfiles, guildMember.guildRank);
     }
 }

@@ -8,12 +8,12 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class EventCommand extends Command {
 
@@ -27,7 +27,8 @@ public class EventCommand extends Command {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
-        if (!DiscordServer.getDiscordServerFromEvent(e).getHypixelGuild().equals(HypixelGuild.SBG)) {
+        if (e.getMember() == null) return;
+        if (!currentDiscordServer.getHypixelGuild().equals(HypixelGuild.SBG)) {
             e.getChannel().sendMessage("This command cannot be used on this server.").queue();
             return;
         }
@@ -40,49 +41,49 @@ public class EventCommand extends Command {
             return;
         }
 
-        if(args[1].equals("start")){
+        if (args[1].equals("start")) {
 
-            String messageId = e.getChannel().sendMessage("Loading... (" + main.getLangUtil().getProgressBar(0,50) + ")").complete().getId();
+            String messageId = e.getChannel().sendMessage("Loading... (" + main.getLangUtil().getProgressBar(0, 50) + ")").complete().getId();
 
             JSONArray eventData = new JSONArray();
 
-            int guildMemberAmount = main.getApiUtil().getGuildMembers(HypixelGuild.SBG).size();
+            ArrayList<Player> guildmembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
 
             int i = 0;
-            for(Player guildMember : main.getApiUtil().getGuildMembers(HypixelGuild.SBG)){
+            for (Player guildMember : guildmembers) {
 
                 i++;
-                if(i%3==0){
-                    e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar((Double.valueOf(i))/ (Double.valueOf(guildMemberAmount)),50) + ")").queue();
+                if (i % 3 == 0) {
+                    e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar((double) i / guildmembers.size(), 50) + ")").queue();
                 }
 
                 Player player = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
                 JSONObject playerData = new JSONObject();
-                playerData.put("uuid",player.getUUID());
-                playerData.put("displayName",player.getDisplayName());
-                playerData.put("lastLogin",player.getLastLogin());
-                playerData.put("lastLogout",player.getLastLogout());
+                playerData.put("uuid", player.getUUID());
+                playerData.put("displayName", player.getDisplayName());
+                playerData.put("lastLogin", player.getLastLogin());
+                playerData.put("lastLogout", player.getLastLogout());
 
                 SlayerExp slayer = main.getApiUtil().getPlayerSlayerExp(player.getUUID());
 
-                playerData.put("slayerTotal",slayer.getTotalExp());
-                playerData.put("slayerZombie",slayer.getZombie());
-                playerData.put("slayerSpider",slayer.getSpider());
-                playerData.put("slayerWolf",slayer.getWolf());
+                playerData.put("slayerTotal", slayer.getTotalExp());
+                playerData.put("slayerZombie", slayer.getZombie());
+                playerData.put("slayerSpider", slayer.getSpider());
+                playerData.put("slayerWolf", slayer.getWolf());
 
                 SkillExp skillExp = main.getApiUtil().getBestProfileSkillExp(player.getUUID());
 
-                playerData.put("skillTotal",skillExp.getTotalSkillExp());
-                playerData.put("skillAlchemy",skillExp.getAlchemy());
-                playerData.put("skillCarpentry",skillExp.getCarpentry());
-                playerData.put("skillCombat",skillExp.getCombat());
-                playerData.put("skillEnchanting",skillExp.getEnchanting());
-                playerData.put("skillFarming",skillExp.getFarming());
-                playerData.put("skillFishing",skillExp.getFishing());
-                playerData.put("skillForaging",skillExp.getForaging());
-                playerData.put("skillMining",skillExp.getMining());
-                playerData.put("skillRunecrafting",skillExp.getRunecrafting());
-                playerData.put("skillTaming",skillExp.getTaming());
+                playerData.put("skillTotal", skillExp.getTotalSkillExp());
+                playerData.put("skillAlchemy", skillExp.getAlchemy());
+                playerData.put("skillCarpentry", skillExp.getCarpentry());
+                playerData.put("skillCombat", skillExp.getCombat());
+                playerData.put("skillEnchanting", skillExp.getEnchanting());
+                playerData.put("skillFarming", skillExp.getFarming());
+                playerData.put("skillFishing", skillExp.getFishing());
+                playerData.put("skillForaging", skillExp.getForaging());
+                playerData.put("skillMining", skillExp.getMining());
+                playerData.put("skillRunecrafting", skillExp.getRunecrafting());
+                playerData.put("skillTaming", skillExp.getTaming());
 
                 eventData.put(playerData);
             }
@@ -94,7 +95,7 @@ public class EventCommand extends Command {
             return;
         }
 
-        if(args[1].equals("stop")){
+        if (args[1].equals("stop")) {
 
             String messageId = e.getChannel().sendMessage("...").complete().getId();
 
@@ -105,213 +106,185 @@ public class EventCommand extends Command {
             return;
         }
 
-        if(args[1].equals("progress")){
-
-            String progressTypes = "`totalslayer` `totalskill` `wolfslayer` `spiderslayer` `zombieslayer` `alchemyskill` `carpentryskill` `combatskill` `enchantingskill` `farmingskill` `fishingskill` `foragingskill` `miningskill` `runecraftingskill` `tamingskill`";
-
-            if(args.length == 2){
-                e.getChannel().sendMessage("You must specify a progress type. Avalible progress types are: " + progressTypes).queue();
+        if (args[1].equals("progress")) {
+            if (args.length <= 2) {
+                e.getChannel().sendMessage("You must specify a progress type. Avalible progress types are: `totalslayer` `totalskill` `wolfslayer` `spiderslayer` `zombieslayer` `alchemyskill` `carpentryskill` `combatskill` `enchantingskill` `farmingskill` `fishingskill` `foragingskill` `miningskill` `runecraftingskill` `tamingskill`").queue();
                 return;
             }
 
-            if(args[2].equalsIgnoreCase("totalskill")){
-                sendProgressLb(e.getTextChannel(),"skillTotal", "Total Skill Exp Progress\n");
-                return;
+            switch (args[2].toLowerCase()) {
+                case "totalskill":
+                    sendProgressLb(e.getTextChannel(), "skillTotal", "Total Skill Exp Progress\n");
+                    return;
+
+                case "totalslayer":
+                    sendProgressLb(e.getTextChannel(), "slayerTotal", "Total Slayer Exp Progress\n");
+                    return;
+
+                case "wolfslayer":
+                    sendProgressLb(e.getTextChannel(), "slayerWolf", "Wolf Slayer Exp Progress\n");
+                    return;
+
+                case "spiderslayer":
+                    sendProgressLb(e.getTextChannel(), "slayerSpider", "Spider Slayer Exp Progress\n");
+                    return;
+
+                case "zombieslayer":
+                    sendProgressLb(e.getTextChannel(), "slayerZombie", "Zombie Slayer Exp Progress\n");
+                    return;
+
+                case "alchemyskill":
+                    sendProgressLb(e.getTextChannel(), "skillAlchemy", "Alchemy Skill Exp Progress\n");
+                    return;
+
+                case "carpentryskill":
+                    sendProgressLb(e.getTextChannel(), "skillCarpentry", "Carpentry Skill Exp Progress\n");
+                    return;
+
+                case "combatskill":
+                    sendProgressLb(e.getTextChannel(), "skillCombat", "Combat Skill Exp Progress\n");
+                    return;
+
+                case "enchantingskill":
+                    sendProgressLb(e.getTextChannel(), "skillEnchanting", "Enchanting Skill Exp Progress\n");
+                    return;
+
+                case "farmingskill":
+                    sendProgressLb(e.getTextChannel(), "skillFarming", "Farming Skill Exp Progress\n");
+                    return;
+
+                case "fishingskill":
+                    sendProgressLb(e.getTextChannel(), "skillFishing", "Fishing Skill Exp Progress\n");
+                    return;
+
+                case "foragingskill":
+                    sendProgressLb(e.getTextChannel(), "skillForaging", "Foraging Skill Exp Progress\n");
+                    return;
+
+                case "miningskill":
+                    sendProgressLb(e.getTextChannel(), "skillMining", "Mining Skill Exp Progress\n");
+                    return;
+
+                case "runecraftingskill":
+                    sendProgressLb(e.getTextChannel(), "skillRunecrafting", "Runecrafting Skill Exp Progress\n");
+                    return;
+
+                case "tamingskill":
+                    sendProgressLb(e.getTextChannel(), "skillTaming", "Taming Skill Exp Progress\n");
+                    return;
+
+                default:
+                    e.getChannel().sendMessage("Invalid progress type. Valid progress types are: `totalslayer` `totalskill` `wolfslayer` `spiderslayer` `zombieslayer` `alchemyskill` `carpentryskill` `combatskill` `enchantingskill` `farmingskill` `fishingskill` `foragingskill` `miningskill` `runecraftingskill` `tamingskill`").queue();
+                    return;
             }
-
-            if(args[2].equalsIgnoreCase("totalslayer")){
-                sendProgressLb(e.getTextChannel(),"slayerTotal", "Total Slayer Exp Progress\n");
-                return;
-            }
-
-            if(args[2].equalsIgnoreCase("wolfslayer")){
-                sendProgressLb(e.getTextChannel(),"slayerWolf", "Wolf Slayer Exp Progress\n");
-                return;
-            }
-
-            if(args[2].equalsIgnoreCase("spiderslayer")){
-                sendProgressLb(e.getTextChannel(),"slayerSpider", "Spider Slayer Exp Progress\n");
-                return;
-            }
-
-            if(args[2].equalsIgnoreCase("zombieslayer")){
-                sendProgressLb(e.getTextChannel(),"slayerZombie", "Zombie Slayer Exp Progress\n");
-                return;
-            }
-
-            if(args[2].equalsIgnoreCase("alchemyskill")){
-                sendProgressLb(e.getTextChannel(),"skillAlchemy", "Alchemy Skill Exp Progress\n");
-                return;
-            }
-
-            if(args[2].equalsIgnoreCase("carpentryskill")){
-                sendProgressLb(e.getTextChannel(),"skillCarpentry", "Carpentry Skill Exp Progress\n");
-                return;
-            }
-
-            if(args[2].equalsIgnoreCase("combatskill")){
-                sendProgressLb(e.getTextChannel(),"skillCombat", "Combat Skill Exp Progress\n");
-                return;
-            }
-
-            if(args[2].equalsIgnoreCase("enchantingskill")){
-                sendProgressLb(e.getTextChannel(),"skillEnchanting", "Enchanting Skill Exp Progress\n");
-                return;
-            }
-
-            if(args[2].equalsIgnoreCase("farmingskill")){
-                sendProgressLb(e.getTextChannel(),"skillFarming", "Farming Skill Exp Progress\n");
-                return;
-            }
-
-            if(args[2].equalsIgnoreCase("fishingskill")){
-                sendProgressLb(e.getTextChannel(),"skillFishing", "Fishing Skill Exp Progress\n");
-                return;
-            }
-
-            if(args[2].equalsIgnoreCase("foragingskill")){
-                sendProgressLb(e.getTextChannel(),"skillForaging", "Foraging Skill Exp Progress\n");
-                return;
-            }
-
-            if(args[2].equalsIgnoreCase("miningskill")){
-                sendProgressLb(e.getTextChannel(),"skillMining", "Mining Skill Exp Progress\n");
-                return;
-            }
-
-            if(args[2].equalsIgnoreCase("runecraftingskill")){
-                sendProgressLb(e.getTextChannel(),"skillRunecrafting", "Runecrafting Skill Exp Progress\n");
-                return;
-            }
-
-            if(args[2].equalsIgnoreCase("tamingskill")){
-                sendProgressLb(e.getTextChannel(),"skillTaming", "Taming Skill Exp Progress\n");
-                return;
-            }
-
-
-            e.getChannel().sendMessage("Invalid progress type. Valid progress types are: " + progressTypes).queue();
-
-            return;
         }
-
-
         e.getChannel().sendMessage("Invalid usage! Usage: `" + this.usage + "`").queue();
     }
 
-    private void sendProgressLb(TextChannel e, String key, String message){
+    private void sendProgressLb(TextChannel e, String key, String message) {
         JSONArray eventProgress = getEventDataProgress(e);
 
-        int len = eventProgress.length();//  Really bad soring algorithm below, but i couldent get any other to work
-        for(int i = 0;i<len;i++){
-            JSONObject best = eventProgress.getJSONObject(0);
-            int bestIndex=0;
-            for(int o = 0;o<eventProgress.length();o++){
-                if(eventProgress.getJSONObject(o).getJSONObject("playerProgress").getInt(key)>best.getJSONObject("playerProgress").getInt(key)){
-                    best = eventProgress.getJSONObject(o);
-                    bestIndex = o;
-                }
-            }
+        StringBuilder messageBuilder = new StringBuilder(message);
+        List<JSONObject> leaderboardList = eventProgress.toList().stream()
+                .filter(object -> object instanceof JSONObject)
+                .map(object -> (JSONObject) object)
+                .sorted(Comparator.comparingDouble(jsonObject -> jsonObject.getInt(key)))
+                .collect(Collectors.toList());
 
-            message += "#" + i + " " + best.getString("displayName") + ": " + main.getLangUtil().addNotation(best.getJSONObject("playerProgress").getInt(key)) + "\n";
-            eventProgress.remove(bestIndex);
+        for (int i = 0; i < leaderboardList.size(); i++) {
+            JSONObject player = leaderboardList.get(i);
+            messageBuilder.append("#").append(i + 1).append(" ").append(player.getString("displayName")).append(": ").append(main.getLangUtil().addNotation(player.getJSONObject("playerProgress").getInt(key))).append("\n");
         }
+        message = messageBuilder.toString();
 
         List<String> messageSend = main.getUtil().processMessageForDiscord(message, 2000);
-        for(String messageSending : messageSend){
+        for (String messageSending : messageSend) {
             e.sendMessage(new EmbedBuilder().setDescription(messageSending).build()).queue();
         }
     }
 
-    private JSONArray getEventDataProgress(TextChannel e){
-        String messageId = e.sendMessage("Loading... (" + main.getLangUtil().getProgressBar(0,50) + ")").complete().getId();
+    private JSONArray getEventDataProgress(TextChannel e) {
+        String messageId = e.sendMessage("Loading... (" + main.getLangUtil().getProgressBar(0, 50) + ")").complete().getId();
 
         JSONArray data = main.getApiUtil().getEventData();
 
-        for(int i = 0;i<data.length();i++){
-            if(i%3==0){
-                e.editMessageById(messageId,"Loading... (" + main.getLangUtil().getProgressBar(Double.valueOf(i)/Double.valueOf(data.length()),50) + ")").queue();
+        for (int i = 0; i < data.length(); i++) {
+            if (i % 3 == 0) {
+                e.editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar((double) i / data.length(), 50) + ")").queue();
             }
 
             JSONObject memberData = data.getJSONObject(i);
 
             boolean needToUpdateData = false;
-            Player player = null;
+            Player player = main.getApiUtil().getPlayerFromUUID(memberData.getString("uuid"));
 
-            if(memberData.getInt("lastLogin")>memberData.getInt("lastLogout")){
+            if (memberData.getInt("lastLogin") > memberData.getInt("lastLogout")) {
                 needToUpdateData = true;
-            }else{
-                player = main.getApiUtil().getPlayerFromUUID(memberData.getString("uuid"));
-                if(memberData.getInt("lastLogin")<player.getLastLogin()){
+            } else {
+                if (memberData.getInt("lastLogin") < player.getLastLogin()) {
                     needToUpdateData = true;
                 }
             }
 
-            if(needToUpdateData){
-                if(player == null){
-                    player = main.getApiUtil().getPlayerFromUUID(memberData.getString("uuid"));
-                }
-                JSONObject playerProgress = new JSONObject();
+            JSONObject playerProgress = new JSONObject();
+            if (needToUpdateData) {
 
                 SlayerExp slayer = main.getApiUtil().getPlayerSlayerExp(player.getUUID());
 
-                playerProgress.put("slayerZombie",(slayer.getZombie()-memberData.getInt("slayerZombie"))/2);
-                playerProgress.put("slayerSpider",slayer.getSpider()-memberData.getInt("slayerSpider"));
-                playerProgress.put("slayerWolf",slayer.getWolf()-memberData.getInt("slayerWolf"));
-                playerProgress.put("slayerTotal",playerProgress.getInt("slayerZombie") + playerProgress.getInt("slayerSpider") + playerProgress.getInt("slayerWolf"));
+                playerProgress.put("slayerZombie", (slayer.getZombie() - memberData.getInt("slayerZombie")) / 2);
+                playerProgress.put("slayerSpider", slayer.getSpider() - memberData.getInt("slayerSpider"));
+                playerProgress.put("slayerWolf", slayer.getWolf() - memberData.getInt("slayerWolf"));
+                playerProgress.put("slayerTotal", playerProgress.getInt("slayerZombie") + playerProgress.getInt("slayerSpider") + playerProgress.getInt("slayerWolf"));
 
                 SkillExp skillExp = main.getApiUtil().getBestProfileSkillExp(player.getUUID());
 
                 int totalSkillProgress = 0;
-                playerProgress.put("skillAlchemy",(skillExp.getAlchemy()-memberData.getInt("skillAlchemy"))/4);
-                totalSkillProgress+=playerProgress.getInt("skillAlchemy");
-                playerProgress.put("skillCarpentry",skillExp.getCarpentry()-memberData.getInt("skillCarpentry"));
-                totalSkillProgress+=playerProgress.getInt("skillCarpentry");
-                playerProgress.put("skillCombat",skillExp.getCombat()-memberData.getInt("skillCombat"));
-                totalSkillProgress+=playerProgress.getInt("skillCombat");
-                playerProgress.put("skillEnchanting",skillExp.getEnchanting()-memberData.getInt("skillEnchanting"));
-                totalSkillProgress+=playerProgress.getInt("skillEnchanting");
-                playerProgress.put("skillFarming",skillExp.getFarming()-memberData.getInt("skillFarming"));
-                totalSkillProgress+=playerProgress.getInt("skillFarming");
-                playerProgress.put("skillFishing",skillExp.getFishing()-memberData.getInt("skillFishing"));
-                totalSkillProgress+=playerProgress.getInt("skillFishing");
-                playerProgress.put("skillForaging",skillExp.getForaging()-memberData.getInt("skillForaging"));
-                totalSkillProgress+=playerProgress.getInt("skillForaging");
-                playerProgress.put("skillMining",skillExp.getMining()-memberData.getInt("skillMining"));
-                totalSkillProgress+=playerProgress.getInt("skillMining");
-                playerProgress.put("skillRunecrafting",skillExp.getRunecrafting()-memberData.getInt("skillRunecrafting"));
-                totalSkillProgress+=playerProgress.getInt("skillRunecrafting");
-                playerProgress.put("skillTaming",skillExp.getTaming()-memberData.getInt("skillTaming"));
-                totalSkillProgress+=playerProgress.getInt("skillTaming");
+                playerProgress.put("skillAlchemy", (skillExp.getAlchemy() - memberData.getInt("skillAlchemy")) / 4);
+                totalSkillProgress += playerProgress.getInt("skillAlchemy");
+                playerProgress.put("skillCarpentry", skillExp.getCarpentry() - memberData.getInt("skillCarpentry"));
+                totalSkillProgress += playerProgress.getInt("skillCarpentry");
+                playerProgress.put("skillCombat", skillExp.getCombat() - memberData.getInt("skillCombat"));
+                totalSkillProgress += playerProgress.getInt("skillCombat");
+                playerProgress.put("skillEnchanting", skillExp.getEnchanting() - memberData.getInt("skillEnchanting"));
+                totalSkillProgress += playerProgress.getInt("skillEnchanting");
+                playerProgress.put("skillFarming", skillExp.getFarming() - memberData.getInt("skillFarming"));
+                totalSkillProgress += playerProgress.getInt("skillFarming");
+                playerProgress.put("skillFishing", skillExp.getFishing() - memberData.getInt("skillFishing"));
+                totalSkillProgress += playerProgress.getInt("skillFishing");
+                playerProgress.put("skillForaging", skillExp.getForaging() - memberData.getInt("skillForaging"));
+                totalSkillProgress += playerProgress.getInt("skillForaging");
+                playerProgress.put("skillMining", skillExp.getMining() - memberData.getInt("skillMining"));
+                totalSkillProgress += playerProgress.getInt("skillMining");
+                playerProgress.put("skillRunecrafting", skillExp.getRunecrafting() - memberData.getInt("skillRunecrafting"));
+                totalSkillProgress += playerProgress.getInt("skillRunecrafting");
+                playerProgress.put("skillTaming", skillExp.getTaming() - memberData.getInt("skillTaming"));
+                totalSkillProgress += playerProgress.getInt("skillTaming");
 
-                playerProgress.put("skillTotal",totalSkillProgress);
+                playerProgress.put("skillTotal", totalSkillProgress);
 
-                memberData.put("playerProgress",playerProgress);
-            }else{
-                JSONObject playerProgress = new JSONObject();
+            } else {
+                playerProgress.put("slayerTotal", 0);
+                playerProgress.put("slayerZombie", 0);
+                playerProgress.put("slayerSpider", 0);
+                playerProgress.put("slayerWolf", 0);
 
-                playerProgress.put("slayerTotal",0);
-                playerProgress.put("slayerZombie",0);
-                playerProgress.put("slayerSpider",0);
-                playerProgress.put("slayerWolf",0);
+                playerProgress.put("skillTotal", 0);
+                playerProgress.put("skillAlchemy", 0);
+                playerProgress.put("skillCarpentry", 0);
+                playerProgress.put("skillCombat", 0);
+                playerProgress.put("skillEnchanting", 0);
+                playerProgress.put("skillFarming", 0);
+                playerProgress.put("skillFishing", 0);
+                playerProgress.put("skillForaging", 0);
+                playerProgress.put("skillMining", 0);
+                playerProgress.put("skillRunecrafting", 0);
+                playerProgress.put("skillTaming", 0);
 
-                playerProgress.put("skillTotal",0);
-                playerProgress.put("skillAlchemy",0);
-                playerProgress.put("skillCarpentry",0);
-                playerProgress.put("skillCombat",0);
-                playerProgress.put("skillEnchanting",0);
-                playerProgress.put("skillFarming",0);
-                playerProgress.put("skillFishing",0);
-                playerProgress.put("skillForaging",0);
-                playerProgress.put("skillMining",0);
-                playerProgress.put("skillRunecrafting",0);
-                playerProgress.put("skillTaming",0);
-
-                memberData.put("playerProgress",playerProgress);
             }
+            memberData.put("playerProgress", playerProgress);
 
             data.remove(i);
-            data.put(i,memberData);
+            data.put(i, memberData);
         }
 
         e.deleteMessageById(messageId).queue();

@@ -32,9 +32,9 @@ public class SkillCommand extends Command {
             return;
         }
 
-        boolean spreadsheet = false;
-        if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
-            spreadsheet = true;
+        if (args.length == 1) {
+            player(e.getTextChannel(), main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag()));
+            return;
         }
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
@@ -45,7 +45,7 @@ public class SkillCommand extends Command {
                 if (currentDiscordServer.getHypixelGuild().getLeaderboardProgress() == 0) {
                     e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards have a higher priority)").queue();
                 } else {
-                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getLeaderboardProgress()+ " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
+                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getLeaderboardProgress() + " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
                 }
                 return;
             }
@@ -72,6 +72,10 @@ public class SkillCommand extends Command {
                     .subList(0, topX);
 
             StringBuilder response = new StringBuilder("**Average Skill Level Leaderboard:**\n\n");
+            boolean spreadsheet = false;
+            if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
+                spreadsheet = true;
+            }
             if (spreadsheet) {
                 for (Entry<String, SkillLevels> currentEntry : leaderboardList) {
                     if (!currentEntry.getValue().isApproximate()) {
@@ -110,24 +114,15 @@ public class SkillCommand extends Command {
                     }
                 }
             }
-            return;
         }
-
-        if (args.length >= 2) {
-            sendPlayerSkillStats(e.getTextChannel(),args[2]);
-            e.getTextChannel().sendMessage("You can also use `-skill leaderboard`").queue();
-            return;
-        } else {
-            sendPlayerSkillStats(e.getTextChannel(),main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag()));
-            return;
-        }
+        player(e.getTextChannel(), args[1]);
     }
 
-    private void sendPlayerSkillStats(TextChannel chan, String playerName){
+    private void player(TextChannel channel, String playerName) {
         Player thePlayer = main.getApiUtil().getPlayerFromUsername(playerName);
 
         if (thePlayer.getSkyblockProfiles().isEmpty()) {
-            chan.sendMessage("Player **" + playerName + "** does not exist!").queue();
+            channel.sendMessage("Player **" + playerName + "** does not exist!").queue();
             return;
         }
 
@@ -176,6 +171,6 @@ public class SkillCommand extends Command {
                 .append(", runecrafting: ").append(highestSkillLevels.getRunecrafting())
                 .toString());
 
-        chan.sendMessage(embedBuilder.build()).queue();
+        channel.sendMessage(embedBuilder.build()).queue();
     }
 }

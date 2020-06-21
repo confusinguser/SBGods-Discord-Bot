@@ -29,9 +29,8 @@ public class SlayerCommand extends Command {
             return;
         }
 
-        boolean spreadsheet = false;
-        if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
-            spreadsheet = true;
+        if (args.length == 1) {
+            player(e.getChannel(), main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag()));
         }
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
@@ -90,6 +89,10 @@ public class SlayerCommand extends Command {
             // Split the message every 2000 characters in a nice looking way because of discord limitations
             List<String> responseList = main.getUtil().processMessageForDiscord(responseString, 2000);
 
+            boolean spreadsheet = false;
+            if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
+                spreadsheet = true;
+            }
             for (int j = 0; j < responseList.size(); j++) {
                 String message = responseList.get(j);
                 if (j == 0 && !spreadsheet) {
@@ -104,44 +107,31 @@ public class SlayerCommand extends Command {
             }
             return;
         }
-
-        if (args.length >= 2) {
-            player(args, e.getChannel());
-            e.getTextChannel().sendMessage("You can also use `-slayer leaderboard`").queue();
-            return;
-        }else{
-            player(new String[]{"-slayer",main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag())}, e.getChannel());
-            return;
-        }
-
+        player(e.getChannel(), args[1]);
     }
 
-    public void player(String[] args, MessageChannel channel) {
-        if (args.length >= 2) {
-            Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
-            if (thePlayer.getUUID() == null) {
-                channel.sendMessage("Player **" + args[2] + "** does not exist!").queue();
-                return;
-            }
-            if (thePlayer.getSkyblockProfiles().isEmpty()) {
-                channel.sendMessage("Player **" + args[2] + "** has never played Skyblock!").queue();
-                return;
-            }
-
-            SlayerExp playerSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer.getUUID());
-
-            EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x51047d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " slayer xp");
-            embedBuilder.setDescription(embedBuilder.getDescriptionBuilder()
-                    .append("Total slayer xp: **").append(main.getLangUtil().addNotation(playerSlayerExp.getTotalExp())).append("**\n\n")
-
-                    .append("Zombie: **").append(main.getLangUtil().addNotation(playerSlayerExp.getZombie())).append("**\n")
-                    .append("Spider: **").append(main.getLangUtil().addNotation(playerSlayerExp.getSpider())).append("**\n")
-                    .append("Wolf:   **").append(main.getLangUtil().addNotation(playerSlayerExp.getWolf())).append("**\n")
-                    .toString());
-
-            channel.sendMessage(embedBuilder.build()).queue();
-        } else {
-            channel.sendMessage("Invalid usage! Usage: `" + this.getName() + " <IGN>`").queue();
+    public void player(MessageChannel channel, String playerName) {
+        Player thePlayer = main.getApiUtil().getPlayerFromUsername(playerName);
+        if (thePlayer.getUUID() == null) {
+            channel.sendMessage("Player **" + playerName + "** does not exist!").queue();
+            return;
         }
+        if (thePlayer.getSkyblockProfiles().isEmpty()) {
+            channel.sendMessage("Player **" + playerName + "** has never played Skyblock!").queue();
+            return;
+        }
+
+        SlayerExp playerSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer.getUUID());
+
+        EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x51047d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " slayer xp");
+        embedBuilder.setDescription(embedBuilder.getDescriptionBuilder()
+                .append("Total slayer xp: **").append(main.getLangUtil().addNotation(playerSlayerExp.getTotalExp())).append("**\n\n")
+
+                .append("Zombie: **").append(main.getLangUtil().addNotation(playerSlayerExp.getZombie())).append("**\n")
+                .append("Spider: **").append(main.getLangUtil().addNotation(playerSlayerExp.getSpider())).append("**\n")
+                .append("Wolf:   **").append(main.getLangUtil().addNotation(playerSlayerExp.getWolf())).append("**\n")
+                .toString());
+
+        channel.sendMessage(embedBuilder.build()).queue();
     }
 }
