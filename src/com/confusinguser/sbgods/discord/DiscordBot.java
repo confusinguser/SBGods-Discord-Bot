@@ -44,6 +44,7 @@ public class DiscordBot {
         BankCommand bankCommand = new BankCommand(main, this);
         EventCommand eventCommand = new EventCommand(main, this);
         VerifyListCommand verifyListCommand = new VerifyListCommand(main, this);
+        GuildDiscListCommand guildDiscListCommand = new GuildDiscListCommand(main, this);
 
         MessageListener messageListener = new MessageListener(main, this);
         ReactionListener reactionListener = new ReactionListener(main, this);
@@ -65,9 +66,10 @@ public class DiscordBot {
                 playerCommand,
                 bankCommand,
                 eventCommand,
+                verifyListCommand,
+                guildDiscListCommand,
                 messageListener,
-                reactionListener,
-                verifyListCommand
+                reactionListener
         ));
 
         JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT)

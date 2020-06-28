@@ -452,8 +452,6 @@ public class TaxCommand extends Command {
 
             ArrayList<String> playerUuids = new ArrayList<>(taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").keySet());
 
-            ArrayList<Player> SBGGuildMembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
-
             int playersUpdated = 0;
             for (String playerUuid : playerUuids) {
 

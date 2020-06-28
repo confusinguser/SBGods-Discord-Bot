@@ -20,12 +20,10 @@ public class LeaderboardUpdater {
 
     public LeaderboardUpdater(SBGods main) {
         this.main = main;
-        for (HypixelGuild hypixelGuild : HypixelGuild.values())
-            updateLeaderboardCache(hypixelGuild);
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             for (HypixelGuild hypixelGuild : HypixelGuild.values())
                 updateLeaderboardCache(hypixelGuild);
-        }, 9, 9, TimeUnit.MINUTES);
+        }, 0, 9, TimeUnit.MINUTES);
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             try {
                 main.getDiscord().verifyAllCommand.verifyAll(main.getDiscord().getJDA().awaitReady().getTextChannelById("713012939258593290"));
