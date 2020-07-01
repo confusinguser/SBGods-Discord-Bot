@@ -21,7 +21,6 @@ public class EventCommand extends Command {
         this.main = main;
         this.discord = discord;
         this.name = "event";
-        this.usage = this.getName() + "";
         this.aliases = new String[]{};
     }
 
@@ -181,8 +180,8 @@ public class EventCommand extends Command {
         e.getChannel().sendMessage("Invalid usage! Usage: `" + this.usage + "`").queue();
     }
 
-    private void sendProgressLb(TextChannel e, String key, String message) {
-        JSONArray eventProgress = getEventDataProgress(e);
+    private void sendProgressLb(TextChannel channel, String key, String message) {
+        JSONArray eventProgress = getEventDataProgress(channel);
 
         StringBuilder messageBuilder = new StringBuilder(message);
         List<JSONObject> leaderboardList = eventProgress.toList().stream()
@@ -199,7 +198,7 @@ public class EventCommand extends Command {
 
         List<String> messageSend = main.getUtil().processMessageForDiscord(message, 2000);
         for (String messageSending : messageSend) {
-            e.sendMessage(new EmbedBuilder().setDescription(messageSending).build()).queue();
+            channel.sendMessage(new EmbedBuilder().setDescription(messageSending).build()).queue();
         }
     }
 

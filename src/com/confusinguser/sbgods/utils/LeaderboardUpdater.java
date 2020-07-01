@@ -5,6 +5,7 @@ import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import com.confusinguser.sbgods.entities.SlayerExp;
+import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,8 +23,15 @@ public class LeaderboardUpdater {
         this.main = main;
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             for (HypixelGuild hypixelGuild : HypixelGuild.values())
-                updateLeaderboardCache(hypixelGuild);
-        }, 0, 9, TimeUnit.MINUTES);
+                try {
+                    updateLeaderboardCache(hypixelGuild);
+                } catch (Throwable t) {
+                    TextChannel textChannel = main.getDiscord().getJDA().getTextChannelById("713870866051498086");
+                    main.logger.severe("Exception when updating leaderboard: \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t));
+                    if (textChannel != null)
+                        textChannel.sendMessage("Exception when updating leaderboard: \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t)).queue();
+                }
+        }, 0, 15, TimeUnit.MINUTES);
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             try {
                 main.getDiscord().verifyAllCommand.verifyAll(main.getDiscord().getJDA().awaitReady().getTextChannelById("713012939258593290"));
@@ -31,7 +39,7 @@ public class LeaderboardUpdater {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-        }, 10, 360, TimeUnit.MINUTES); // Every 6h
+        }, 10, 720, TimeUnit.MINUTES); // Every 12h
     }
 
     private void updateLeaderboardCache(HypixelGuild guild) {
@@ -41,9 +49,8 @@ public class LeaderboardUpdater {
 
         ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
 
-
         int i = 0;
-
+        guild.setLeaderboardProgress(0);
         for (Player guildMember : guildMembers) {
             Player thePlayer = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
             SkillLevels highestSkillLevels = main.getApiUtil().getBestProfileSkillLevels(thePlayer.getUUID());
