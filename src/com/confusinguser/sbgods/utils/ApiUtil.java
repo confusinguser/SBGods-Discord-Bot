@@ -645,7 +645,7 @@ public class ApiUtil {
     }
 
     public void setDiscNameFromMc(String mcName, String discordName) { // For auto verification in the future it will already have data
-        String response = getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/setDiscordMcName.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace("#", "*").replace(" ", "%20") + "&mc=" + mcName);
+        getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/setDiscordMcName.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace("#", "*").replace(" ", "%20") + "&mc=" + mcName);
     }
 
     public Path downloadFile(String urlStr, File file) throws IOException {
@@ -710,7 +710,6 @@ public class ApiUtil {
     }
 
     public void setTaxData(JSONObject data) {
-        IOException ioException = null;
 
         String dataString = data.toString(4);
 
@@ -812,6 +811,8 @@ public class ApiUtil {
         String response = main.getApiUtil().getResponse(main.getApiUtil().BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 600000);
         if (response == null) return 0;
         JSONObject jsonObject = new JSONObject(response);
+
+        if(jsonObject.getBoolean("success") == false){return 0;}
 
         double totalMoney = 0;
         try {
