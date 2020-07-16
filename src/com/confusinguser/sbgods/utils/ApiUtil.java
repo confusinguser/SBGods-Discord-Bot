@@ -819,11 +819,15 @@ public class ApiUtil {
             totalMoney += jsonObject.getJSONObject("profile").getJSONObject("banking").getLong("balance");
         } catch (JSONException ignore) {
         }
-        for (String profMemberUuid : jsonObject.getJSONObject("profile").getJSONObject("members").keySet()) {
-            try {
-                totalMoney += jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(profMemberUuid).getLong("coin_purse");
-            } catch (JSONException ignore) {
+        try {
+            for (String profMemberUuid : jsonObject.getJSONObject("profile").getJSONObject("members").keySet()) {
+                try {
+                    totalMoney += jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(profMemberUuid).getLong("coin_purse");
+                } catch (JSONException ignore) {
+                }
             }
+        }catch(JSONException ignore){
+
         }
         return totalMoney;
     }
