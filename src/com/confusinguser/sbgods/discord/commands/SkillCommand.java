@@ -6,7 +6,7 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class SkillCommand extends Command {
         }
 
         if (args.length == 1) {
-            player(e.getTextChannel(), main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag()));
+            player(e.getChannel(), main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag()));
             return;
         }
 
@@ -71,7 +71,7 @@ public class SkillCommand extends Command {
                     .collect(Collectors.toList())
                     .subList(0, topX);
 
-            StringBuilder response = new StringBuilder("**Average Skill Level Leaderboard:**\n\n");
+            StringBuilder response = new StringBuilder();
             boolean spreadsheet = false;
             if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
                 spreadsheet = true;
@@ -110,15 +110,16 @@ public class SkillCommand extends Command {
                     if (spreadsheet) {
                         e.getChannel().sendMessage("```arm\n" + message + "```").queue();
                     } else {
-                        e.getChannel().sendMessage(new EmbedBuilder().setDescription(message).build()).queue();
+                        e.getChannel().sendMessage(new EmbedBuilder().setTitle("Average Skill Level Leaderboard").setDescription(message).build()).queue();
                     }
                 }
             }
+        } else {
+            player(e.getChannel(), args[1]);
         }
-        player(e.getTextChannel(), args[1]);
     }
 
-    private void player(TextChannel channel, String playerName) {
+    private void player(MessageChannel channel, String playerName) {
         Player thePlayer = main.getApiUtil().getPlayerFromUsername(playerName);
 
         if (thePlayer.getSkyblockProfiles().isEmpty()) {

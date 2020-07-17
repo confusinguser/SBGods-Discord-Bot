@@ -8,6 +8,7 @@ import com.confusinguser.sbgods.entities.SkyblockProfile;
 import com.confusinguser.sbgods.entities.banking.BankTransaction;
 import com.confusinguser.sbgods.entities.banking.TransactionType;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.*;
@@ -30,8 +31,8 @@ public class BankCommand extends Command {
             return;
         }
 
-        if (args.length <= 1) {
-            e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
+        if (args.length == 1) {
+            player(e.getChannel(), main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag()));
             return;
         }
 
@@ -72,7 +73,7 @@ public class BankCommand extends Command {
                     .collect(Collectors.toList())
                     .subList(0, topX - 1);
 
-            StringBuilder response = new StringBuilder("**Total Coins Leaderboard:**\n\n");
+            StringBuilder response = new StringBuilder();
             if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
                 for (Entry<String, Double> currentEntry : leaderboardList) {
                     response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey()).append(":* ").append(Math.round(currentEntry.getValue())).append("\n\n");
@@ -111,73 +112,71 @@ public class BankCommand extends Command {
                     if (spreadsheet) {
                         e.getChannel().sendMessage("```arm\n" + message + "```").queue();
                     } else {
-                        e.getChannel().sendMessage("\u200E" + message).queue();
+                        e.getChannel().sendMessage(new EmbedBuilder().setTitle("Total Coins Leaderboard:").setDescription(message).build()).queue();
                     }
                 }
             }
-            return;
+        } else {
+            player(e.getChannel(), args[1]);
         }
+    }
 
-        if (args[1].equalsIgnoreCase("player")) {
-            Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[1]);
-            boolean bankingApi = false;
-            for (String profile : thePlayer.getSkyblockProfiles()) {
-                SkyblockProfile skyblockProfile = main.getApiUtil().getSkyblockProfileByProfileUUID(profile);
-                if (skyblockProfile.getBankHistory().isEmpty()) {
-                    continue;
-                }
-                bankingApi = true;
+    public void player(MessageChannel channel, String playerName) {
+        Player thePlayer = main.getApiUtil().getPlayerFromUsername(playerName);
+        boolean bankingApi = false;
+        for (String profile : thePlayer.getSkyblockProfiles()) {
+            SkyblockProfile skyblockProfile = main.getApiUtil().getSkyblockProfileByProfileUUID(profile);
+            if (skyblockProfile.getBankHistory().isEmpty()) {
+                continue;
+            }
+            bankingApi = true;
 
-                Map<String, Double> personalBankMap = new HashMap<>();
-                Map<String, Double> personalBankMapWithoutForegin = new HashMap<>();
-                EmbedBuilder profileEmbed = new EmbedBuilder();
+            Map<String, Double> personalBankMap = new HashMap<>();
+            Map<String, Double> personalBankMapWithoutForegin = new HashMap<>();
+            EmbedBuilder profileEmbed = new EmbedBuilder();
 
-                for (Player member : skyblockProfile.getMembers()) {
-                    personalBankMap.put(member.getDisplayName(), 0d);
-                    personalBankMapWithoutForegin.put(member.getDisplayName(), 0d);
-                }
+            for (Player member : skyblockProfile.getMembers()) {
+                personalBankMap.put(member.getDisplayName(), 0d);
+                personalBankMapWithoutForegin.put(member.getDisplayName(), 0d);
+            }
 
-                double amountInterest = 0;
-                for (BankTransaction transaction : skyblockProfile.getBankHistory()) {
-                    if (!personalBankMap.containsKey(transaction.getInitiatorName())) { // If it's a foreign transaction (ex-coop-member or bank interest)
-                        for (Player member : skyblockProfile.getMembers()) {
-                            if (transaction.getType() == TransactionType.DEPOSIT) {
-                                personalBankMap.put(member.getDisplayName(), personalBankMap.get(member.getDisplayName()) + (transaction.getAmount() / skyblockProfile.getMembers().size()));
-                            } else if (transaction.getType() == TransactionType.WITHDRAW) {
-                                personalBankMap.put(member.getDisplayName(), personalBankMap.get(member.getDisplayName()) - (transaction.getAmount() / skyblockProfile.getMembers().size()));
-                            }
+            double amountInterest = 0;
+            for (BankTransaction transaction : skyblockProfile.getBankHistory()) {
+                if (!personalBankMap.containsKey(transaction.getInitiatorName())) { // If it's a foreign transaction (ex-coop-member or bank interest)
+                    for (Player member : skyblockProfile.getMembers()) {
+                        if (transaction.getType() == TransactionType.DEPOSIT) {
+                            personalBankMap.put(member.getDisplayName(), personalBankMap.get(member.getDisplayName()) + (transaction.getAmount() / skyblockProfile.getMembers().size()));
+                        } else if (transaction.getType() == TransactionType.WITHDRAW) {
+                            personalBankMap.put(member.getDisplayName(), personalBankMap.get(member.getDisplayName()) - (transaction.getAmount() / skyblockProfile.getMembers().size()));
                         }
-
-                    } else if (transaction.getType() == TransactionType.DEPOSIT) {
-                        personalBankMap.put(transaction.getInitiatorName(), personalBankMap.get(transaction.getInitiatorName()) + transaction.getAmount());
-                        personalBankMapWithoutForegin.put(transaction.getInitiatorName(), personalBankMapWithoutForegin.get(transaction.getInitiatorName()) + transaction.getAmount());
-                    } else if (transaction.getType() == TransactionType.WITHDRAW) {
-                        personalBankMap.put(transaction.getInitiatorName(), personalBankMap.get(transaction.getInitiatorName()) - transaction.getAmount());
-                        personalBankMapWithoutForegin.put(transaction.getInitiatorName(), personalBankMapWithoutForegin.get(transaction.getInitiatorName()) - transaction.getAmount());
                     }
+
+                } else if (transaction.getType() == TransactionType.DEPOSIT) {
+                    personalBankMap.put(transaction.getInitiatorName(), personalBankMap.get(transaction.getInitiatorName()) + transaction.getAmount());
+                    personalBankMapWithoutForegin.put(transaction.getInitiatorName(), personalBankMapWithoutForegin.get(transaction.getInitiatorName()) + transaction.getAmount());
+                } else if (transaction.getType() == TransactionType.WITHDRAW) {
+                    personalBankMap.put(transaction.getInitiatorName(), personalBankMap.get(transaction.getInitiatorName()) - transaction.getAmount());
+                    personalBankMapWithoutForegin.put(transaction.getInitiatorName(), personalBankMapWithoutForegin.get(transaction.getInitiatorName()) - transaction.getAmount());
                 }
-
-                StringBuilder description = new StringBuilder();
-                StringBuilder title = new StringBuilder();
-                personalBankMap.entrySet().stream().sorted((entry, otherEntry) -> Double.compare(otherEntry.getValue(), entry.getValue()))
-                        .forEach(entry -> {
-                            description.append(entry.getKey()).append(" has ").append(entry.getValue() < 0 ? "taken out " : "contributed ")
-                                    .append(main.getLangUtil().addNotation(Math.abs(entry.getValue()))).append(" coins (")
-                                    .append(main.getLangUtil().addNotation(personalBankMapWithoutForegin.get(entry.getKey()))).append(" coins without interest)\n");
-                            title.append(entry.getKey()).append(", ");
-                        });
-
-                profileEmbed.setTitle(title.toString().substring(0, title.length() - 2));
-                profileEmbed.addField("Total coins", main.getLangUtil().addNotation(skyblockProfile.getBalance()) + " coins", false);
-                profileEmbed.addField("Members", description.toString(), false);
-                e.getChannel().sendMessage(profileEmbed.build()).queue();
             }
-            if (!bankingApi) {
-                e.getChannel().sendMessage("Banking API is off for all profiles").queue();
-            }
-            return;
+
+            StringBuilder description = new StringBuilder();
+            StringBuilder title = new StringBuilder();
+            personalBankMap.entrySet().stream().sorted((entry, otherEntry) -> Double.compare(otherEntry.getValue(), entry.getValue()))
+                    .forEach(entry -> {
+                        description.append(entry.getKey()).append(" has ").append(entry.getValue() < 0 ? "taken out " : "contributed ")
+                                .append(main.getLangUtil().addNotation(Math.abs(entry.getValue()))).append(" coins (")
+                                .append(main.getLangUtil().addNotation(personalBankMapWithoutForegin.get(entry.getKey()))).append(" coins without interest)\n");
+                        title.append(entry.getKey()).append(", ");
+                    });
+
+            profileEmbed.setTitle(title.toString().substring(0, title.length() - 2));
+            profileEmbed.addField("Total coins", main.getLangUtil().addNotation(skyblockProfile.getBalance()) + " coins", false);
+            profileEmbed.addField("Members", description.toString(), false);
+            channel.sendMessage(profileEmbed.build()).queue();
         }
-
-        e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
+        if (!bankingApi) {
+            channel.sendMessage("Banking API is off for all profiles").queue();
+        }
     }
 }

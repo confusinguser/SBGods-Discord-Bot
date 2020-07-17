@@ -24,7 +24,7 @@ public class GuildDiscListCommand extends Command {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
-        if(!Objects.requireNonNull(e.getMember()).hasPermission(Permission.MANAGE_ROLES)){
+        if (!Objects.requireNonNull(e.getMember()).hasPermission(Permission.MANAGE_ROLES)) {
             e.getChannel().sendMessage("You don't have permission to perform this command").queue();
             return;
         }
@@ -35,23 +35,23 @@ public class GuildDiscListCommand extends Command {
 
         StringBuilder message = new StringBuilder();
 
-        for(Player guildMember : guildMembers){
-            if(i++%5==0){
-                e.getChannel().editMessageById(messageId,"Loading... (" + main.getLangUtil().getProgressBar((double) i / (double) guildMembers.size(), 30) + ")").queue();
+        for (Player guildMember : guildMembers) {
+            if (i++ % 5 == 0) {
+                e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar((double) i / (double) guildMembers.size(), 30) + ")").queue();
             }
 
             Player player = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
 
-            if(player.getDiscordTag().equals("")){
+            if (player.getDiscordTag().equals("")) {
                 message.append(player.getDisplayName()).append(": Not linked to discord.\n");
-            }else{
+            } else {
                 User discUser = main.getDiscord().getJDA().getUserByTag(player.getDiscordTag());
-                if(discUser == null){
+                if (discUser == null) {
                     message.append(player.getDisplayName()).append(": ");
                     message.append(" Not in discord server\n");
-                }else {
+                } else {
                     message.append(player.getDisplayName()).append(": ").append(discUser.getAsMention());
-                    if (!discUser.getMutualGuilds().contains(main.getDiscord().getJDA().getGuildById(currentDiscordServer.getServerId()))){
+                    if (!discUser.getMutualGuilds().contains(main.getDiscord().getJDA().getGuildById(currentDiscordServer.getServerId()))) {
                         message.append(" (Not in discord server)\n");
                     } else {
                         message.append("\n");
@@ -63,7 +63,7 @@ public class GuildDiscListCommand extends Command {
         e.getChannel().deleteMessageById(messageId).queue();
         List<String> sendMessage = main.getUtil().processMessageForDiscord(message.toString(), 2000);
 
-        for(String messagePart : sendMessage){
+        for (String messagePart : sendMessage) {
             e.getChannel().sendMessage(new EmbedBuilder().setDescription(messagePart).build()).queue();
         }
     }

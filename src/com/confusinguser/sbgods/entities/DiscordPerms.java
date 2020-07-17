@@ -10,35 +10,35 @@ public enum DiscordPerms {
     STAFFPLUS(2, "Staff+"),
     BOTDEV(3, "Botdev");
 
-    private static SBGods main = SBGods.getInstance();
+    private static final SBGods main = SBGods.getInstance();
 
     private final int power;
     private final String name;
 
-    DiscordPerms(int power, String name){
+    DiscordPerms(int power, String name) {
         this.power = power;
         this.name = name;
     }
 
-    public static DiscordPerms getPerms(Member member){
-        if(main.isDeveloper(member.getId())){
+    public static DiscordPerms getPerms(Member member) {
+        if (main.isDeveloper(member.getId())) {
             return DiscordPerms.BOTDEV;
         }
-        if(member.hasPermission(Permission.MANAGE_SERVER)){
+        if (member.hasPermission(Permission.MANAGE_SERVER)) {
             return DiscordPerms.STAFFPLUS;
         }
-        if(member.hasPermission(Permission.MANAGE_ROLES)){
+        if (member.hasPermission(Permission.MANAGE_ROLES)) {
             return DiscordPerms.STAFF;
         }
 
         return DiscordPerms.DEFAULT;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
-    public int getPower(){
+    public int getPower() {
         return power;
     }
 }

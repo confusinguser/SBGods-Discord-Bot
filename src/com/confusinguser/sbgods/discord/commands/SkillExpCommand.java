@@ -6,6 +6,7 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SkillLevels;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
@@ -30,8 +31,8 @@ public class SkillExpCommand extends Command {
             return;
         }
 
-        if (args.length <= 1) {
-            e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
+        if (args.length == 1) {
+            player(e.getChannel(), main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag()));
             return;
         }
 
@@ -84,7 +85,6 @@ public class SkillExpCommand extends Command {
                     }
                 }
             } else {
-                response.append("**Average Skill XP leaderboard:**\n\n");
                 int totalAvgSkillExp = 0;
 
                 for (Map.Entry<String, SkillLevels> currentEntry : leaderboardList) {
@@ -109,76 +109,70 @@ public class SkillExpCommand extends Command {
                     if (spreadsheet) {
                         e.getChannel().sendMessage("```arm\n" + message + "```").queue();
                     } else {
-                        e.getChannel().sendMessage(new EmbedBuilder().setDescription(message).build()).queue();
+                        e.getChannel().sendMessage(new EmbedBuilder().setTitle("Average Skill XP leaderboard").setDescription(message).build()).queue();
                     }
                 }
             }
+        } else {
+            player(e.getChannel(), args[1]);
+        }
+    }
+
+    public void player(MessageChannel channel, String playerName) {
+        Player thePlayer = main.getApiUtil().getPlayerFromUsername(playerName);
+
+        if (thePlayer.getSkyblockProfiles().isEmpty()) {
+            channel.sendMessage("Player **" + playerName + "** does not exist!").queue();
             return;
         }
 
-        if (args[1].equalsIgnoreCase("player")) {
-            if (args.length >= 3) {
-                Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
+        SkillLevels highestSkillLevels = new SkillLevels();
+        for (String profile : thePlayer.getSkyblockProfiles()) {
+            SkillLevels skillLevels = main.getApiUtil().getProfileSkills(profile, thePlayer.getUUID());
 
-                if (thePlayer.getSkyblockProfiles().isEmpty()) {
-                    e.getChannel().sendMessage("Player **" + args[2] + "** does not exist!").queue();
-                    return;
-                }
-
-                SkillLevels highestSkillLevels = new SkillLevels();
-                for (String profile : thePlayer.getSkyblockProfiles()) {
-                    SkillLevels skillLevels = main.getApiUtil().getProfileSkills(profile, thePlayer.getUUID());
-
-                    if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
-                        highestSkillLevels = skillLevels;
-                    }
-                }
-
-                if (highestSkillLevels.getAvgSkillLevel() == 0) {
-                    SkillLevels skillLevels = main.getApiUtil().getProfileSkillsAlternate(thePlayer.getUUID());
-
-                    if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
-                        highestSkillLevels = skillLevels;
-                    }
-                }
-
-                EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x03731d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " skill xp");
-                StringBuilder descriptionBuilder = new StringBuilder();
-
-                if (highestSkillLevels.isApproximate()) {
-                    descriptionBuilder.append("Approximate average skill xp: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getAvgSkillLevel())).append("\n\n");
-                } else {
-                    descriptionBuilder.append("Average skill xp: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getAvgSkillLevel())).append("\n\n");
-                }
-
-                descriptionBuilder
-                        .append("Farming: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getFarming())).append('\n')
-                        .append("Mining: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getMining())).append('\n')
-                        .append("Combat: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getCombat())).append('\n')
-                        .append("Foraging: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getForaging())).append('\n')
-                        .append("Fishing: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getFishing())).append('\n')
-                        .append("Enchanting: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getEnchanting())).append('\n');
-                if (!highestSkillLevels.isApproximate())
-                    descriptionBuilder.append("Taming: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getTaming())).append('\n');
-                descriptionBuilder.append("Alchemy: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getAlchemy())).append('\n');
-
-
-                embedBuilder.setDescription(descriptionBuilder.toString());
-
-                StringBuilder footerBuilder = new StringBuilder();
-                embedBuilder.setFooter(footerBuilder
-                        .append("Carpentry: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getCarpentry()))
-                        .append(", runecrafting: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getRunecrafting()))
-                        .toString());
-
-                e.getChannel().sendMessage(embedBuilder.build()).queue();
-
-            } else {
-                e.getChannel().sendMessage("Invalid usage! Usage: *" + getName() + " player <IGN>*").queue();
+            if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
+                highestSkillLevels = skillLevels;
             }
-            return;
         }
 
-        e.getChannel().sendMessage("Invalid argument! Valid arguments: `leaderboard`, `player`!").queue();
+        if (highestSkillLevels.getAvgSkillLevel() == 0) {
+            SkillLevels skillLevels = main.getApiUtil().getProfileSkillsAlternate(thePlayer.getUUID());
+
+            if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
+                highestSkillLevels = skillLevels;
+            }
+        }
+
+        EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x03731d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " skill xp");
+        StringBuilder descriptionBuilder = new StringBuilder();
+
+        if (highestSkillLevels.isApproximate()) {
+            descriptionBuilder.append("Approximate average skill xp: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getAvgSkillLevel())).append("\n\n");
+        } else {
+            descriptionBuilder.append("Average skill xp: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getAvgSkillLevel())).append("\n\n");
+        }
+
+        descriptionBuilder
+                .append("Farming: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getFarming())).append('\n')
+                .append("Mining: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getMining())).append('\n')
+                .append("Combat: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getCombat())).append('\n')
+                .append("Foraging: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getForaging())).append('\n')
+                .append("Fishing: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getFishing())).append('\n')
+                .append("Enchanting: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getEnchanting())).append('\n')
+                .append("Taming: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getTaming())).append('\n')
+                .append("Alchemy: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getAlchemy())).append('\n');
+
+
+        embedBuilder.setDescription(descriptionBuilder.toString());
+
+        StringBuilder footerBuilder = new StringBuilder();
+        embedBuilder.setFooter(footerBuilder
+                .append("Carpentry: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getCarpentry()))
+                .append(", runecrafting: ").append(main.getSBUtil().toSkillExp(highestSkillLevels.getRunecrafting()))
+                .toString());
+
+        channel.sendMessage(embedBuilder.build()).queue();
+
+        channel.sendMessage("Invalid usage! Usage: *" + getName() + " player <IGN>*").queue();
     }
 }

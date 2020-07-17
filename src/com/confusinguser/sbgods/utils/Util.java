@@ -184,7 +184,6 @@ public class Util {
             }
         }
 
-
         HypixelGuild hypixelGuild = HypixelGuild.getGuildById(guildId);
         DiscordServer discordServer = DiscordServer.getDiscordServerFromDiscordGuild(discord);
         if (hypixelGuild != null && discordServer != null && hypixelGuild == discordServer.getHypixelGuild()) {
@@ -273,17 +272,15 @@ public class Util {
                             }
                         }
 
-                        if (thePlayer.getGuildRank() != null) { //gotta check for null BEFORE checking guild.getguildid
-                            if (!thePlayer.getGuildRank().contains(rankGiven) && (thePlayer.getGuildRank().contains("Member") || thePlayer.getGuildRank().contains("Elite") || thePlayer.getGuildRank().contains("King") || thePlayer.getGuildRank().contains("God"))) {
-                                JSONObject newPlayerJson = new JSONObject();
+                        if (thePlayer.getGuildRank() != null && !thePlayer.getGuildRank().contains(rankGiven) && (thePlayer.getGuildRank().contains("Member") || thePlayer.getGuildRank().contains("Elite") || thePlayer.getGuildRank().contains("King") || thePlayer.getGuildRank().contains("God"))) {
+                            JSONObject newPlayerJson = new JSONObject();
 
-                                newPlayerJson.put("uuid", thePlayer.getUUID());
-                                newPlayerJson.put("name", thePlayer.getDisplayName());
-                                newPlayerJson.put("currRank", thePlayer.getGuildRank());
-                                newPlayerJson.put("needRank", rankGiven);
+                            newPlayerJson.put("uuid", thePlayer.getUUID());
+                            newPlayerJson.put("name", thePlayer.getDisplayName());
+                            newPlayerJson.put("currRank", thePlayer.getGuildRank());
+                            newPlayerJson.put("needRank", rankGiven);
 
-                                guildRanksChange.put(newPlayerJson);
-                            }
+                            guildRanksChange.put(newPlayerJson);
                         }
 
                         main.getApiUtil().setGuildRanksChange(guildRanksChange);
@@ -291,7 +288,6 @@ public class Util {
                 }
             }
         }
-
 
         if (sendMsg) {
             if (guild == null) {

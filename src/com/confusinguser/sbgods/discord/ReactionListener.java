@@ -35,7 +35,7 @@ public class ReactionListener extends ListenerAdapter {
         }
         if (e.getChannel().getName().toLowerCase().contains("accepted-applications") &&
                 e.getReaction().getReactionEmote().getEmoji().equalsIgnoreCase("☑")) {
-            e.getTextChannel().deleteMessageById(e.getMessageId()).queue();
+            e.getChannel().deleteMessageById(e.getMessageId()).queue();
         }
 
         if (e.getChannel().getName().toLowerCase().contains("apply") &&
@@ -74,6 +74,7 @@ public class ReactionListener extends ListenerAdapter {
                     .complete()
                     .getRetrievedHistory()
                     .stream()
+                    .filter(message -> !message.getEmbeds().isEmpty())
                     .map(message -> message.getEmbeds().get(0).getTitle())
                     .filter(Objects::nonNull)
                     .anyMatch(title -> title.toLowerCase().contains(player.getDisplayName().toLowerCase()))) {
@@ -136,8 +137,10 @@ public class ReactionListener extends ListenerAdapter {
             e.getChannel().deleteMessageById(messageId).queue();
 
         } catch (Throwable t) {
-            main.logger.warning("Guild application failed for player " + user.getAsTag() + ":\n");
-            main.logger.warning(main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t));
+            TextChannel textChannel = main.getDiscord().getJDA().getTextChannelById("713870866051498086");
+            main.logger.severe("Exception in reaction listener: \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t));
+            if (textChannel != null)
+                textChannel.sendMessage("Exception in reaction listener: \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t)).queue();
 
             e.getChannel().sendMessage(user.getAsMention() + " there was an error somewhere, get in contact with a bot dev to help fix the error.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
             e.getChannel().deleteMessageById(messageId).queue();

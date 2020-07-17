@@ -812,7 +812,10 @@ public class ApiUtil {
         if (response == null) return 0;
         JSONObject jsonObject = new JSONObject(response);
 
-        if(!jsonObject.getBoolean("success")){main.logger.warning("API REQ FAILED: " + jsonObject.getString("cause"));return 0;}
+        if (!jsonObject.getBoolean("success")) {
+            main.logger.warning("API REQ FAILED: " + jsonObject.getString("cause"));
+            return 0;
+        }
 
         double totalMoney = 0;
         try {
@@ -826,7 +829,7 @@ public class ApiUtil {
                 } catch (JSONException ignore) {
                 }
             }
-        }catch(JSONException ignore){
+        } catch (JSONException ignore) {
 
         }
         return totalMoney;

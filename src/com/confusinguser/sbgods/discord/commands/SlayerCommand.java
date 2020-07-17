@@ -31,6 +31,7 @@ public class SlayerCommand extends Command {
 
         if (args.length == 1) {
             player(e.getChannel(), main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag()));
+            return;
         }
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
@@ -67,7 +68,7 @@ public class SlayerCommand extends Command {
                     .collect(Collectors.toList())
                     .subList(0, topX);
 
-            StringBuilder response = new StringBuilder("**Slayer XP Leaderboard:**\n\n");
+            StringBuilder response = new StringBuilder();
             if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
                 for (Entry<String, SlayerExp> currentEntry : leaderboardList) {
                     response.append(currentEntry.getKey()).append("    ").append(main.getLangUtil().addNotation(main.getSBUtil().toSkillExp(main.getUtil().round(currentEntry.getValue().getTotalExp(), 2)))).append("\n");
@@ -101,13 +102,13 @@ public class SlayerCommand extends Command {
                     if (spreadsheet) {
                         e.getChannel().sendMessage("```arm\n" + message + "```").queue();
                     } else {
-                        e.getChannel().sendMessage(new EmbedBuilder().setDescription(message).build()).queue();
+                        e.getChannel().sendMessage(new EmbedBuilder().setTitle("Slayer XP Leaderboard").setDescription(message).build()).queue();
                     }
                 }
             }
-            return;
+        } else {
+            player(e.getChannel(), args[1]);
         }
-        player(e.getChannel(), args[1]);
     }
 
     public void player(MessageChannel channel, String playerName) {

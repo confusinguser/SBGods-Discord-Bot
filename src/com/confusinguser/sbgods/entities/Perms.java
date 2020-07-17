@@ -34,11 +34,11 @@ public enum Perms {
     VERIFYLIST(DiscordPerms.STAFFPLUS),
     WHATGUILD(DiscordPerms.DEFAULT);
 
-    private static SBGods main = SBGods.getInstance();
+    private static final SBGods main = SBGods.getInstance();
 
     private final DiscordPerms minPerms;
 
-    Perms(DiscordPerms minPerms){
+    Perms(DiscordPerms minPerms) {
         this.minPerms = minPerms;
     }
 }
