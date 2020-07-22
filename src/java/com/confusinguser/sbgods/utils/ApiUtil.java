@@ -29,7 +29,7 @@ public class ApiUtil {
 
     public ApiUtil(SBGods main) {
         this.main = main;
-        REQUEST_RATE = 115 * main.keys.length; //caps at 120 actually
+        REQUEST_RATE = 115 * main.getKeys().length; //caps at 120 actually
         allowance = REQUEST_RATE;
     }
 

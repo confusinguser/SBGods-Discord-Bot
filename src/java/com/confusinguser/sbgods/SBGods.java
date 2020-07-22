@@ -5,10 +5,14 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.utils.*;
 
 import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.*;
+import java.util.stream.Collectors;
 
 public class SBGods {
     public static final String VERSION = "0.9.3.5";
@@ -19,7 +23,6 @@ public class SBGods {
     private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
     //private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
     private static SBGods instance;
-    public final String[] keys = {"bc90572a-1547-41a5-8f28-d7664916a28d", "3963906e-ffb6-45b9-b07b-80ca9838eb20", "a269efda-d93f-4521-a7a1-b793166d9ca3", "7673c96b-95b0-429d-81b6-031d9e249c75"};
     public final Logger logger = Logger.getLogger(this.getClass().getName());
     private final ApiUtil apiutil;
     private final Util util;
@@ -28,6 +31,7 @@ public class SBGods {
     private final JsonApiUtil jsonApiUtil;
     private final CacheUtil cacheUtil;
     private final LeaderboardUpdater leaderboardUpdater;
+    private String[] keys = null;
     private DiscordBot discordBot;
     private int keyIndex = 0;
 
@@ -72,12 +76,12 @@ public class SBGods {
 
     public String getNextApiKey() {
         keyIndex++;
-        if (keyIndex >= keys.length) keyIndex = 0;
-        return keys[keyIndex];
+        if (keyIndex >= getKeys().length) keyIndex = 0;
+        return getKeys()[keyIndex];
     }
 
     public String getCurrentApiKey() {
-        return keys[keyIndex];
+        return getKeys()[keyIndex];
     }
 
     public ApiUtil getApiUtil() {
@@ -122,5 +126,24 @@ public class SBGods {
 
     public boolean isDeveloper(String userId) {
         return Arrays.asList(DEVELOPERS).contains(userId);
+    }
+
+    public String[] getKeys() {
+        if (keys == null) {
+            byte[] bytes;
+            try (InputStream stream = getClass().getResourceAsStream("/keys.txt")) {
+                bytes = stream.readAllBytes();
+            } catch (IOException exception) {
+                exception.printStackTrace();
+                return new String[]{};
+            }
+
+            String fileContent = new String(bytes);
+            List<String> output = Arrays.asList(fileContent.split("\n"));
+            output = output.stream().filter(s -> s.length() >= 36 && !s.substring(0, 36).contains("//")).map(s -> s.substring(0, 36)).collect(Collectors.toList());
+            keys = output.toArray(new String[]{});
+            return keys;
+        }
+        return keys;
     }
 }
