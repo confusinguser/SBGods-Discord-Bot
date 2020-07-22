@@ -66,7 +66,7 @@ public class SkillCommand extends Command {
                 topX = 10;
             }
 
-            List<Map.Entry<String, SkillLevels>> leaderboardList = usernameSkillExpHashMap.entrySet().stream()
+            List<Entry<String, SkillLevels>> leaderboardList = usernameSkillExpHashMap.entrySet().stream()
                     .sorted(Comparator.comparingDouble(entry -> -entry.getValue().getAvgSkillLevel()))
                     .collect(Collectors.toList())
                     .subList(0, topX);

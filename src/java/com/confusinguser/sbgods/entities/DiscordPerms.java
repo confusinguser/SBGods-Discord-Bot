@@ -5,18 +5,16 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 
 public enum DiscordPerms {
-    DEFAULT(0, "Default"),
-    STAFF(1, "Staff"),
-    STAFFPLUS(2, "Staff+"),
-    BOTDEV(3, "Botdev");
+    DEFAULT("Default"),
+    STAFF("Staff"),
+    STAFFPLUS("Staff+"),
+    BOTDEV("Botdev");
 
     private static final SBGods main = SBGods.getInstance();
 
-    private final int power;
     private final String name;
 
-    DiscordPerms(int power, String name) {
-        this.power = power;
+    DiscordPerms(String name) {
         this.name = name;
     }
 
@@ -39,6 +37,6 @@ public enum DiscordPerms {
     }
 
     public int getPower() {
-        return power;
+        return ordinal();
     }
 }
