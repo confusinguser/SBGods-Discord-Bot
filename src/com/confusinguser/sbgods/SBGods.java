@@ -11,10 +11,10 @@ import java.util.Date;
 import java.util.logging.*;
 
 public class SBGods {
-    public static final String VERSION = "0.9.3.4";
+    public static final String VERSION = "0.9.3.5";
     public static final String VERSION_DESCRIPTION_MAJOR = ""; // Change this every major release: 0.9.6.3 -> 1.0
     public static final String VERSION_DESCRIPTION_MINOR = "Added the verify list"; // Change this every minor release: 0.8.11.5 -> 0.8.12
-    public static final String VERSION_DESCRIPTION_PATCH = "maby fix lb update bug"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
+    public static final String VERSION_DESCRIPTION_PATCH = "Add error tracking in reaction listener"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
     public static final String[] DEVELOPERS = {"244786205873405952", "497210228274757632"};
     private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
     //private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
