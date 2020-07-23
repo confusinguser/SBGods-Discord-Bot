@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -860,5 +861,22 @@ public class ApiUtil {
             return new SkyblockProfile(members, new ArrayList<>(), 0);
         }
         return new SkyblockProfile(members, transactions, balance);
+    }
+
+    public byte[] getEiffelTowerImage() {
+        URL url = null;
+        try {
+            url = new URL("https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Construction_tour_eiffel.JPG/334px-Construction_tour_eiffel.JPG");
+        } catch (MalformedURLException e) {
+            return null;
+        }
+        try {
+            InputStream is = url.openConnection().getInputStream();
+            byte[] bytes = is.readAllBytes();
+            is.close();
+            return bytes;
+        } catch (IOException exception) {
+            return null;
+        }
     }
 }

@@ -33,7 +33,7 @@ public class SbgodsCommand extends Command {
                     .setDescription(
                             "Minor: " + SBGods.VERSION_DESCRIPTION_MINOR +
                                     "\nPatch: " + SBGods.VERSION_DESCRIPTION_PATCH)
-                    .setFooter("Made by ConfusingUser#5712 Soopyboo32#3042, and Leyrox#4105");
+                    .setFooter("Made by ConfusingUser#5712 and Soopyboo32#3042");
             e.getChannel().sendMessage(embedBuilder.build()).queue();
             return;
         }

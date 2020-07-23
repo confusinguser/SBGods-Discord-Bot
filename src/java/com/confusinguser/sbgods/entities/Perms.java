@@ -3,42 +3,42 @@ package com.confusinguser.sbgods.entities;
 import com.confusinguser.sbgods.SBGods;
 
 public enum Perms {
-    AH(DiscordPerms.DEFAULT),
-    BANK(DiscordPerms.DEFAULT),
-    DEATHS(DiscordPerms.DEFAULT),
-    EVENT_START(DiscordPerms.STAFFPLUS),
-    EVENT_END(DiscordPerms.BOTDEV),
-    EVENT_PROGRESS(DiscordPerms.STAFF),
-    GUILDDESCLIST(DiscordPerms.STAFFPLUS),
-    HELP(DiscordPerms.DEFAULT),
-    KILLS(DiscordPerms.DEFAULT),
-    PETS(DiscordPerms.DEFAULT),
-    PLAYER(DiscordPerms.DEFAULT),
-    SBGODS_VERSION(DiscordPerms.DEFAULT),
-    SBGODS_UPDATE(DiscordPerms.BOTDEV),
-    SBGODS_STOP(DiscordPerms.BOTDEV),
-    SBGODS_DEV_ADDGAPPLYREACT(DiscordPerms.BOTDEV),
-    SETTINGS(DiscordPerms.STAFFPLUS),
-    SKILL(DiscordPerms.DEFAULT),
-    SKILLEXP(DiscordPerms.DEFAULT),
-    SLAYER(DiscordPerms.DEFAULT),
-    TAX_INFO(DiscordPerms.DEFAULT),
-    TAX_PAID(DiscordPerms.STAFF),
-    TAX_OWES(DiscordPerms.STAFF),
-    TAX_OWELIST(DiscordPerms.STAFF),
-    TAX_PAIDLIST(DiscordPerms.STAFF),
-    TAX_CLEAROWES(DiscordPerms.STAFFPLUS),
-    TAX_SETROLE(DiscordPerms.STAFF),
-    VALL(DiscordPerms.STAFFPLUS),
-    VERIFY(DiscordPerms.DEFAULT),
-    VERIFYLIST(DiscordPerms.STAFFPLUS),
-    WHATGUILD(DiscordPerms.DEFAULT);
+    AH(DiscordPerm.DEFAULT),
+    BANK(DiscordPerm.DEFAULT),
+    DEATHS(DiscordPerm.DEFAULT),
+    EVENT_START(DiscordPerm.STAFFPLUS),
+    EVENT_END(DiscordPerm.BOTDEV),
+    EVENT_PROGRESS(DiscordPerm.STAFF),
+    GUILDDESCLIST(DiscordPerm.STAFFPLUS),
+    HELP(DiscordPerm.DEFAULT),
+    KILLS(DiscordPerm.DEFAULT),
+    PETS(DiscordPerm.DEFAULT),
+    PLAYER(DiscordPerm.DEFAULT),
+    SBGODS_VERSION(DiscordPerm.DEFAULT),
+    SBGODS_UPDATE(DiscordPerm.BOTDEV),
+    SBGODS_STOP(DiscordPerm.BOTDEV),
+    SBGODS_DEV_ADDGAPPLYREACT(DiscordPerm.BOTDEV),
+    SETTINGS(DiscordPerm.STAFFPLUS),
+    SKILL(DiscordPerm.DEFAULT),
+    SKILLEXP(DiscordPerm.DEFAULT),
+    SLAYER(DiscordPerm.DEFAULT),
+    TAX_INFO(DiscordPerm.DEFAULT),
+    TAX_PAID(DiscordPerm.STAFF),
+    TAX_OWES(DiscordPerm.STAFF),
+    TAX_OWELIST(DiscordPerm.STAFF),
+    TAX_PAIDLIST(DiscordPerm.STAFF),
+    TAX_CLEAROWES(DiscordPerm.STAFFPLUS),
+    TAX_SETROLE(DiscordPerm.STAFF),
+    VALL(DiscordPerm.STAFFPLUS),
+    VERIFY(DiscordPerm.DEFAULT),
+    VERIFYLIST(DiscordPerm.STAFFPLUS),
+    WHATGUILD(DiscordPerm.DEFAULT);
 
     private static final SBGods main = SBGods.getInstance();
 
-    private final DiscordPerms minPerms;
+    private final DiscordPerm minPerms;
 
-    Perms(DiscordPerms minPerms) {
+    Perms(DiscordPerm minPerms) {
         this.minPerms = minPerms;
     }
 }

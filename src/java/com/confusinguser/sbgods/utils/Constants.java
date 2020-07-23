@@ -231,6 +231,7 @@ public class Constants {
             "gatherer",
             "angler",
             "augmentation",
-            "concoctor"
+            "concoctor",
+            "domesticator"
     };
 }
