@@ -20,8 +20,8 @@ public class SBGods {
     public static final String VERSION_DESCRIPTION_MINOR = "Added the verify list"; // Change this every minor release: 0.8.11.5 -> 0.8.12
     public static final String VERSION_DESCRIPTION_PATCH = "Add error tracking in reaction listener"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
     public static final String[] DEVELOPERS = {"244786205873405952", "497210228274757632"};
-    //private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
-    private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
+    private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
+    //private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
     private static SBGods instance;
     public final Logger logger = Logger.getLogger(this.getClass().getName());
     private final ApiUtil apiutil;
