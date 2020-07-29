@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum HypixelGuild {
-    SBG("5cd01bdf77ce84cf1204cd61", 500000, 27, "Skyblock Gods", "SBG Guild Member", "SBG"),
-    SBDG("5e4e6d0d8ea8c9feb3f0e44f", 1000, 10, "Skyblock Forceful", "SBF", "SBF Guild Member", "SBDG Guild Member", "Skyblock Demigods", "SBDG", "Skyblock Demi Gods");
+    SBG("5cd01bdf77ce84cf1204cd61", 500000, 26, "Skyblock Gods", "SBG Guild Member", "SBG"),
+    SBDG("5e4e6d0d8ea8c9feb3f0e44f", 25000, 17, "Skyblock Forceful", "SBF", "SBF Guild Member", "SBDG Guild Member", "Skyblock Demigods", "SBDG", "Skyblock Demi Gods");
 
     private final String guildId;
     private final int skillReq;

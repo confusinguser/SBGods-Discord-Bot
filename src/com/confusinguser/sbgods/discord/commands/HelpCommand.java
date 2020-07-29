@@ -2,7 +2,7 @@ package com.confusinguser.sbgods.discord.commands;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
-import com.confusinguser.sbgods.entities.DiscordPerm;
+import com.confusinguser.sbgods.entities.DiscordPerms;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HelpMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -18,7 +18,7 @@ public class HelpCommand extends Command {
         this.discord = discord;
         this.name = "help";
         this.aliases = new String[]{"h"};
-        this.perm = DiscordPerm.DEFAULT;
+        this.perm = DiscordPerms.DEFAULT;
     }
 
     @Override
