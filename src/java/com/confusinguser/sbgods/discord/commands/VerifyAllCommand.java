@@ -69,7 +69,7 @@ public class VerifyAllCommand extends Command {
             main.getApiUtil().setGuildRanksChange(new JSONArray());
         }
 
-        String messageId = channel.sendMessage("Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(0.0, 30) + ") [0/0]").complete().getId();
+        String messageId = channel.sendMessage("Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(0.0, 30) + ") [0/" + discord.getMembers().size() + "]").complete().getId();
 
         int playersVerified = 0;
         int i = 0; // For loading animation
@@ -92,7 +92,7 @@ public class VerifyAllCommand extends Command {
             }
         }
 
-        channel.editMessageById(messageId, playersVerified == 0 ? "Did not verify any players" : "Verified a total of " + playersVerified + (playersVerified == 1 ? " player!" : " players!")).queue();
+        channel.editMessageById(messageId, playersVerified == 0 ? "Did not verify any players" : "Verified " + playersVerified + (playersVerified == 1 ? " player!" : " players!")).queue();
 
         main.getUtil().scheduleCommandAfter(() ->
                 channel.getHistoryAfter(messageId, 100).complete().getRetrievedHistory().stream()

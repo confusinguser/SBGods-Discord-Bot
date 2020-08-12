@@ -42,8 +42,9 @@ public abstract class Command extends ListenerAdapter {
                 main.logger.severe("Exception when handling command '" + e.getMessage().getContentRaw() + "': \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t));
                 if (textChannel != null)
                     textChannel.sendMessage("Exception when handling command '" + e.getMessage().getContentRaw() + "': \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t)).queue();
+            } finally {
+                main.getUtil().setTyping(false, e.getChannel());
             }
-            main.getUtil().setTyping(false, e.getChannel());
         });
         executorService.shutdown();
     }

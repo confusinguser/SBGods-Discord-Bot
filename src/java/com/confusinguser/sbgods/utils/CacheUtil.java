@@ -54,7 +54,7 @@ public class CacheUtil {
                 }
             }
         }
-        return new Response(null, null);
+        return null;
     }
 
     public void addToCache(String url, String json) {

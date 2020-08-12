@@ -37,14 +37,13 @@ public class ApiUtil {
     public String getResponse(String url_string, int cacheTime) {
         // See if request already in cache
         Response cacheResponse = main.getCacheUtil().getCachedResponse(main.getCacheUtil().stripUnnecesaryInfo(url_string), cacheTime);
-        String cacheResponseStr = cacheResponse.getJson();
-        long current = System.currentTimeMillis();
-        if (cacheResponseStr != null) {
-            return cacheResponseStr;
+        if (cacheResponse != null) {
+            return cacheResponse.getJson();
         }
+        long current = System.currentTimeMillis();
 
+        // rate limiting
         int timePassed = (int) ((current - LAST_CHECK) / 1000);
-
         LAST_CHECK = current;
         // unit: seconds
         int PER = 60;
@@ -923,9 +922,6 @@ public class ApiUtil {
 
 
     }*/
-
-
-
 
     public byte[] getEiffelTowerImage() {
         URL url;
