@@ -241,7 +241,6 @@ public class EventCommand extends Command {
                 playerProgress.put("skillAlchemy", (skillExp.getAlchemy() - memberData.getInt("skillAlchemy")) / 4);
                 totalSkillProgress += playerProgress.getInt("skillAlchemy");
                 playerProgress.put("skillCarpentry", skillExp.getCarpentry() - memberData.getInt("skillCarpentry"));
-                totalSkillProgress += playerProgress.getInt("skillCarpentry");
                 playerProgress.put("skillCombat", skillExp.getCombat() - memberData.getInt("skillCombat"));
                 totalSkillProgress += playerProgress.getInt("skillCombat");
                 playerProgress.put("skillEnchanting", skillExp.getEnchanting() - memberData.getInt("skillEnchanting"));
@@ -255,7 +254,6 @@ public class EventCommand extends Command {
                 playerProgress.put("skillMining", skillExp.getMining() - memberData.getInt("skillMining"));
                 totalSkillProgress += playerProgress.getInt("skillMining");
                 playerProgress.put("skillRunecrafting", skillExp.getRunecrafting() - memberData.getInt("skillRunecrafting"));
-                totalSkillProgress += playerProgress.getInt("skillRunecrafting");
                 playerProgress.put("skillTaming", skillExp.getTaming() - memberData.getInt("skillTaming"));
                 totalSkillProgress += playerProgress.getInt("skillTaming");
 

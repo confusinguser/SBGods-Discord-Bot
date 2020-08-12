@@ -4,7 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 
-public enum DiscordPerm {
+public enum DiscordPerms {
     DEFAULT("Default"),
     STAFF("Staff"),
     STAFFPLUS("Staff+"),
@@ -14,22 +14,22 @@ public enum DiscordPerm {
 
     private final String name;
 
-    DiscordPerm(String name) {
+    DiscordPerms(String name) {
         this.name = name;
     }
 
-    public static DiscordPerm getPerms(Member member) {
+    public static DiscordPerms getPerms(Member member) {
         if (main.isDeveloper(member.getId())) {
-            return DiscordPerm.BOTDEV;
+            return DiscordPerms.BOTDEV;
         }
         if (member.hasPermission(Permission.MANAGE_SERVER)) {
-            return DiscordPerm.STAFFPLUS;
+            return DiscordPerms.STAFFPLUS;
         }
         if (member.hasPermission(Permission.MANAGE_ROLES)) {
-            return DiscordPerm.STAFF;
+            return DiscordPerms.STAFF;
         }
 
-        return DiscordPerm.DEFAULT;
+        return DiscordPerms.DEFAULT;
     }
 
     public String getName() {

@@ -5,6 +5,7 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.utils.*;
 
 import javax.security.auth.login.LoginException;
+import com.confusinguser.sbgods.utils.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -20,8 +21,8 @@ public class SBGods {
     public static final String VERSION_DESCRIPTION_MINOR = "Added the verify list"; // Change this every minor release: 0.8.11.5 -> 0.8.12
     public static final String VERSION_DESCRIPTION_PATCH = "Add error tracking in reaction listener"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
     public static final String[] DEVELOPERS = {"244786205873405952", "497210228274757632"};
-    //private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
-    private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
+    private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
+    //private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
     private static SBGods instance;
     public final Logger logger = Logger.getLogger(this.getClass().getName());
     private final ApiUtil apiutil;
@@ -131,8 +132,13 @@ public class SBGods {
     public String[] getKeys() {
         if (keys == null) {
             byte[] bytes;
-            try (InputStream stream = getClass().getResourceAsStream("/keys.txt")) {
-                bytes = stream.readAllBytes();
+            try (InputStream stream = getClass().getResourceAsStream("/resources/keys.txt")) {
+                if(stream != null) {
+                    bytes = stream.readAllBytes();
+                }else{
+                    this.getLogger().warning("Inputstream to get the key returned null");
+                    return new String[]{};
+                }
             } catch (IOException exception) {
                 exception.printStackTrace();
                 return new String[]{};
@@ -142,7 +148,6 @@ public class SBGods {
             List<String> output = Arrays.asList(fileContent.split("\n"));
             output = output.stream().filter(s -> s.length() >= 36 && !s.substring(0, 36).contains("//")).map(s -> s.substring(0, 36)).collect(Collectors.toList());
             keys = output.toArray(new String[]{});
-            return keys;
         }
         return keys;
     }

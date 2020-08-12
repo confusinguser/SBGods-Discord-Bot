@@ -2,7 +2,7 @@ package com.confusinguser.sbgods.discord.commands;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
-import com.confusinguser.sbgods.entities.DiscordPerm;
+import com.confusinguser.sbgods.entities.DiscordPerms;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -17,7 +17,7 @@ public abstract class Command extends ListenerAdapter {
     String name;
     String usage;
     String[] aliases;
-    DiscordPerm perm = DiscordPerm.DEFAULT;
+    DiscordPerms perm = DiscordPerms.DEFAULT;
 
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
