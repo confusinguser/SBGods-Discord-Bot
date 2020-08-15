@@ -27,20 +27,13 @@ public class VerifyCommand extends Command {
             // Check if that is actual player ign
             Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
             if (player == null || player.getDiscordTag() == null) {
-                e.getChannel().sendMessage(e.getAuthor().getAsMention() + " Could not find MC account " + args[1]).queue();
+                e.getChannel().sendMessage(e.getAuthor().getAsMention() + " could not find MC account " + args[1]).queue();
                 return;
             }
             if (player.getDiscordTag().equalsIgnoreCase(e.getAuthor().getAsTag())) {
                 switch (main.getUtil().verifyPlayer(e.getMember(), player.getDisplayName(), e.getGuild(), e.getChannel())) {
                     case 0:
-                        switch (currentDiscordServer) {
-                            case SBGods:
-                                e.getChannel().sendMessage("You are already verified or you need to link your minecraft account with discord (see <#711192630863855696> )").queue();
-                            case SBDGods:
-                                e.getChannel().sendMessage("You are already verified or you need to link your minecraft account with discord (see <#711462220852101170> )").queue();
-                            default:
-                                e.getChannel().sendMessage("You are already verified or you need to link your minecraft account with discord (see welcome channel )").queue();
-                        }
+                        e.getChannel().sendMessage(e.getAuthor().getAsMention() + " you are already verified to the account mc account " + player.getDisplayName()).queue();
                         return;
                     case 2:
                         e.getChannel().sendMessage("Bot is still loading the leaderboards! Try again in a few minutes").queue();
@@ -52,17 +45,26 @@ public class VerifyCommand extends Command {
             }
 
             // Send error message saying to link discord account with mc
-            e.getChannel().sendMessage(e.getAuthor().getAsMention() + " You need to link your minecraft account with discord (see the welcome channel) then run this command again.").queue();
-            return;
-        }
+            switch (currentDiscordServer) {
+                case SBGods:
+                    e.getChannel().sendMessage(e.getAuthor().getAsMention() + " you are already verified or you need to link your minecraft account with discord (see <#713134802542264351>)").queue();
+                    break;
+                case SBDGods:
+                    e.getChannel().sendMessage(e.getAuthor().getAsMention() + " you are already verified or you need to link your minecraft account with discord (see <#711462220852101170>)").queue();
+                    break;
+                default:
+                    e.getChannel().sendMessage(e.getAuthor().getAsMention() + " you are already verified or you need to link your minecraft account with discord (see welcome channel)").queue();
+                    break;
+            }
+        } else {
+            String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag());
+            if (mcName.isEmpty()) {
+                e.getChannel().sendMessage("There was an error auto-detecting your minecraft ign. Please do -verify <IGN>").queue();
+                return;
+            }
 
-        String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag());
-        if (mcName.isEmpty()) {
-            e.getChannel().sendMessage("There was an error auto-detecting your minecraft ign. Please do -verify <IGN>").queue();
-            return;
+            // Verify player with mc name mcName
+            main.getUtil().verifyPlayer(e.getMember(), mcName, e.getGuild(), e.getChannel());
         }
-
-        // Verify player with mc name mcName
-        main.getUtil().verifyPlayer(e.getMember(), mcName, e.getGuild(), e.getChannel());
     }
 }

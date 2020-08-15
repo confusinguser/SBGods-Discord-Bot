@@ -37,14 +37,13 @@ public class ApiUtil {
     public String getResponse(String url_string, int cacheTime) {
         // See if request already in cache
         Response cacheResponse = main.getCacheUtil().getCachedResponse(main.getCacheUtil().stripUnnecesaryInfo(url_string), cacheTime);
-        String cacheResponseStr = cacheResponse.getJson();
-        long current = System.currentTimeMillis();
-        if (cacheResponseStr != null) {
-            return cacheResponseStr;
+        if (cacheResponse != null) {
+            return cacheResponse.getJson();
         }
+        long current = System.currentTimeMillis();
 
+        // rate limiting
         int timePassed = (int) ((current - LAST_CHECK) / 1000);
-
         LAST_CHECK = current;
         // unit: seconds
         int PER = 60;
@@ -863,8 +862,69 @@ public class ApiUtil {
         return new SkyblockProfile(members, transactions, balance);
     }
 
+    public List<SkyblockProfile> getSkyblockProfilesByPlayerUUID(String playerUUID) {
+        String response = main.getApiUtil().getResponse(main.getApiUtil().BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&player=" + playerUUID, 600000);
+        if (response == null) return new ArrayList<>();
+        JSONObject jsonObject = new JSONObject(response);
+
+        List<SkyblockProfile> output = new ArrayList<>();
+        for (Object profile : jsonObject.getJSONArray("profiles")) {
+            List<Player> members = ((JSONObject) profile).getJSONObject("members").keySet().stream().map(this::getPlayerFromUUID).collect(Collectors.toList());
+            List<BankTransaction> transactions = new ArrayList<>();
+            double balance;
+            try {
+                ((JSONObject) profile).getJSONObject("banking").getJSONArray("transactions").forEach(transaction -> {
+                    if (transaction instanceof JSONObject)
+                        transactions.add(new BankTransaction((JSONObject) transaction));
+                });
+                balance = ((JSONObject) profile).getJSONObject("banking").getDouble("balance");
+            } catch (JSONException e) { // Banking API off
+                output.add(new SkyblockProfile(members, new ArrayList<>(), 0));
+                continue;
+            }
+            output.add(new SkyblockProfile(members, transactions, balance));
+        }
+        return output;
+    }
+
+    public SkyblockProfilePlayer getSkyblockProfilePlayer(String playerUUID, String profileUUID) {
+        String response = main.getApiUtil().getResponse(main.getApiUtil().BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&player=" + playerUUID, 600000);
+        if (response == null) return null;
+        JSONObject jsonObject = new JSONObject(response);
+
+        for (Object profile : jsonObject.getJSONArray("profiles")) {
+            if (((JSONObject) profile).getString("profile_id").equals(profileUUID)) {
+                try {
+                    JSONObject member = ((JSONObject) profile).getJSONObject("members").getJSONObject(playerUUID);
+                    String inv_contents = member.getJSONObject("inv_contents").getString("data");
+                    String talisman_bag = member.getJSONObject("talisman_bag").getString("data");
+                    String candy_inventory_contents = member.getJSONObject("candy_inventory_contents").getString("data");
+                    String wardrobe_contents = member.getJSONObject("wardrobe_contents").getString("data");
+                    //String pets = member.getJSONObject("pets").getString("data");
+                } catch (JSONException e) {
+                    return null;
+                }
+
+            }
+        }
+        return null;
+    }
+
+
+    /*public int getNetWorth(String playerUUID) {
+        int netWorth = 0;
+        for (SkyblockProfile profile : getSkyblockProfilesByPlayerUUID(playerUUID)) {
+            netWorth += profile.getBalance();
+            profile.getMembers().get(1).
+        }
+
+
+
+
+    }*/
+
     public byte[] getEiffelTowerImage() {
-        URL url = null;
+        URL url;
         try {
             url = new URL("https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Construction_tour_eiffel.JPG/334px-Construction_tour_eiffel.JPG");
         } catch (MalformedURLException e) {

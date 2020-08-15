@@ -32,7 +32,7 @@ public class Util {
         this.main = main;
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             for (MessageChannel channel : typingChannels) channel.sendTyping().queue();
-        }, 0, 1, TimeUnit.SECONDS);
+        }, 0, 3, TimeUnit.SECONDS);
     }
 
     public Entry<String, Integer> getHighestKeyValuePair(Map<String, Integer> map, int position) {
@@ -127,7 +127,7 @@ public class Util {
      * @param mcName  The minecraft IGN
      * @param discord The discord {@link Guild} object
      * @param channel The discord {@link MessageChannel} object
-     * @return 0 if message was not sent, or 1 if message was sent, or 2 if bot still hasn't loaded leaderboards
+     * @return 0 if player was already verified, 1 if player was not verified, or 2 if bot still hasn't loaded leaderboards
      */
     public int verifyPlayer(Member member, String mcName, Guild discord, MessageChannel channel) {
         try {
@@ -250,7 +250,7 @@ public class Util {
                     }
                 }
                 if (guild != null) {
-                    if (guild.getGuildId().equals(HypixelGuild.SBG.getGuildId())) { //highestLeaderboardPos is one higher than it needs to be so it is only less than not less than or equal to
+                    if (guild == HypixelGuild.SBG) { //highestLeaderboardPos is one higher than it needs to be so it is only less than not less than or equal to
                         if (highestLeaderboardPos < 45) {
                             rankGiven = "Elite";
                         }
@@ -259,9 +259,6 @@ public class Util {
                         }
                         if (highestLeaderboardPos < 5) {
                             rankGiven = "God";
-                        }
-                        if (highestLeaderboardPos < 0) {
-                            rankGiven = "Member";
                         }
 
                         JSONArray guildRanksChange = main.getApiUtil().getGuildRanksChange();
@@ -316,7 +313,7 @@ public class Util {
             channel.sendTyping().queue();
             typingChannels.add(channel);
         } else {
-            typingChannels.remove(channel);
+            typingChannels.stream().filter(messageChannel -> messageChannel.getIdLong() == channel.getIdLong()).forEach(typingChannels::remove);
             channel.deleteMessageById(channel.sendMessage("\u200E").complete().getId()).queue(); // To remove the typing status instantly
         }
     }
