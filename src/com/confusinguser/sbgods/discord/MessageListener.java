@@ -8,6 +8,10 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -26,6 +30,22 @@ public class MessageListener extends ListenerAdapter {
         if (discord.shouldNotRun(e)) {
             return;
         }
+
+        if(e.getChannel().getId().equals("736164363731337297")){ //Splash leech channel
+        //if(e.getChannel().getId().equals("744558150426034268")){ //Splash leech channel (test server)
+
+            Runnable target = () -> {
+                String message = null;
+                try {
+                    message = URLEncoder.encode("&2" + e.getMember().getEffectiveName() + ": &c" + e.getMessage().getContentDisplay(), StandardCharsets.UTF_8.toString());
+                    SBGods.getInstance().getApiUtil().getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/newLeechMessage.json?key=HoVoiuWfpdAjJhfTj0YN&timestamp=" + new Date().getTime() + "&message=" + message);
+                } catch (UnsupportedEncodingException unsupportedEncodingException) {
+                    unsupportedEncodingException.printStackTrace();
+                }
+            };
+            new Thread(target).start();
+        }
+
         if (e.getChannel().getName().contains("verif") && e.getMember() != null &&
                 (!e.getMember().hasPermission(Permission.MANAGE_SERVER) || e.getAuthor().isBot())) {
             e.getMessage().delete().queueAfter(30, TimeUnit.SECONDS);
