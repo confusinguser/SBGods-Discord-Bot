@@ -43,9 +43,9 @@ public class LeaderboardUpdater {
     }
 
     private void updateLeaderboardCache(HypixelGuild guild) {
-        Map<String, SkillLevels> skillLevelMap = new HashMap<>();
-        Map<String, SlayerExp> slayerExpMap = new HashMap<>();
-        Map<String, Double> totalCoinsMap = new HashMap<>();
+        Map<Player, SkillLevels> skillLevelMap = new HashMap<>();
+        Map<Player, SlayerExp> slayerExpMap = new HashMap<>();
+        Map<Player, Double> totalCoinsMap = new HashMap<>();
 
         ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
 
@@ -53,12 +53,13 @@ public class LeaderboardUpdater {
         guild.setLeaderboardProgress(0);
         for (Player guildMember : guildMembers) {
             Player thePlayer = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
+            Player.mergePlayerAndGuildMember(thePlayer, guildMember);
             SkillLevels highestSkillLevels = main.getApiUtil().getBestProfileSkillLevels(thePlayer.getUUID());
             SlayerExp totalSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer.getUUID());
             double totalCoins = main.getApiUtil().getTotalCoinsInPlayer(thePlayer.getUUID());
-            skillLevelMap.put(thePlayer.getDisplayName(), highestSkillLevels == null ? new SkillLevels() : highestSkillLevels);
-            slayerExpMap.put(thePlayer.getDisplayName(), totalSlayerExp);
-            totalCoinsMap.put(thePlayer.getDisplayName(), totalCoins);
+            skillLevelMap.put(thePlayer, highestSkillLevels == null ? new SkillLevels() : highestSkillLevels);
+            slayerExpMap.put(thePlayer, totalSlayerExp);
+            totalCoinsMap.put(thePlayer, totalCoins);
             guild.setLeaderboardProgress(i++);
         }
 
@@ -68,9 +69,9 @@ public class LeaderboardUpdater {
     }
 
     private void updateLeaderboardCacheFast(HypixelGuild guild) {
-        Map<String, SkillLevels> skillLevelMap = new HashMap<>();
-        Map<String, SlayerExp> slayerExpMap = new HashMap<>();
-        Map<String, Double> totalCoinsMap = new HashMap<>();
+        Map<Player, SkillLevels> skillLevelMap = new HashMap<>();
+        Map<Player, SlayerExp> slayerExpMap = new HashMap<>();
+        Map<Player, Double> totalCoinsMap = new HashMap<>();
 
         ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
 
@@ -82,12 +83,13 @@ public class LeaderboardUpdater {
         for (Player guildMember : guildMembers) {
             Runnable target = () -> {
                 Player thePlayer = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
+                thePlayer = Player.mergePlayerAndGuildMember(thePlayer, guildMember);
                 SkillLevels highestSkillLevels = main.getApiUtil().getBestProfileSkillLevels(thePlayer.getUUID());
                 SlayerExp totalSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer.getUUID());
                 double totalCoins = main.getApiUtil().getTotalCoinsInPlayer(thePlayer.getUUID());
-                skillLevelMap.put(thePlayer.getDisplayName(), highestSkillLevels == null ? new SkillLevels() : highestSkillLevels);
-                slayerExpMap.put(thePlayer.getDisplayName(), totalSlayerExp);
-                totalCoinsMap.put(thePlayer.getDisplayName(), totalCoins);
+                skillLevelMap.put(thePlayer, highestSkillLevels == null ? new SkillLevels() : highestSkillLevels);
+                slayerExpMap.put(thePlayer, totalSlayerExp);
+                totalCoinsMap.put(thePlayer, totalCoins);
                 guild.setLeaderboardProgress(i[0]++);
             };
             threads.add(new Thread(target));

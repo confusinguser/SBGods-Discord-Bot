@@ -142,11 +142,11 @@ public class Util {
         List<String> roleNames = discord.getRoles().stream().map(Role::getName).collect(Collectors.toList());
         List<String> memberRoleNames = member.getRoles().stream().map(Role::getName).collect(Collectors.toList()); // Make a list of all role names the member has
 
-        boolean sendMsg = false;
+        boolean gotVerified = false;
         for (Role role : discord.getRolesByName("verified", true)) {
             try {
                 if (!member.getRoles().contains(role)) {
-                    sendMsg = true;
+                    gotVerified = true;
                     discord.addRoleToMember(member, role).complete();
                 }
             } catch (HierarchyException ignored) {
@@ -187,11 +187,10 @@ public class Util {
         HypixelGuild hypixelGuild = HypixelGuild.getGuildById(guildId);
         DiscordServer discordServer = DiscordServer.getDiscordServerFromDiscordGuild(discord);
         if (hypixelGuild != null && discordServer != null && hypixelGuild == discordServer.getHypixelGuild()) {
-            int highestLeaderboardPos = Math.min(thePlayer.getSkillPos(), thePlayer.getSlayerPos());
+            int highestLeaderboardPos = Math.min(thePlayer.getSkillPos(false), thePlayer.getSlayerPos(false));
             if (highestLeaderboardPos == -2) {
                 return 2;
             }
-            String rankGiven = "Member";
 
             // Give Elite, SBK and SBG rank
             if (hypixelGuild == discordServer.getHypixelGuild()) {
@@ -249,51 +248,51 @@ public class Util {
                         }
                     }
                 }
-                if (guild != null) {
-                    if (guild == HypixelGuild.SBG) { //highestLeaderboardPos is one higher than it needs to be so it is only less than not less than or equal to
-                        if (highestLeaderboardPos < 45) {
-                            rankGiven = "Elite";
-                        }
-                        if (highestLeaderboardPos < 15) {
-                            rankGiven = "King";
-                        }
-                        if (highestLeaderboardPos < 5) {
-                            rankGiven = "God";
-                        }
 
-                        JSONArray guildRanksChange = main.getApiUtil().getGuildRanksChange();
-
-                        for (int i = 0; i < guildRanksChange.length(); i++) {
-                            if (guildRanksChange.getJSONObject(i).getString("uuid").equals(thePlayer.getUUID())) {
-                                guildRanksChange.remove(i);
-                            }
-                        }
-
-                        if (thePlayer.getGuildRank() != null && !thePlayer.getGuildRank().contains(rankGiven) && (thePlayer.getGuildRank().contains("Member") || thePlayer.getGuildRank().contains("Elite") || thePlayer.getGuildRank().contains("King") || thePlayer.getGuildRank().contains("God"))) {
-                            JSONObject newPlayerJson = new JSONObject();
-
-                            newPlayerJson.put("uuid", thePlayer.getUUID());
-                            newPlayerJson.put("name", thePlayer.getDisplayName());
-                            newPlayerJson.put("currRank", thePlayer.getGuildRank());
-                            newPlayerJson.put("needRank", rankGiven);
-
-                            guildRanksChange.put(newPlayerJson);
-                        }
-
-                        main.getApiUtil().setGuildRanksChange(guildRanksChange);
+                String rankGiven = "Member";
+                if (guild == HypixelGuild.SBG) { //highestLeaderboardPos is one higher than it needs to be so it is only less than not less than or equal to
+                    if (highestLeaderboardPos < 45) {
+                        rankGiven = "Elite";
                     }
+                    if (highestLeaderboardPos < 15) {
+                        rankGiven = "King";
+                    }
+                    if (highestLeaderboardPos < 5) {
+                        rankGiven = "God";
+                    }
+
+                    JSONArray guildRanksChange = main.getApiUtil().getGuildRanksChange();
+
+                    for (int i = 0; i < guildRanksChange.length(); i++) {
+                        if (guildRanksChange.getJSONObject(i).getString("uuid").equals(thePlayer.getUUID())) {
+                            guildRanksChange.remove(i);
+                        }
+                    }
+
+                    if (thePlayer.getGuildRank() != null && !thePlayer.getGuildRank().contains(rankGiven) && (thePlayer.getGuildRank().contains("Member") || thePlayer.getGuildRank().contains("Elite") || thePlayer.getGuildRank().contains("King") || thePlayer.getGuildRank().contains("God"))) {
+                        JSONObject newPlayerJson = new JSONObject();
+
+                        newPlayerJson.put("uuid", thePlayer.getUUID());
+                        newPlayerJson.put("name", thePlayer.getDisplayName());
+                        newPlayerJson.put("currRank", thePlayer.getGuildRank());
+                        newPlayerJson.put("needRank", rankGiven);
+
+                        guildRanksChange.put(newPlayerJson);
+                    }
+
+                    main.getApiUtil().setGuildRanksChange(guildRanksChange);
                 }
             }
         }
 
-        if (sendMsg) {
+        if (gotVerified) {
             if (guild == null) {
                 channel.sendMessage(main.getDiscord().escapeMarkdown("Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "!")).queue();
             } else {
                 channel.sendMessage(main.getDiscord().escapeMarkdown("Linked " + member.getUser().getAsTag() + " with the minecraft account " + mcName + "! (Guild: " + guild.getDisplayName() + ")")).queue();
             }
         }
-        return sendMsg ? 1 : 0;
+        return gotVerified ? 1 : 0;
     }
 
     public List<JSONObject> getJSONObjectListByJSONArray(JSONArray jsonArray) {
@@ -311,9 +310,13 @@ public class Util {
     public void setTyping(boolean typing, MessageChannel channel) {
         if (typing) {
             channel.sendTyping().queue();
-            typingChannels.add(channel);
+            synchronized (typingChannels) {
+                typingChannels.add(channel);
+            }
         } else {
-            typingChannels.stream().filter(messageChannel -> messageChannel.getIdLong() == channel.getIdLong()).forEach(typingChannels::remove);
+            synchronized (typingChannels) {
+                typingChannels.stream().filter(messageChannel -> messageChannel.getIdLong() == channel.getIdLong()).forEach(typingChannels::remove);
+            }
             channel.deleteMessageById(channel.sendMessage("\u200E").complete().getId()).queue(); // To remove the typing status instantly
         }
     }
@@ -322,7 +325,6 @@ public class Util {
         return stripColorCodesRegex.matcher(input).replaceAll("");
     }
 
-    // For recursiveness
     public File getFileToUse(String fileName) {
         File file = new File(fileName);
         if (file.exists()) {

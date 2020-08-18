@@ -13,9 +13,9 @@ public enum HypixelGuild {
     private final String[] names;
     private int playerSize = 125;
 
-    private Map<String, SkillLevels> skillExpMap = new HashMap<>();
-    private Map<String, SlayerExp> slayerExpMap = new HashMap<>();
-    private Map<String, Double> totalCoinsMap = new HashMap<>();
+    private Map<Player, SkillLevels> skillExpMap = new HashMap<>();
+    private Map<Player, SlayerExp> slayerExpMap = new HashMap<>();
+    private Map<Player, Double> totalCoinsMap = new HashMap<>();
     private int leaderboardProgress;
 
     HypixelGuild(String guildId, int slayerReq, int skillReq, String... names) {
@@ -46,27 +46,27 @@ public enum HypixelGuild {
         return guildId;
     }
 
-    public Map<String, SkillLevels> getSkillExpMap() {
+    public Map<Player, SkillLevels> getSkillExpMap() {
         return skillExpMap;
     }
 
-    public void setAvgSkillLevelMap(Map<String, SkillLevels> skillLevelMap) {
+    public void setAvgSkillLevelMap(Map<Player, SkillLevels> skillLevelMap) {
         this.skillExpMap = skillLevelMap;
     }
 
-    public Map<String, SlayerExp> getSlayerExpMap() {
+    public Map<Player, SlayerExp> getSlayerExpMap() {
         return slayerExpMap;
     }
 
-    public void setSlayerExpMap(Map<String, SlayerExp> slayerExpMap) {
+    public void setSlayerExpMap(Map<Player, SlayerExp> slayerExpMap) {
         this.slayerExpMap = slayerExpMap;
     }
 
-    public Map<String, Double> getTotalCoinsMap() {
+    public Map<Player, Double> getTotalCoinsMap() {
         return totalCoinsMap;
     }
 
-    public void setTotalCoinsMap(Map<String, Double> totalCoinsMap) {
+    public void setTotalCoinsMap(Map<Player, Double> totalCoinsMap) {
         this.totalCoinsMap = totalCoinsMap;
     }
 
