@@ -7,20 +7,19 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.URLDecoder;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 class Start {
 
     public static void main(String[] args) throws UnsupportedEncodingException {
+        ServerSocket s;
         try {
-            ServerSocket s = new ServerSocket(65000, 10, InetAddress.getLocalHost());
-        } catch (UnknownHostException e) {
-            // Shouldn't happen for localhost
+            s = new ServerSocket(34583, 10, InetAddress.getLocalHost());
         } catch (IOException e) {
             // Port taken, so app is already running
-            System.out.print("Application is probably already running, it would be pretty weird with 2 bots at the same time wouldn't it?");
-            System.exit(0);
+            System.out.print("Application is most likely already running");
+            System.exit(1);
+            return;
         }
 
         Console console = System.console();
@@ -39,5 +38,41 @@ class Start {
 
         SBGods sbgods = new SBGods();
         if (logTerminalError) sbgods.logger.info("Could not open terminal");
+
+        /*Thread listenerThread = new Thread(() -> {
+            while (true) {
+                try {
+                    Socket socket = s.accept();
+                    Thread socketThread = new Thread(() -> {
+                        BufferedReader bufferedReader;
+                        try {
+                            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                        } catch (IOException ioException) {
+                            ioException.printStackTrace();
+                            return;
+                        }
+                        while (true) {
+                            String data;
+                            try {
+                                data = bufferedReader.readLine();
+                                if (data == null) {
+                                    socket.close();
+                                    break;
+                                }
+                            } catch (IOException ioException) {
+                                ioException.printStackTrace();
+                                return;
+                            }
+                            System.out.println(data);
+                        }
+                    });
+
+                    socketThread.start();
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+            }
+        });
+        listenerThread.start();*/
     }
 }

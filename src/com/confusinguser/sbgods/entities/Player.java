@@ -1,12 +1,15 @@
 package com.confusinguser.sbgods.entities;
 
 import com.confusinguser.sbgods.SBGods;
+import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
+import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Player {
 
@@ -112,28 +115,42 @@ public class Player {
     /**
      * @return The skill leaderboard position or {@code -1} if player is not in guild or {@code -2} if bot is still loading
      */
-    public int getSkillPos() {
+    public int getSkillPos(boolean includeStaff) {
         if (getGuildId() == null) return -1;
         HypixelGuild guild = HypixelGuild.getGuildById(getGuildId());
         if (guild == null) return -1;
         if (guild.getSkillExpMap().isEmpty()) return -2;
 
-        List<Map.Entry<String, SkillLevels>> list = new ArrayList<>(guild.getSkillExpMap().entrySet());
+        List<Map.Entry<Player, SkillLevels>> list = new ArrayList<>(guild.getSkillExpMap().entrySet());
+        if (!includeStaff) {
+            list = list.stream().filter(player -> Stream.of("Trial Helper", "Helper", "Moderator", "Officer", "Bot Developer", "Co Owner").anyMatch(s -> !player.getKey().getGuildRank().contains(s))).collect(Collectors.toList());
+        }
         list.sort(Comparator.comparingDouble(entry -> -entry.getValue().getAvgSkillLevel()));
-        return list.stream().map(Map.Entry::getKey).collect(Collectors.toList()).indexOf(getDisplayName());
+        int output = list.stream().map(Map.Entry::getKey).map(Player::getDisplayName).collect(Collectors.toList()).indexOf(getDisplayName());
+        if (output == -1) {
+            return getSkillPos(true);
+        }
+        return output;
     }
 
     /**
      * @return The slayer leaderboard position or {@code -1} if player is not in guild or {@code -2} if bot is still loading
      */
-    public int getSlayerPos() {
+    public int getSlayerPos(boolean includeStaff) {
         if (getGuildId() == null) return -1;
         HypixelGuild guild = HypixelGuild.getGuildById(getGuildId());
         if (guild == null) return -1;
         if (guild.getSlayerExpMap().isEmpty()) return -2;
 
-        List<Map.Entry<String, SlayerExp>> list = new ArrayList<>(guild.getSlayerExpMap().entrySet());
+        List<Map.Entry<Player, SlayerExp>> list = new ArrayList<>(guild.getSlayerExpMap().entrySet());
+        if (!includeStaff) {
+            list = list.stream().filter(player -> Stream.of("Trial Helper", "Helper", "Moderator", "Officer", "Bot Developer", "Co Owner").anyMatch(s -> !player.getKey().getGuildRank().contains(s))).collect(Collectors.toList());
+        }
         list.sort(Comparator.comparingDouble(entry -> -entry.getValue().getTotalExp()));
-        return list.stream().map(Map.Entry::getKey).collect(Collectors.toList()).indexOf(getDisplayName());
+        int output = list.stream().map(Map.Entry::getKey).map(Player::getDisplayName).collect(Collectors.toList()).indexOf(getDisplayName());
+        if (output == -1) {
+            return getSlayerPos(true);
+        }
+        return output;
     }
 }

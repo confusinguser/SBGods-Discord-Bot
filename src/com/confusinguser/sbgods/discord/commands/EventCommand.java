@@ -2,7 +2,11 @@ package com.confusinguser.sbgods.discord.commands;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
-import com.confusinguser.sbgods.entities.*;
+import com.confusinguser.sbgods.entities.DiscordServer;
+import com.confusinguser.sbgods.entities.HypixelGuild;
+import com.confusinguser.sbgods.entities.Player;
+import com.confusinguser.sbgods.entities.leaderboard.SkillExp;
+import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.TextChannel;

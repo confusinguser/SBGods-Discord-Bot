@@ -4,7 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
-import com.confusinguser.sbgods.entities.SkillLevels;
+import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -39,7 +39,7 @@ public class SkillCommand extends Command {
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
             ArrayList<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
-            Map<String, SkillLevels> usernameSkillExpHashMap = currentDiscordServer.getHypixelGuild().getSkillExpMap();
+            Map<Player, SkillLevels> usernameSkillExpHashMap = currentDiscordServer.getHypixelGuild().getSkillExpMap();
 
             if (usernameSkillExpHashMap.size() == 0) {
                 if (currentDiscordServer.getHypixelGuild().getLeaderboardProgress() == 0) {
@@ -66,7 +66,7 @@ public class SkillCommand extends Command {
                 topX = 10;
             }
 
-            List<Entry<String, SkillLevels>> leaderboardList = usernameSkillExpHashMap.entrySet().stream()
+            List<Entry<Player, SkillLevels>> leaderboardList = usernameSkillExpHashMap.entrySet().stream()
                     .sorted(Comparator.comparingDouble(entry -> -entry.getValue().getAvgSkillLevel()))
                     .collect(Collectors.toList())
                     .subList(0, topX);
@@ -77,15 +77,15 @@ public class SkillCommand extends Command {
                 spreadsheet = true;
             }
             if (spreadsheet) {
-                for (Entry<String, SkillLevels> currentEntry : leaderboardList) {
+                for (Entry<Player, SkillLevels> currentEntry : leaderboardList) {
                     if (!currentEntry.getValue().isApproximate()) {
-                        response.append(currentEntry.getKey()).append("    ").append(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2)).append("\n");
+                        response.append(currentEntry.getKey().getDisplayName()).append("    ").append(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2)).append("\n");
                     }
                 }
             } else {
                 int totalAvgSkillLvl = 0;
-                for (Entry<String, SkillLevels> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2));
+                for (Entry<Player, SkillLevels> currentEntry : leaderboardList) {
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2));
                     if (currentEntry.getValue().isApproximate()) {
                         response.append(" *(appr.)*");
                     }

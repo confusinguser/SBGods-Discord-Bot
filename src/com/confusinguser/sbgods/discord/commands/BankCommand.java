@@ -43,7 +43,7 @@ public class BankCommand extends Command {
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
             ArrayList<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
-            Map<String, Double> usernameTotalCoinsMap = currentDiscordServer.getHypixelGuild().getTotalCoinsMap();
+            Map<Player, Double> usernameTotalCoinsMap = currentDiscordServer.getHypixelGuild().getTotalCoinsMap();
 
             if (usernameTotalCoinsMap.size() == 0) {
                 if (currentDiscordServer.getHypixelGuild().getLeaderboardProgress() == 0) {
@@ -68,21 +68,21 @@ public class BankCommand extends Command {
                 }
             }
 
-            List<Entry<String, Double>> leaderboardList = usernameTotalCoinsMap.entrySet().stream()
+            List<Entry<Player, Double>> leaderboardList = usernameTotalCoinsMap.entrySet().stream()
                     .sorted(Comparator.comparingDouble(entry -> -entry.getValue()))
                     .collect(Collectors.toList())
                     .subList(0, topX - 1);
 
             StringBuilder response = new StringBuilder();
             if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
-                for (Entry<String, Double> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey()).append(":* ").append(Math.round(currentEntry.getValue())).append("\n\n");
+                for (Entry<Player, Double> currentEntry : leaderboardList) {
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(Math.round(currentEntry.getValue())).append("\n\n");
                 }
             } else {
                 int totalCoins = 0;
 
-                for (Entry<String, Double> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue())).append("\n\n");
+                for (Entry<Player, Double> currentEntry : leaderboardList) {
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue())).append("\n\n");
                     totalCoins += currentEntry.getValue();
                 }
 

@@ -4,7 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
-import com.confusinguser.sbgods.entities.SlayerExp;
+import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -36,7 +36,7 @@ public class SlayerCommand extends Command {
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
             ArrayList<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(Objects.requireNonNull(DiscordServer.getDiscordServerFromEvent(e)).getHypixelGuild());
-            Map<String, SlayerExp> usernameSlayerExpHashMap = currentDiscordServer.getHypixelGuild().getSlayerExpMap();
+            Map<Player, SlayerExp> usernameSlayerExpHashMap = currentDiscordServer.getHypixelGuild().getSlayerExpMap();
 
             if (usernameSlayerExpHashMap.size() == 0) {
                 if (currentDiscordServer.getHypixelGuild().getLeaderboardProgress() == 0) {
@@ -63,20 +63,20 @@ public class SlayerCommand extends Command {
                 topX = 10;
             }
 
-            List<Entry<String, SlayerExp>> leaderboardList = usernameSlayerExpHashMap.entrySet().stream()
+            List<Entry<Player, SlayerExp>> leaderboardList = usernameSlayerExpHashMap.entrySet().stream()
                     .sorted(Comparator.comparingDouble(entry -> -entry.getValue().getTotalExp()))
                     .collect(Collectors.toList())
                     .subList(0, topX);
 
             StringBuilder response = new StringBuilder();
             if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
-                for (Entry<String, SlayerExp> currentEntry : leaderboardList) {
-                    response.append(currentEntry.getKey()).append("    ").append(main.getLangUtil().addNotation(main.getSBUtil().toSkillExp(main.getUtil().round(currentEntry.getValue().getTotalExp(), 2)))).append("\n");
+                for (Entry<Player, SlayerExp> currentEntry : leaderboardList) {
+                    response.append(currentEntry.getKey().getDisplayName()).append("    ").append(main.getLangUtil().addNotation(main.getSBUtil().toSkillExp(main.getUtil().round(currentEntry.getValue().getTotalExp(), 2)))).append("\n");
                 }
             } else {
                 int totalSlayer = 0;
-                for (Entry<String, SlayerExp> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue().getTotalExp())).append("\n");
+                for (Entry<Player, SlayerExp> currentEntry : leaderboardList) {
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue().getTotalExp())).append("\n");
                     totalSlayer += currentEntry.getValue().getTotalExp();
                 }
                 if (topX == guildMemberUuids.size())

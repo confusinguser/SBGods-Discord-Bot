@@ -5,7 +5,6 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.utils.*;
 
 import javax.security.auth.login.LoginException;
-import com.confusinguser.sbgods.utils.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -16,10 +15,10 @@ import java.util.logging.*;
 import java.util.stream.Collectors;
 
 public class SBGods {
-    public static final String VERSION = "0.9.3.5";
+    public static final String VERSION = "0.9.3.6";
     public static final String VERSION_DESCRIPTION_MAJOR = ""; // Change this every major release: 0.9.6.3 -> 1.0
     public static final String VERSION_DESCRIPTION_MINOR = "Added the verify list"; // Change this every minor release: 0.8.11.5 -> 0.8.12
-    public static final String VERSION_DESCRIPTION_PATCH = "Add error tracking in reaction listener"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
+    public static final String VERSION_DESCRIPTION_PATCH = "Staff are no longer counted in the Elite, King, God requirements"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
     public static final String[] DEVELOPERS = {"244786205873405952", "497210228274757632"};
     private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
     //private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
@@ -133,21 +132,21 @@ public class SBGods {
         if (keys == null) {
             byte[] bytes;
             try (InputStream stream = getClass().getResourceAsStream("/resources/keys.txt")) {
-                if(stream != null) {
+                if (stream != null) {
                     bytes = stream.readAllBytes();
-                }else{
+                } else {
                     this.getLogger().warning("Inputstream to get the key returned null");
-                    return new String[]{};
+                    return new String[0];
                 }
             } catch (IOException exception) {
                 exception.printStackTrace();
-                return new String[]{};
+                return new String[0];
             }
 
             String fileContent = new String(bytes);
-            List<String> output = Arrays.asList(fileContent.split("\n"));
+            List<String> output = Arrays.asList(fileContent.split("\r\n"));
             output = output.stream().filter(s -> s.length() >= 36 && !s.substring(0, 36).contains("//")).map(s -> s.substring(0, 36)).collect(Collectors.toList());
-            keys = output.toArray(new String[]{});
+            keys = output.toArray(new String[0]);
         }
         return keys;
     }

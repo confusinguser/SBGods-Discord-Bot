@@ -1,8 +1,8 @@
-package com.confusinguser.sbgods.entities;
+package com.confusinguser.sbgods.entities.leaderboard;
 
 import java.util.Map;
 
-public class SlayerExp {
+public class SlayerExp implements LeaderboardValue{
 
     private final int zombie;
     private final int spider;
@@ -53,5 +53,10 @@ public class SlayerExp {
 
     public int getTotalExp() {
         return totalExp;
+    }
+
+    @Override
+    public double getValue() {
+        return getTotalExp();
     }
 }
