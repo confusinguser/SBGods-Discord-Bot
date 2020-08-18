@@ -126,7 +126,11 @@ public class Player {
             list = list.stream().filter(player -> Stream.of("Trial Helper", "Helper", "Moderator", "Officer", "Bot Developer", "Co Owner").anyMatch(s -> !player.getKey().getGuildRank().contains(s))).collect(Collectors.toList());
         }
         list.sort(Comparator.comparingDouble(entry -> -entry.getValue().getAvgSkillLevel()));
-        return list.stream().map(Map.Entry::getKey).map(Player::getDisplayName).collect(Collectors.toList()).indexOf(getDisplayName());
+        int output = list.stream().map(Map.Entry::getKey).map(Player::getDisplayName).collect(Collectors.toList()).indexOf(getDisplayName());
+        if (output == -1) {
+            return getSkillPos(true);
+        }
+        return output;
     }
 
     /**
@@ -143,6 +147,10 @@ public class Player {
             list = list.stream().filter(player -> Stream.of("Trial Helper", "Helper", "Moderator", "Officer", "Bot Developer", "Co Owner").anyMatch(s -> !player.getKey().getGuildRank().contains(s))).collect(Collectors.toList());
         }
         list.sort(Comparator.comparingDouble(entry -> -entry.getValue().getTotalExp()));
-        return list.stream().map(Map.Entry::getKey).map(Player::getDisplayName).collect(Collectors.toList()).indexOf(getDisplayName());
+        int output = list.stream().map(Map.Entry::getKey).map(Player::getDisplayName).collect(Collectors.toList()).indexOf(getDisplayName());
+        if (output == -1) {
+            return getSlayerPos(true);
+        }
+        return output;
     }
 }
