@@ -1,5 +1,8 @@
 package com.confusinguser.sbgods.entities;
 
+import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
+import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
+
 import java.util.HashMap;
 import java.util.Map;
 

@@ -2,7 +2,11 @@ package com.confusinguser.sbgods.discord.commands;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
-import com.confusinguser.sbgods.entities.*;
+import com.confusinguser.sbgods.entities.DiscordServer;
+import com.confusinguser.sbgods.entities.Pet;
+import com.confusinguser.sbgods.entities.Player;
+import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
+import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -73,8 +77,8 @@ public class PlayerCommand extends Command {
         embedBuilder.addField("Slayer EXP", main.getLangUtil().addNotation(slayerExp.getTotalExp()), true);
         embedBuilder.addField("Total money (All coops)", totalMoney == 0 ? "Banking API off" : main.getLangUtil().addNotation(totalMoney), true);
 
-        embedBuilder.addField("Skill LB Position", player.getSkillPos() == -1 ? "Not in guild" : player.getSkillPos() == -2 ? "Bot is loading..." : "#" + (player.getSkillPos() + 1), true);
-        embedBuilder.addField("Slayer LB Position", player.getSlayerPos() == -1 ? "Not in guild" : player.getSkillPos() == -2 ? "Bot is loading..." : "#" + (player.getSlayerPos() + 1), true);
+        embedBuilder.addField("Skill LB Position", player.getSkillPos(true) == -1 ? "Not in guild" : player.getSkillPos(true) == -2 ? "Bot is loading..." : "#" + (player.getSkillPos(true) + 1), true);
+        embedBuilder.addField("Slayer LB Position", player.getSlayerPos(true) == -1 ? "Not in guild" : player.getSkillPos(true) == -2 ? "Bot is loading..." : "#" + (player.getSlayerPos(true) + 1), true);
 
         StringBuilder petStr = new StringBuilder();
         for (Pet pet : totalPets) {

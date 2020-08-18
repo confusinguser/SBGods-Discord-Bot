@@ -1,4 +1,4 @@
-package com.confusinguser.sbgods.entities;
+package com.confusinguser.sbgods.entities.leaderboard;
 
 import com.confusinguser.sbgods.SBGods;
 
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
-public class SkillExp {
+public class SkillExp implements LeaderboardValue {
 
     private final double farming;
     private final double mining;
@@ -113,10 +113,14 @@ public class SkillExp {
 
     public double getTotalSkillExp() {
         double output = 0;
-        for (Double aDouble : skillList) {
+        for (double aDouble : skillList) {
             output += aDouble;
         }
-
         return output;
+    }
+
+    @Override
+    public double getValue() {
+        return getTotalSkillExp();
     }
 }

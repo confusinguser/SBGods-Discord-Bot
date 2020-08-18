@@ -3,8 +3,8 @@ package com.confusinguser.sbgods.utils;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.Player;
-import com.confusinguser.sbgods.entities.SkillLevels;
-import com.confusinguser.sbgods.entities.SlayerExp;
+import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
+import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class LeaderboardUpdater {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-        }, 10, 720, TimeUnit.MINUTES); // Every 12h
+        }, 10, 360, TimeUnit.MINUTES); // Every 6h // Sometimes ppl complain about specific changes not coming into effect immediately
     }
 
     private void updateLeaderboardCache(HypixelGuild guild) {

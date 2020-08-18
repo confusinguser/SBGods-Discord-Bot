@@ -1,7 +1,11 @@
 package com.confusinguser.sbgods.utils;
 
 import com.confusinguser.sbgods.SBGods;
-import com.confusinguser.sbgods.entities.*;
+import com.confusinguser.sbgods.entities.DiscordServer;
+import com.confusinguser.sbgods.entities.HypixelGuild;
+import com.confusinguser.sbgods.entities.Player;
+import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
+import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -31,7 +35,9 @@ public class Util {
     public Util(SBGods main) {
         this.main = main;
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
-            for (MessageChannel channel : typingChannels) channel.sendTyping().queue();
+            synchronized (typingChannels) {
+                for (MessageChannel channel : typingChannels) channel.sendTyping().queue();
+            }
         }, 0, 3, TimeUnit.SECONDS);
     }
 
@@ -331,5 +337,9 @@ public class Util {
             file = getFileToUse(fileName.replace(".jar", "") + "_new.jar");
         }
         return file;
+    }
+
+    public void handleGuildMessage(String sender, String message) {
+        System.out.println("Guild > " + sender + ": " + message);
     }
 }
