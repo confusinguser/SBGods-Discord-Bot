@@ -47,7 +47,7 @@ public class VerifyCommand extends Command {
             // Send error message saying to link discord account with mc
             switch (currentDiscordServer) {
                 case SBGods:
-                    e.getChannel().sendMessage(e.getAuthor().getAsMention() + " you are already verified or you need to link your minecraft account with discord (see <#713134802542264351>)").queue();
+                    e.getChannel().sendMessage(e.getAuthor().getAsMention() + " you are already verified or you need to link your minecraft account with discord (see <#743066201806340137>)").queue();
                     break;
                 case SBDGods:
                     e.getChannel().sendMessage(e.getAuthor().getAsMention() + " you are already verified or you need to link your minecraft account with discord (see <#711462220852101170>)").queue();

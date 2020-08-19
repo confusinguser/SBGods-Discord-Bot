@@ -1,15 +1,14 @@
 package com.confusinguser.sbgods.utils;
 
 import com.confusinguser.sbgods.SBGods;
+import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
 import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,6 +30,8 @@ public class Util {
     private final List<MessageChannel> typingChannels = new ArrayList<>();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Pattern stripColorCodesRegex = Pattern.compile("§[a-f0-9rlkmn]");
+    private String latestGuildmessageAuthor = "";
+    private String latestGuildmessage = "";
 
     public Util(SBGods main) {
         this.main = main;
@@ -321,7 +322,9 @@ public class Util {
             }
         } else {
             synchronized (typingChannels) {
-                typingChannels.stream().filter(messageChannel -> messageChannel.getIdLong() == channel.getIdLong()).forEach(typingChannels::remove);
+                List<MessageChannel> channelsToRemove = new ArrayList<>();
+                typingChannels.stream().filter(messageChannel -> messageChannel.getIdLong() == channel.getIdLong()).forEach(channelsToRemove::add);
+                for (MessageChannel channelToRemove : channelsToRemove) typingChannels.remove(channelToRemove);
             }
             channel.deleteMessageById(channel.sendMessage("\u200E").complete().getId()).queue(); // To remove the typing status instantly
         }
@@ -339,7 +342,35 @@ public class Util {
         return file;
     }
 
-    public void handleGuildMessage(String sender, String message) {
-        System.out.println("Guild > " + sender + ": " + message);
+    public void handleGuildMessage(DiscordBot discordBot, String author, String message) {
+        if (discordBot == null || author.isEmpty() || message.isEmpty()) return;
+        MessageChannel channel;
+        if ((channel = discordBot.getJDA().getTextChannelById("745632663456579664")) != null) {
+            MessageEmbed embed;
+            if (latestGuildmessageAuthor.equals(author)) {
+                latestGuildmessage += "\n" + message;
+                embed = new EmbedBuilder().setDescription(latestGuildmessage).setColor(getColorFromRankString(author.split(" ")[0])).setAuthor(author).build();
+            } else {
+                latestGuildmessage = message;
+                embed = new EmbedBuilder().setDescription(message).setColor(getColorFromRankString(author.split(" ")[0])).setAuthor(author).build();
+            }
+            channel.deleteMessageById(channel.getLatestMessageId()).queue();
+            channel.sendMessage(embed).queue();
+            latestGuildmessageAuthor = author;
+        }
+    }
+
+    public int getColorFromRankString(String rank) {
+        switch (rank) {
+            case "[VIP]":
+            case "[VIP+]":
+                return 0x55FF55;
+            case "[MVP]":
+            case "[MVP+]":
+                return 0x00AAAA;
+            case "[MVP++]":
+                return 0xFFAA00;
+        }
+        return 0x555555;
     }
 }

@@ -1,11 +1,16 @@
 package com.confusinguser.sbgods;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.awt.*;
 import java.io.Console;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
@@ -17,7 +22,7 @@ class Start {
             s = new ServerSocket(34583, 10, InetAddress.getLocalHost());
         } catch (IOException e) {
             // Port taken, so app is already running
-            System.out.print("Application is most likely already running");
+            System.out.println("Application is most likely already running");
             System.exit(1);
             return;
         }
@@ -39,40 +44,42 @@ class Start {
         SBGods sbgods = new SBGods();
         if (logTerminalError) sbgods.logger.info("Could not open terminal");
 
-        /*Thread listenerThread = new Thread(() -> {
+        Thread listenerThread = new Thread(() -> {
             while (true) {
                 try {
                     Socket socket = s.accept();
                     Thread socketThread = new Thread(() -> {
-                        BufferedReader bufferedReader;
+                        DataInputStream dataInputStream = null;
+                        String author;
+                        String message;
+                        String data = "";
                         try {
-                            bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                            dataInputStream = new DataInputStream(socket.getInputStream());
+                            data = dataInputStream.readUTF();
                         } catch (IOException ioException) {
                             ioException.printStackTrace();
-                            return;
-                        }
-                        while (true) {
-                            String data;
                             try {
-                                data = bufferedReader.readLine();
-                                if (data == null) {
-                                    socket.close();
-                                    break;
-                                }
-                            } catch (IOException ioException) {
-                                ioException.printStackTrace();
+                                socket.close();
+                                if (dataInputStream != null)
+                                    dataInputStream.close();
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
                                 return;
                             }
-                            System.out.println(data);
                         }
+                        System.out.println(data);
+                        JsonObject jsonData = JsonParser.parseString(data).getAsJsonObject();
+                        author = jsonData.get("author").getAsString();
+                        message = jsonData.get("message").getAsString();
+                        sbgods.getUtil().handleGuildMessage(sbgods.getDiscord(), author, message);
                     });
-
                     socketThread.start();
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
+                    return;
                 }
             }
         });
-        listenerThread.start();*/
+        listenerThread.start();
     }
 }
