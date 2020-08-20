@@ -3,6 +3,7 @@ package com.confusinguser.sbgods.utils;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.Player;
+import com.confusinguser.sbgods.entities.leaderboard.BankBalance;
 import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
 import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -45,9 +46,9 @@ public class LeaderboardUpdater {
     private void updateLeaderboardCache(HypixelGuild guild) {
         Map<Player, SkillLevels> skillLevelMap = new HashMap<>();
         Map<Player, SlayerExp> slayerExpMap = new HashMap<>();
-        Map<Player, Double> totalCoinsMap = new HashMap<>();
+        Map<Player, BankBalance> totalCoinsMap = new HashMap<>();
 
-        ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
+        List<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
 
         int i = 0;
         guild.setLeaderboardProgress(0);
@@ -59,7 +60,7 @@ public class LeaderboardUpdater {
             double totalCoins = main.getApiUtil().getTotalCoinsInPlayer(thePlayer.getUUID());
             skillLevelMap.put(thePlayer, highestSkillLevels == null ? new SkillLevels() : highestSkillLevels);
             slayerExpMap.put(thePlayer, totalSlayerExp);
-            totalCoinsMap.put(thePlayer, totalCoins);
+            totalCoinsMap.put(thePlayer, new BankBalance(totalCoins));
             guild.setLeaderboardProgress(i++);
         }
 
@@ -71,7 +72,7 @@ public class LeaderboardUpdater {
     private void updateLeaderboardCacheFast(HypixelGuild guild) {
         Map<Player, SkillLevels> skillLevelMap = new HashMap<>();
         Map<Player, SlayerExp> slayerExpMap = new HashMap<>();
-        Map<Player, Double> totalCoinsMap = new HashMap<>();
+        Map<Player, BankBalance> totalCoinsMap = new HashMap<>();
 
         ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
 
@@ -89,7 +90,7 @@ public class LeaderboardUpdater {
                 double totalCoins = main.getApiUtil().getTotalCoinsInPlayer(thePlayer.getUUID());
                 skillLevelMap.put(thePlayer, highestSkillLevels == null ? new SkillLevels() : highestSkillLevels);
                 slayerExpMap.put(thePlayer, totalSlayerExp);
-                totalCoinsMap.put(thePlayer, totalCoins);
+                totalCoinsMap.put(thePlayer, new BankBalance(totalCoins));
                 guild.setLeaderboardProgress(i[0]++);
             };
             threads.add(new Thread(target));

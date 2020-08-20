@@ -14,7 +14,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,6 +34,7 @@ public class Util {
     private final Pattern stripColorCodesRegex = Pattern.compile("§[a-f0-9rlkmn]");
     private String latestGuildmessageAuthor = "";
     private String latestGuildmessage = "";
+    private final Map<InetAddress, String> latestMessageByIP = new HashMap<>();
 
     public Util(SBGods main) {
         this.main = main;
@@ -342,21 +345,26 @@ public class Util {
         return file;
     }
 
-    public void handleGuildMessage(DiscordBot discordBot, String author, String message) {
+    public void handleGuildMessage(DiscordBot discordBot, String author, String message, InetAddress requestSenderIpAddr) {
         if (discordBot == null || author.isEmpty() || message.isEmpty()) return;
         MessageChannel channel;
         if ((channel = discordBot.getJDA().getTextChannelById("745632663456579664")) != null) {
+            if (latestGuildmessage.equals(message) && latestGuildmessageAuthor.equals(author) &&
+                    !latestMessageByIP.getOrDefault(requestSenderIpAddr, "").equals(author + ":" + message)) {
+                return;
+            }
             MessageEmbed embed;
             if (latestGuildmessageAuthor.equals(author)) {
                 latestGuildmessage += "\n" + message;
                 embed = new EmbedBuilder().setDescription(latestGuildmessage).setColor(getColorFromRankString(author.split(" ")[0])).setAuthor(author).build();
+                channel.deleteMessageById(channel.getLatestMessageId()).queue();
             } else {
                 latestGuildmessage = message;
                 embed = new EmbedBuilder().setDescription(message).setColor(getColorFromRankString(author.split(" ")[0])).setAuthor(author).build();
             }
-            channel.deleteMessageById(channel.getLatestMessageId()).queue();
             channel.sendMessage(embed).queue();
             latestGuildmessageAuthor = author;
+            latestMessageByIP.put(requestSenderIpAddr, author + ":" + message);
         }
     }
 

@@ -5,6 +5,7 @@ import com.confusinguser.sbgods.entities.Response;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class CacheUtil {
@@ -14,7 +15,7 @@ public class CacheUtil {
 
     // private SBGods main;
 
-    private final ArrayList<Response> cache = new ArrayList<>();
+    private final List<Response> cache = new ArrayList<>();
 
     public CacheUtil(SBGods main) {
         // this.main = main;

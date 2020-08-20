@@ -20,3 +20,4 @@ build
 # Intellij Idea data
 .idea
 *.iml
+hs_err_pid*.log

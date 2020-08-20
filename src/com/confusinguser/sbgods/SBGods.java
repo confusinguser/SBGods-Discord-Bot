@@ -28,7 +28,6 @@ public class SBGods {
     private final Util util;
     private final SBUtil sbUtil;
     private final LangUtil langUtil;
-    private final JsonApiUtil jsonApiUtil;
     private final CacheUtil cacheUtil;
     private final LeaderboardUpdater leaderboardUpdater;
     private String[] keys = null;
@@ -58,7 +57,6 @@ public class SBGods {
         this.util = new Util(this);
         this.sbUtil = new SBUtil(this);
         this.langUtil = new LangUtil(this);
-        this.jsonApiUtil = new JsonApiUtil(this);
         this.cacheUtil = new CacheUtil(this);
         instance = this;
         try {
@@ -98,10 +96,6 @@ public class SBGods {
 
     public LangUtil getLangUtil() {
         return langUtil;
-    }
-
-    public JsonApiUtil getJsonApiUtil() {
-        return jsonApiUtil;
     }
 
     public CacheUtil getCacheUtil() {

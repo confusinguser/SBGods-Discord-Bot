@@ -118,7 +118,7 @@ public class TaxCommand extends Command {
                 role = args[3];
             }
 
-            ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
+            List<Player> guildMembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
             String messageId = e.getChannel().sendMessage("Loading (" + main.getLangUtil().getProgressBar(0.0, 30) + ")").complete().getId();
 
             int i = 0;

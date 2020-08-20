@@ -53,6 +53,7 @@ class Start {
                         String author;
                         String message;
                         String data = "";
+                        InetAddress ipAddr = socket.getInetAddress();
                         try {
                             dataInputStream = new DataInputStream(socket.getInputStream());
                             data = dataInputStream.readUTF();
@@ -71,7 +72,7 @@ class Start {
                         JsonObject jsonData = JsonParser.parseString(data).getAsJsonObject();
                         author = jsonData.get("author").getAsString();
                         message = jsonData.get("message").getAsString();
-                        sbgods.getUtil().handleGuildMessage(sbgods.getDiscord(), author, message);
+                        sbgods.getUtil().handleGuildMessage(sbgods.getDiscord(), author, message, ipAddr);
                     });
                     socketThread.start();
                 } catch (IOException ioException) {

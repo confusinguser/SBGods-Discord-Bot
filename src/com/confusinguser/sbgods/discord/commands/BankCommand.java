@@ -7,6 +7,7 @@ import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SkyblockProfile;
 import com.confusinguser.sbgods.entities.banking.BankTransaction;
 import com.confusinguser.sbgods.entities.banking.TransactionType;
+import com.confusinguser.sbgods.entities.leaderboard.BankBalance;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -43,7 +44,7 @@ public class BankCommand extends Command {
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
             ArrayList<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
-            Map<Player, Double> usernameTotalCoinsMap = currentDiscordServer.getHypixelGuild().getTotalCoinsMap();
+            Map<Player, BankBalance> usernameTotalCoinsMap = currentDiscordServer.getHypixelGuild().getTotalCoinsMap();
 
             if (usernameTotalCoinsMap.size() == 0) {
                 if (currentDiscordServer.getHypixelGuild().getLeaderboardProgress() == 0) {
@@ -68,22 +69,22 @@ public class BankCommand extends Command {
                 }
             }
 
-            List<Entry<Player, Double>> leaderboardList = usernameTotalCoinsMap.entrySet().stream()
-                    .sorted(Comparator.comparingDouble(entry -> -entry.getValue()))
+            List<Entry<Player, BankBalance>> leaderboardList = usernameTotalCoinsMap.entrySet().stream()
+                    .sorted(Comparator.comparingDouble(entry -> -entry.getValue().getValue()))
                     .collect(Collectors.toList())
                     .subList(0, topX - 1);
 
             StringBuilder response = new StringBuilder();
             if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
-                for (Entry<Player, Double> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(Math.round(currentEntry.getValue())).append("\n\n");
+                for (Entry<Player, BankBalance> currentEntry : leaderboardList) {
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(Math.round(currentEntry.getValue().getValue())).append("\n\n");
                 }
             } else {
                 int totalCoins = 0;
 
-                for (Entry<Player, Double> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue())).append("\n\n");
-                    totalCoins += currentEntry.getValue();
+                for (Entry<Player, BankBalance> currentEntry : leaderboardList) {
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue().getValue())).append("\n\n");
+                    totalCoins += currentEntry.getValue().getValue();
                 }
 
                 // Print average coins
@@ -131,13 +132,13 @@ public class BankCommand extends Command {
             }
             bankingApi = true;
 
-            Map<String, Double> personalBankMap = new HashMap<>();
-            Map<String, Double> personalBankMapWithoutForegin = new HashMap<>();
+            Map<String, BankBalance> personalBankMap = new HashMap<>();
+            Map<String, BankBalance> personalBankMapWithoutForegin = new HashMap<>();
             EmbedBuilder profileEmbed = new EmbedBuilder();
 
             for (Player member : skyblockProfile.getMembers()) {
-                personalBankMap.put(member.getDisplayName(), 0d);
-                personalBankMapWithoutForegin.put(member.getDisplayName(), 0d);
+                personalBankMap.put(member.getDisplayName(), new BankBalance(0d));
+                personalBankMapWithoutForegin.put(member.getDisplayName(), new BankBalance(0d));
             }
 
             double amountInterest = 0;
@@ -145,28 +146,28 @@ public class BankCommand extends Command {
                 if (!personalBankMap.containsKey(transaction.getInitiatorName())) { // If it's a foreign transaction (ex-coop-member or bank interest)
                     for (Player member : skyblockProfile.getMembers()) {
                         if (transaction.getType() == TransactionType.DEPOSIT) {
-                            personalBankMap.put(member.getDisplayName(), personalBankMap.get(member.getDisplayName()) + (transaction.getAmount() / skyblockProfile.getMembers().size()));
+                            personalBankMap.put(member.getDisplayName(), new BankBalance(personalBankMap.get(member.getDisplayName()).getBalance() + (transaction.getAmount() / skyblockProfile.getMembers().size())));
                         } else if (transaction.getType() == TransactionType.WITHDRAW) {
-                            personalBankMap.put(member.getDisplayName(), personalBankMap.get(member.getDisplayName()) - (transaction.getAmount() / skyblockProfile.getMembers().size()));
+                            personalBankMap.put(member.getDisplayName(), new BankBalance(personalBankMap.get(member.getDisplayName()).getBalance() - (transaction.getAmount() / skyblockProfile.getMembers().size())));
                         }
                     }
 
                 } else if (transaction.getType() == TransactionType.DEPOSIT) {
-                    personalBankMap.put(transaction.getInitiatorName(), personalBankMap.get(transaction.getInitiatorName()) + transaction.getAmount());
-                    personalBankMapWithoutForegin.put(transaction.getInitiatorName(), personalBankMapWithoutForegin.get(transaction.getInitiatorName()) + transaction.getAmount());
+                    personalBankMap.put(transaction.getInitiatorName(), new BankBalance(personalBankMap.get(transaction.getInitiatorName()).getBalance() + transaction.getAmount()));
+                    personalBankMapWithoutForegin.put(transaction.getInitiatorName(), new BankBalance(personalBankMapWithoutForegin.get(transaction.getInitiatorName()).getBalance() + transaction.getAmount()));
                 } else if (transaction.getType() == TransactionType.WITHDRAW) {
-                    personalBankMap.put(transaction.getInitiatorName(), personalBankMap.get(transaction.getInitiatorName()) - transaction.getAmount());
-                    personalBankMapWithoutForegin.put(transaction.getInitiatorName(), personalBankMapWithoutForegin.get(transaction.getInitiatorName()) - transaction.getAmount());
+                    personalBankMap.put(transaction.getInitiatorName(), new BankBalance(personalBankMap.get(transaction.getInitiatorName()).getBalance() - transaction.getAmount()));
+                    personalBankMapWithoutForegin.put(transaction.getInitiatorName(), new BankBalance(personalBankMapWithoutForegin.get(transaction.getInitiatorName()).getBalance() - transaction.getAmount()));
                 }
             }
 
             StringBuilder description = new StringBuilder();
             StringBuilder title = new StringBuilder();
-            personalBankMap.entrySet().stream().sorted((entry, otherEntry) -> Double.compare(otherEntry.getValue(), entry.getValue()))
+            personalBankMap.entrySet().stream().sorted((entry, otherEntry) -> Double.compare(otherEntry.getValue().getBalance(), entry.getValue().getBalance()))
                     .forEach(entry -> {
-                        description.append(entry.getKey()).append(" has ").append(entry.getValue() < 0 ? "taken out " : "contributed ")
-                                .append(main.getLangUtil().addNotation(Math.abs(entry.getValue()))).append(" coins (")
-                                .append(main.getLangUtil().addNotation(personalBankMapWithoutForegin.get(entry.getKey()))).append(" coins without interest)\n");
+                        description.append(entry.getKey()).append(" has ").append(entry.getValue().getBalance() < 0 ? "taken out " : "contributed ")
+                                .append(main.getLangUtil().addNotation(Math.abs(entry.getValue().getBalance()))).append(" coins (")
+                                .append(main.getLangUtil().addNotation(personalBankMapWithoutForegin.get(entry.getKey()).getBalance())).append(" coins without interest)\n");
                         title.append(entry.getKey()).append(", ");
                     });
 

@@ -34,7 +34,7 @@ public class SettingsCommand extends Command {
             }
 
             discord.commandPrefix = args[2];
-            main.getJsonApiUtil().updateSettings();
+//            main.getJsonApiUtil().updateSettings();
             e.getChannel().sendMessage("The prefix is now `" + args[2] + "`");
         }
 

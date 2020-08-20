@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PetsCommand extends Command {
 
@@ -40,9 +41,9 @@ public class PetsCommand extends Command {
             return;
         }
 
-        ArrayList<Pet> totalPets = new ArrayList<>();
+        List<Pet> totalPets = new ArrayList<>();
         for (String profile : thePlayer.getSkyblockProfiles()) {
-            ArrayList<Pet> pets = main.getApiUtil().getProfilePets(profile, thePlayer.getUUID()); // Pets in profile
+            List<Pet> pets = main.getApiUtil().getProfilePets(profile, thePlayer.getUUID()); // Pets in profile
             totalPets.addAll(pets);
         }
 

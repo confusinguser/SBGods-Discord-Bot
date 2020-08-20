@@ -1,5 +1,6 @@
 package com.confusinguser.sbgods.entities;
 
+import com.confusinguser.sbgods.entities.leaderboard.BankBalance;
 import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
 import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
 
@@ -18,7 +19,7 @@ public enum HypixelGuild {
 
     private Map<Player, SkillLevels> skillExpMap = new HashMap<>();
     private Map<Player, SlayerExp> slayerExpMap = new HashMap<>();
-    private Map<Player, Double> totalCoinsMap = new HashMap<>();
+    private Map<Player, BankBalance> totalCoinsMap = new HashMap<>();
     private int leaderboardProgress;
 
     HypixelGuild(String guildId, int slayerReq, int skillReq, String... names) {
@@ -65,11 +66,11 @@ public enum HypixelGuild {
         this.slayerExpMap = slayerExpMap;
     }
 
-    public Map<Player, Double> getTotalCoinsMap() {
+    public Map<Player, BankBalance> getTotalCoinsMap() {
         return totalCoinsMap;
     }
 
-    public void setTotalCoinsMap(Map<Player, Double> totalCoinsMap) {
+    public void setTotalCoinsMap(Map<Player, BankBalance> totalCoinsMap) {
         this.totalCoinsMap = totalCoinsMap;
     }
 

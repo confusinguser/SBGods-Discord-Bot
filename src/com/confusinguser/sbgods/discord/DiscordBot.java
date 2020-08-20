@@ -12,15 +12,15 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.security.auth.login.LoginException;
-import com.confusinguser.sbgods.discord.commands.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class DiscordBot {
     public final VerifyAllCommand verifyAllCommand;
     private final SBGods main;
-    private final ArrayList<ListenerAdapter> commands;
+    private final List<ListenerAdapter> commands;
     private final JDA jda;
     public String commandPrefix = "-";
 
