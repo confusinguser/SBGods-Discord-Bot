@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,7 +30,7 @@ public class GuildDiscListCommand extends Command {
 
         String messageId = e.getChannel().sendMessage("Loading... (" + main.getLangUtil().getProgressBar(0.0, 30) + ")").complete().getId();
         int i = 0;
-        ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
+        List<Player> guildMembers = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
 
         StringBuilder message = new StringBuilder();
 

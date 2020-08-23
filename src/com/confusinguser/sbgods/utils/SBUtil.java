@@ -42,7 +42,7 @@ public class SBUtil {
     }
 
     public double toSkillLevel(int xp) {
-        ArrayList<Integer> skillExpLevels = new ArrayList<>(Arrays.asList(Constants.skill_exp_levels));
+        List<Integer> skillExpLevels = new ArrayList<>(Arrays.asList(Constants.skill_exp_levels));
 
         int xpTotal = 0;
         int level = 0;
@@ -69,7 +69,7 @@ public class SBUtil {
     }
 
     public double toSkillLevelRunecrafting(int xp) {
-        ArrayList<Integer> skillExpLevels = new ArrayList<>(Arrays.asList(Constants.runecrafting_exp_levels));
+        List<Integer> skillExpLevels = new ArrayList<>(Arrays.asList(Constants.runecrafting_exp_levels));
 
         int xpTotal = 0;
         int level = 0;

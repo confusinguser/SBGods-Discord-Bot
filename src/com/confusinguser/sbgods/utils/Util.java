@@ -7,8 +7,10 @@ import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
 import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -74,7 +76,7 @@ public class Util {
         return processMessageForDiscord(message, limit, new ArrayList<>());
     }
 
-    private ArrayList<String> processMessageForDiscord(String message, int limit, ArrayList<String> currentOutput) {
+    private List<String> processMessageForDiscord(String message, int limit, List<String> currentOutput) {
         if (message.length() > limit) {
             int lastIndex = 0;
             for (int index = message.indexOf('\n'); index >= 0; index = message.indexOf('\n', index + 1)) {
@@ -345,24 +347,24 @@ public class Util {
         return file;
     }
 
-    public void handleGuildMessage(DiscordBot discordBot, String author, String message, InetAddress requestSenderIpAddr) {
+    public void handleGuildMessage(DiscordBot discordBot, DiscordServer discordServer, String author, String message, InetAddress requestSenderIpAddr) {
         if (discordBot == null || author.isEmpty() || message.isEmpty()) return;
         MessageChannel channel;
-        if ((channel = discordBot.getJDA().getTextChannelById("745632663456579664")) != null) {
+        if ((channel = discordBot.getJDA().getTextChannelById(discordServer.getGuildChatChannelId())) != null) {
             if (latestGuildmessage.equals(message) && latestGuildmessageAuthor.equals(author) &&
                     !latestMessageByIP.getOrDefault(requestSenderIpAddr, "").equals(author + ":" + message)) {
-                return;
+                return; // TODO fix problem: if multiple ppl send messages at almost exact time then message might come delayed and it isnt latestMessage anymore
             }
-            MessageEmbed embed;
+            String discordOutput = "";
             if (latestGuildmessageAuthor.equals(author)) {
                 latestGuildmessage += "\n" + message;
-                embed = new EmbedBuilder().setDescription(latestGuildmessage).setColor(getColorFromRankString(author.split(" ")[0])).setAuthor(author).build();
                 channel.deleteMessageById(channel.getLatestMessageId()).queue();
+                discordOutput += "\n" + "Guild > " + author + ": " + message;
             } else {
                 latestGuildmessage = message;
-                embed = new EmbedBuilder().setDescription(message).setColor(getColorFromRankString(author.split(" ")[0])).setAuthor(author).build();
+                discordOutput = "Guild > " + author + ": " + message;
             }
-            channel.sendMessage(embed).queue();
+            channel.sendMessage("```css\n" + discordOutput + "\n```").queue();
             latestGuildmessageAuthor = author;
             latestMessageByIP.put(requestSenderIpAddr, author + ":" + message);
         }

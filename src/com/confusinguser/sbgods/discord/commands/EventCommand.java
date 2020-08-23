@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,7 +49,7 @@ public class EventCommand extends Command {
 
             JSONArray eventData = new JSONArray();
 
-            ArrayList<Player> guildmembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
+            List<Player> guildmembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
 
             int i = 0;
             for (Player guildMember : guildmembers) {

@@ -247,7 +247,7 @@ public class TaxCommand extends Command {
                 role = args[3].toLowerCase();
             }
 
-            ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
+            List<Player> guildMembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
             String messageId = e.getChannel().sendMessage("Loading (" + main.getLangUtil().getProgressBar(0.0, 30) + ")").complete().getId();
 
             int i = 0;
@@ -319,9 +319,9 @@ public class TaxCommand extends Command {
             JSONObject taxData = main.getApiUtil().getTaxData();
             e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(0.9, 20) + ")").queue();
 
-            ArrayList<String> playerUuids = new ArrayList<>(taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").keySet());
+            List<String> playerUuids = new ArrayList<>(taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").keySet());
 
-            ArrayList<TaxPayer> taxPayers = new ArrayList<>();
+            List<TaxPayer> taxPayers = new ArrayList<>();
             for (String playerUuid : playerUuids) {
                 JSONObject taxPayerJson = taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(playerUuid);
 
@@ -362,9 +362,9 @@ public class TaxCommand extends Command {
             JSONObject taxData = main.getApiUtil().getTaxData();
             e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(0.9, 20) + ")").queue();
 
-            ArrayList<String> playerUuids = new ArrayList<>(taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").keySet());
+            List<String> playerUuids = new ArrayList<>(taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").keySet());
 
-            ArrayList<TaxPayer> taxPayers = new ArrayList<>();
+            List<TaxPayer> taxPayers = new ArrayList<>();
             for (String playerUuid : playerUuids) {
                 JSONObject taxPayerJson = taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").getJSONObject(playerUuid);
 
@@ -409,9 +409,9 @@ public class TaxCommand extends Command {
             JSONObject taxData = main.getApiUtil().getTaxData();
             e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(0.5, 20) + ")").queue();
 
-            ArrayList<String> playerUuids = new ArrayList<>(taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").keySet());
+            List<String> playerUuids = new ArrayList<>(taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").keySet());
 
-            ArrayList<Player> SBGGuildMembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
+            List<Player> SBGGuildMembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
 
             int playersRemoved = 0;
             for (String playerUuid : playerUuids) {
@@ -450,7 +450,7 @@ public class TaxCommand extends Command {
             JSONObject taxData = main.getApiUtil().getTaxData();
             e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(0.5, 20) + ")").queue();
 
-            ArrayList<String> playerUuids = new ArrayList<>(taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").keySet());
+            List<String> playerUuids = new ArrayList<>(taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").keySet());
 
             int playersUpdated = 0;
             for (String playerUuid : playerUuids) {

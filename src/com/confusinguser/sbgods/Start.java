@@ -1,5 +1,7 @@
 package com.confusinguser.sbgods;
 
+import com.confusinguser.sbgods.entities.DiscordServer;
+import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -50,13 +52,18 @@ class Start {
                     Socket socket = s.accept();
                     Thread socketThread = new Thread(() -> {
                         DataInputStream dataInputStream = null;
-                        String author;
-                        String message;
                         String data = "";
                         InetAddress ipAddr = socket.getInetAddress();
                         try {
                             dataInputStream = new DataInputStream(socket.getInputStream());
                             data = dataInputStream.readUTF();
+                            byte[] bytes = new byte[2500];
+                            int bytesRead = dataInputStream.read(bytes);
+                            if (!new String(bytes, 0, bytesRead).split("\n")[0].startsWith("POST /confusingaddons/registerGuildMessage ")) {
+                                socket.close();
+                                sbgods.logger.warning("Invalid request sent!");
+                                return;
+                            }
                         } catch (IOException ioException) {
                             ioException.printStackTrace();
                             try {
@@ -70,9 +77,11 @@ class Start {
                         }
                         System.out.println(data);
                         JsonObject jsonData = JsonParser.parseString(data).getAsJsonObject();
-                        author = jsonData.get("author").getAsString();
-                        message = jsonData.get("message").getAsString();
-                        sbgods.getUtil().handleGuildMessage(sbgods.getDiscord(), author, message, ipAddr);
+                        String author = jsonData.get("author").getAsString();
+                        String message = jsonData.get("message").getAsString();
+                        DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(HypixelGuild.getGuildById(sbgods.getApiUtil().getGuildIDFromUUID(jsonData.get("senderUUID").getAsString())));
+                        if (discordServer == null) return;
+                        sbgods.getUtil().handleGuildMessage(sbgods.getDiscord(), discordServer, author, message, ipAddr);
                     });
                     socketThread.start();
                 } catch (IOException ioException) {

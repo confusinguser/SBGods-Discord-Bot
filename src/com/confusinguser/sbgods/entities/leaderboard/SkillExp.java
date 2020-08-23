@@ -4,6 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class SkillExp implements LeaderboardValue {
@@ -18,7 +19,7 @@ public class SkillExp implements LeaderboardValue {
     private final double taming;
     private final double carpentry;
     private final double runecrafting;
-    private final ArrayList<Double> skillList;
+    private final List<Double> skillList;
     private boolean approximate = false;
 
     public SkillExp() {
@@ -113,8 +114,8 @@ public class SkillExp implements LeaderboardValue {
 
     public double getTotalSkillExp() {
         double output = 0;
-        for (double aDouble : skillList) {
-            output += aDouble;
+        for (double skillLevel : skillList) {
+            output += skillLevel;
         }
         return output;
     }

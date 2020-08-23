@@ -49,7 +49,7 @@ public class VerifyCommand extends Command {
                 case SBGods:
                     e.getChannel().sendMessage(e.getAuthor().getAsMention() + " you are already verified or you need to link your minecraft account with discord (see <#743066201806340137>)").queue();
                     break;
-                case SBDGods:
+                case SBForceful:
                     e.getChannel().sendMessage(e.getAuthor().getAsMention() + " you are already verified or you need to link your minecraft account with discord (see <#711462220852101170>)").queue();
                     break;
                 default:

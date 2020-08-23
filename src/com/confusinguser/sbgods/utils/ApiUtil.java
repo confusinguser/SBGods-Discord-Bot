@@ -176,11 +176,11 @@ public class ApiUtil {
         return response.toString();
     }
 
-    public ArrayList<Player> getGuildMembers(HypixelGuild guild) {
+    public List<Player> getGuildMembers(HypixelGuild guild) {
         String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&id=" + guild.getGuildId(), 300000);
         if (response == null) return getGuildMembers(guild);
 
-        ArrayList<Player> output = new ArrayList<>();
+        List<Player> output = new ArrayList<>();
         JSONObject jsonObject = new JSONObject(response);
         jsonObject = jsonObject.getJSONObject("guild");
         JSONArray members = jsonObject.getJSONArray("members");
@@ -198,11 +198,11 @@ public class ApiUtil {
         return output;
     }
 
-    public ArrayList<Player> getGuildMembersDeep(HypixelGuild guild) { // Might be used in the future
+    public List<Player> getGuildMembersDeep(HypixelGuild guild) { // Might be used in the future
         String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&id=" + guild.getGuildId(), 300000);
         if (response == null) return getGuildMembersDeep(guild);
 
-        ArrayList<Player> output = new ArrayList<>();
+        List<Player> output = new ArrayList<>();
         JSONObject jsonObject = new JSONObject(response);
         jsonObject = jsonObject.getJSONObject("guild");
         JSONArray members = jsonObject.getJSONArray("members");
@@ -311,7 +311,7 @@ public class ApiUtil {
     }
 
     public SlayerExp getProfileSlayerExp(String profileUUID, String playerUUID) {
-        HashMap<String, Integer> output = new HashMap<>();
+        Map<String, Integer> output = new HashMap<>();
         for (String slayer_type : Constants.slayer_types) {
             output.put(slayer_type, 0);
         }
@@ -348,7 +348,7 @@ public class ApiUtil {
             return new SkillLevels();
         }
 
-        HashMap<String, Integer> skillArray = new HashMap<>();
+        Map<String, Integer> skillArray = new HashMap<>();
         for (String skill_type : Constants.skill_types) {
             try {
                 skillArray.put(skill_type, (int) Math.floor(jsonObject.getDouble("experience_skill_" + skill_type)));
@@ -372,7 +372,7 @@ public class ApiUtil {
             return new SkillLevels();
         }
 
-        HashMap<String, Integer> skillMap = new HashMap<>();
+        Map<String, Integer> skillMap = new HashMap<>();
         for (String skill_type : Constants.alternate_skill_types) {
             try {
                 skillMap.put(main.getSBUtil().alternateToNormalSkillTypes(skill_type), main.getSBUtil().toSkillExp(jsonObject.getInt("skyblock_" + skill_type)));
@@ -397,7 +397,7 @@ public class ApiUtil {
             return new SkillExp();
         }
 
-        HashMap<String, Integer> skillArray = new HashMap<>();
+        Map<String, Integer> skillArray = new HashMap<>();
         for (String skill_type : Constants.skill_types) {
             try {
                 skillArray.put(skill_type, (int) Math.floor(jsonObject.getDouble("experience_skill_" + skill_type)));
@@ -421,7 +421,7 @@ public class ApiUtil {
             return new SkillExp();
         }
 
-        HashMap<String, Integer> skillMap = new HashMap<>();
+        Map<String, Integer> skillMap = new HashMap<>();
         for (String skill_type : Constants.alternate_skill_types) {
             try {
                 skillMap.put(main.getSBUtil().alternateToNormalSkillTypes(skill_type), main.getSBUtil().toSkillExp(jsonObject.getInt("skyblock_" + skill_type)));
@@ -461,7 +461,7 @@ public class ApiUtil {
         }
     }
 
-    public ArrayList<Pet> getProfilePets(String profileUUID, String playerUUID) {
+    public List<Pet> getProfilePets(String profileUUID, String playerUUID) {
 
         String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 300000);
         if (response == null) return new ArrayList<>();
@@ -481,7 +481,7 @@ public class ApiUtil {
             return new ArrayList<>();
         }
 
-        ArrayList<Pet> output = new ArrayList<>();
+        List<Pet> output = new ArrayList<>();
         for (int i = 0; i < pets.length(); i++) {
             String type;
             int xp;
@@ -508,7 +508,7 @@ public class ApiUtil {
 
     public Map<String, Integer> getProfileKills(String profileUUID, String playerUUID) {
 
-        HashMap<String, Integer> output = new HashMap<>();
+        Map<String, Integer> output = new HashMap<>();
 
         String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 300000);
         if (response == null) return new HashMap<>();
@@ -529,9 +529,9 @@ public class ApiUtil {
         return output;
     }
 
-    public HashMap<String, Integer> getProfileDeaths(String profileUUID, String playerUUID) {
+    public Map<String, Integer> getProfileDeaths(String profileUUID, String playerUUID) {
 
-        HashMap<String, Integer> output = new HashMap<>();
+        Map<String, Integer> output = new HashMap<>();
 
         String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 300000);
         if (response == null) return new HashMap<>();

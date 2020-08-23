@@ -74,7 +74,7 @@ public class LeaderboardUpdater {
         Map<Player, SlayerExp> slayerExpMap = new HashMap<>();
         Map<Player, BankBalance> totalCoinsMap = new HashMap<>();
 
-        ArrayList<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
+        List<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
 
 
         final int[] i = {0};

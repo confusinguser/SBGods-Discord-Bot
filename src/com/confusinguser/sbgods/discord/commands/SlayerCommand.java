@@ -35,7 +35,7 @@ public class SlayerCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
-            ArrayList<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(Objects.requireNonNull(DiscordServer.getDiscordServerFromEvent(e)).getHypixelGuild());
+            List<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(Objects.requireNonNull(DiscordServer.getDiscordServerFromEvent(e)).getHypixelGuild());
             Map<Player, SlayerExp> usernameSlayerExpHashMap = currentDiscordServer.getHypixelGuild().getSlayerExpMap();
 
             if (usernameSlayerExpHashMap.size() == 0) {

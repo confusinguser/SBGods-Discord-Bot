@@ -4,6 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class SkillLevels implements LeaderboardValue {
@@ -18,7 +19,7 @@ public class SkillLevels implements LeaderboardValue {
     private final double taming;
     private final double carpentry;
     private final double runecrafting;
-    private final ArrayList<Double> skillList;
+    private final List<Double> skillList;
     private boolean approximate = false;
 
     public SkillLevels() {
@@ -113,13 +114,10 @@ public class SkillLevels implements LeaderboardValue {
 
     public double getAvgSkillLevel() {
         double output = 0;
-        for (Double aDouble : skillList) {
-            output += aDouble;
+        for (double skillLevel : skillList) {
+            output += skillLevel;
         }
-        if (approximate)
-            output /= skillList.size() - 1;
-        else
-            output /= skillList.size();
+        output /= skillList.size();
         return output;
     }
 

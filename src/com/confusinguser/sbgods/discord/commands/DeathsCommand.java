@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 public class DeathsCommand extends Command {
@@ -30,7 +31,7 @@ public class DeathsCommand extends Command {
         String messageId = e.getChannel().sendMessage("...").complete().getId();
 
         if (args[1].equalsIgnoreCase("player")) {
-            HashMap<String, Integer> totalDeaths = new HashMap<>();
+            Map<String, Integer> totalDeaths = new HashMap<>();
             Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[2]);
 
             if (thePlayer.getSkyblockProfiles().isEmpty()) {

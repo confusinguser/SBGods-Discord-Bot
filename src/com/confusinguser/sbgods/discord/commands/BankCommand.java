@@ -43,7 +43,7 @@ public class BankCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
-            ArrayList<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
+            List<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
             Map<Player, BankBalance> usernameTotalCoinsMap = currentDiscordServer.getHypixelGuild().getTotalCoinsMap();
 
             if (usernameTotalCoinsMap.size() == 0) {

@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerCommand extends Command {
 
@@ -41,7 +42,7 @@ public class PlayerCommand extends Command {
         }
 
         SkillLevels skillLevels = new SkillLevels();
-        ArrayList<Pet> totalPets = new ArrayList<>();
+        List<Pet> totalPets = new ArrayList<>();
         SlayerExp slayerExp = new SlayerExp();
         String guildName;
         double totalMoney = 0.0;
@@ -52,7 +53,7 @@ public class PlayerCommand extends Command {
             progress += 1d / player.getSkyblockProfiles().size();
             e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(progress, 20) + ")").queue();
 
-            ArrayList<Pet> pets = main.getApiUtil().getProfilePets(profileId, player.getUUID()); // Pets in profile
+            List<Pet> pets = main.getApiUtil().getProfilePets(profileId, player.getUUID()); // Pets in profile
             totalPets.addAll(pets);
 
             skillLevels = main.getApiUtil().getBestProfileSkillLevels(player.getUUID());
