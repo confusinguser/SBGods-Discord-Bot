@@ -8,9 +8,12 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 import java.util.stream.Collectors;
 
@@ -20,8 +23,8 @@ public class SBGods {
     public static final String VERSION_DESCRIPTION_MINOR = "Added the verify list"; // Change this every minor release: 0.8.11.5 -> 0.8.12
     public static final String VERSION_DESCRIPTION_PATCH = "Staff are no longer counted in the Elite, King, God requirements"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
     public static final String[] DEVELOPERS = {"244786205873405952", "497210228274757632"};
-    //private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBDGods}; // For release on main servers
-    private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
+    private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBForceful}; // For release on main servers
+    //private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
     private static SBGods instance;
     public final Logger logger = Logger.getLogger(this.getClass().getName());
     private final ApiUtil apiutil;
@@ -34,7 +37,7 @@ public class SBGods {
     private DiscordBot discordBot;
     private int keyIndex = 0;
 
-    public SBGods() {
+    public SBGods() throws InterruptedException {
         ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new SimpleFormatter() {
             @Override
@@ -66,6 +69,22 @@ public class SBGods {
             System.exit(-1);
         }
         this.leaderboardUpdater = new LeaderboardUpdater(this);
+        final ArrayList<String>[] event_messageId = new ArrayList[]{};
+
+        //here temporarily, should change location
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+            try {
+                if(getDiscord().eventCommand.started){
+                    for(String messageId : event_messageId[0]){
+                        getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527").deleteMessageById(messageId);
+                    }
+                    event_messageId[0] = getDiscord().eventCommand.sendProgressLbRetId(getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527"), "slayerTotal", "Total Slayer Exp Progress\n", false);
+                }
+            } catch (InterruptedException e) {
+                getLogger().warning(e.getMessage());
+                Thread.currentThread().interrupt();
+            }
+        }, 10, 10, TimeUnit.MINUTES);
     }
 
     public static SBGods getInstance() {

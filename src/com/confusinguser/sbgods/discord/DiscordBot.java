@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 public class DiscordBot {
     public final VerifyAllCommand verifyAllCommand;
+    public final EventCommand eventCommand;
     private final SBGods main;
     private final List<ListenerAdapter> commands;
     private final JDA jda;
@@ -43,7 +44,7 @@ public class DiscordBot {
         TaxCommand taxCommand = new TaxCommand(main, this);
         PlayerCommand playerCommand = new PlayerCommand(main, this);
         BankCommand bankCommand = new BankCommand(main, this);
-        EventCommand eventCommand = new EventCommand(main, this);
+        eventCommand = new EventCommand(main, this);
         VerifyListCommand verifyListCommand = new VerifyListCommand(main, this);
         GuildDiscListCommand guildDiscListCommand = new GuildDiscListCommand(main, this);
 

@@ -2,8 +2,7 @@ package com.confusinguser.sbgods;
 
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import org.json.JSONObject;
 
 import java.awt.*;
 import java.io.Console;
@@ -18,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 class Start {
 
-    public static void main(String[] args) throws UnsupportedEncodingException {
+    public static void main(String[] args) throws UnsupportedEncodingException, InterruptedException {
         ServerSocket s;
         try {
             s = new ServerSocket(34583, 10, InetAddress.getLocalHost());
@@ -76,10 +75,10 @@ class Start {
                             }
                         }
                         System.out.println(data);
-                        JsonObject jsonData = JsonParser.parseString(data).getAsJsonObject();
-                        String author = jsonData.get("author").getAsString();
-                        String message = jsonData.get("message").getAsString();
-                        DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(HypixelGuild.getGuildById(sbgods.getApiUtil().getGuildIDFromUUID(jsonData.get("senderUUID").getAsString())));
+                        JSONObject jsonData = new JSONObject(data);
+                        String author = jsonData.getString("author");
+                        String message = jsonData.getString("message");
+                        DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(HypixelGuild.getGuildById(sbgods.getApiUtil().getGuildIDFromUUID(jsonData.getString("senderUUID"))));
                         if (discordServer == null) return;
                         sbgods.getUtil().handleGuildMessage(sbgods.getDiscord(), discordServer, author, message, ipAddr);
                     });

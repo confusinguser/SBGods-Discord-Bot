@@ -285,17 +285,17 @@ public class ApiUtil {
             output.put(slayer_type, 0);
         }
 
-        Player thePlayer = getPlayerFromUUID(playerUUID);
+        JSONObject response = new JSONObject(getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + playerUUID, 60000));
 
-        for (String profileUUID : thePlayer.getSkyblockProfiles()) {
+        if (response == null) return new SlayerExp();
 
-            String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, thePlayer.isOnline() ? 60000 /* 1 min */ : 3600000 /* 1h */);
-            if (response == null) return new SlayerExp();
 
-            JSONObject jsonObject = new JSONObject(response);
+        for (int i=0;i<response.getJSONArray("profiles").length();i++) {
+            JSONObject jsonObject = response.getJSONArray("profiles").getJSONObject(i);
+
 
             try {
-                jsonObject = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(playerUUID).getJSONObject("slayer_bosses");
+                jsonObject = jsonObject.getJSONObject("members").getJSONObject(playerUUID).getJSONObject("slayer_bosses");
             } catch (JSONException e) {
                 continue;
             }
