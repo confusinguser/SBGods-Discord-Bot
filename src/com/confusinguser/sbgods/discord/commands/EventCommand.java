@@ -233,7 +233,7 @@ public class EventCommand extends Command {
 
                 SlayerExp slayer = main.getApiUtil().getPlayerSlayerExp(player.getUUID());
 
-                playerProgress.put("slayerZombie", (slayer.getZombie() - memberData.getInt("slayerZombie")) / 2);
+                playerProgress.put("slayerZombie", (slayer.getZombie() - memberData.getInt("slayerZombie")));
                 playerProgress.put("slayerSpider", slayer.getSpider() - memberData.getInt("slayerSpider"));
                 playerProgress.put("slayerWolf", slayer.getWolf() - memberData.getInt("slayerWolf"));
                 playerProgress.put("slayerTotal", playerProgress.getInt("slayerZombie") + playerProgress.getInt("slayerSpider") + playerProgress.getInt("slayerWolf"));
@@ -241,7 +241,7 @@ public class EventCommand extends Command {
                 SkillExp skillExp = main.getApiUtil().getBestProfileSkillExp(player.getUUID());
 
                 int totalSkillProgress = 0;
-                playerProgress.put("skillAlchemy", (skillExp.getAlchemy() - memberData.getInt("skillAlchemy")) / 4);
+                playerProgress.put("skillAlchemy", (skillExp.getAlchemy() - memberData.getInt("skillAlchemy")));
                 totalSkillProgress += playerProgress.getInt("skillAlchemy");
                 playerProgress.put("skillCarpentry", skillExp.getCarpentry() - memberData.getInt("skillCarpentry"));
                 playerProgress.put("skillCombat", skillExp.getCombat() - memberData.getInt("skillCombat"));
