@@ -27,6 +27,11 @@ public class TaxCommand extends Command {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
+        if (!currentDiscordServer.getHypixelGuild().equals(HypixelGuild.SBG)) {
+            e.getChannel().sendMessage("This command cannot be used on this server.").queue();
+            return;
+        }
+
         if (args.length <= 1) {
             String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag());
             if (mcName.equalsIgnoreCase("")) {
