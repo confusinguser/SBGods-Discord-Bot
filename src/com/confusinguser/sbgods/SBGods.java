@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 import java.util.stream.Collectors;
@@ -36,6 +37,7 @@ public class SBGods {
     private String[] keys = null;
     private DiscordBot discordBot;
     private int keyIndex = 0;
+    public static final ArrayList<String>[] event_messageId = new ArrayList[]{new ArrayList<String>(),new ArrayList<String>()};
 
     public SBGods() throws InterruptedException {
         ConsoleHandler handler = new ConsoleHandler();
@@ -69,22 +71,30 @@ public class SBGods {
             System.exit(-1);
         }
         this.leaderboardUpdater = new LeaderboardUpdater(this);
-        final ArrayList<String>[] event_messageId = new ArrayList[]{};
 
         //here temporarily, should change location
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
-            try {
-                if(getDiscord().eventCommand.started){
-                    for(String messageId : event_messageId[0]){
-                        getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527").deleteMessageById(messageId);
+        Runnable drawRunnable = new Runnable() {
+            public void run() {
+                try {
+                    if(getDiscord().eventCommand.started){
+                        event_messageId[1] = getDiscord().eventCommand.sendProgressLbRetId(getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527"), "slayerTotal", "Total Slayer Exp Progress\n", false);
+
+                        if(SBGods.event_messageId[0].size() != 0) {
+                            for (String messageId : event_messageId[0]) {
+                                getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527").deleteMessageById(messageId).queue();
+                            }
+                        }
+                        event_messageId[0] = event_messageId[1];
                     }
-                    event_messageId[0] = getDiscord().eventCommand.sendProgressLbRetId(getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527"), "slayerTotal", "Total Slayer Exp Progress\n", false);
+                } catch (InterruptedException e) {
+                    getLogger().warning(e.getMessage());
+                    Thread.currentThread().interrupt();
                 }
-            } catch (InterruptedException e) {
-                getLogger().warning(e.getMessage());
-                Thread.currentThread().interrupt();
             }
-        }, 10, 10, TimeUnit.MINUTES);
+        };
+        ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
+        exec.scheduleAtFixedRate(drawRunnable ,1, 30, TimeUnit.MINUTES);
+
     }
 
     public static SBGods getInstance() {

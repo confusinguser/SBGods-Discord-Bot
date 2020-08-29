@@ -52,11 +52,25 @@ public class EventCommand extends Command {
 
         if (args[1].equals("startPostingLb")) {
             this.started = true;
+            e.getChannel().sendMessage("Started posting event lb").queue();
+            return;
+        }
+        if (args[1].equals("sendLb")) {
+            SBGods.event_messageId[1] = main.getDiscord().eventCommand.sendProgressLbRetId(main.getDiscord().getJDA().getTextChannelById("747881093444796527"), "slayerTotal", "Total Slayer Exp Progress\n", true);
+
+
+            if(SBGods.event_messageId[0].size() != 0){
+                for(String messageId : SBGods.event_messageId[0]){
+                    main.getDiscord().getJDA().getTextChannelById("747881093444796527").deleteMessageById(messageId).queue();
+                }
+            }
+            SBGods.event_messageId[0] = SBGods.event_messageId[1];
             return;
         }
 
         if (args[1].equals("stopPostingLb")) {
             this.started = false;
+            e.getChannel().sendMessage("Stopped posting event lb").queue();
             return;
         }
 
@@ -214,8 +228,8 @@ public class EventCommand extends Command {
                 int valB = 0;
 
                 try {
-                    valA = a.getInt(KEY_NAME);
-                    valB = b.getInt(KEY_NAME);
+                    valA = a.getJSONObject("playerProgress").getInt(KEY_NAME);
+                    valB = b.getJSONObject("playerProgress").getInt(KEY_NAME);
                 }
                 catch (JSONException e) {
                     //exception
@@ -260,14 +274,16 @@ public class EventCommand extends Command {
         JSONArray eventProgress = getEventDataProgress(channel, showLoadingMsg);
 
         StringBuilder messageBuilder = new StringBuilder(message);
-        List<JSONObject> leaderboardList = eventProgress.toList().stream()
-                .filter(object -> object instanceof JSONObject)
-                .map(object -> (JSONObject) object)
-                .sorted(Comparator.comparingDouble(jsonObject -> jsonObject.getInt(key)))
-                .collect(Collectors.toList());
+//        List<JSONObject> leaderboardList = eventProgress.toList().stream()
+//                .filter(object -> object instanceof JSONObject)
+//                .map(object -> (JSONObject) object)
+//                .sorted(Comparator.comparingDouble(jsonObject -> jsonObject.getInt(key)))
+//                .collect(Collectors.toList());
 
-        for (int i = 0; i < leaderboardList.size(); i++) {
-            JSONObject player = leaderboardList.get(i);
+        JSONArray leaderboardList = sort(eventProgress,key,false);
+
+        for (int i = 0; i < leaderboardList.length(); i++) {
+            JSONObject player = leaderboardList.getJSONObject(i);
             messageBuilder.append("#").append(i + 1).append(" ").append(player.getString("displayName")).append(": ").append(main.getLangUtil().addNotation(player.getJSONObject("playerProgress").getInt(key))).append("\n");
         }
         message = messageBuilder.toString();
