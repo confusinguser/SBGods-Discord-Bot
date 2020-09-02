@@ -68,10 +68,10 @@ class Start {
                             }
                         }
                         System.out.println(data);
-                        JsonObject jsonData = JsonParser.parseString(data).getAsJsonObject();
-                        String author = jsonData.get("author").getAsString();
-                        String message = jsonData.get("message").getAsString();
-                        DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(HypixelGuild.getGuildById(sbgods.getApiUtil().getGuildIDFromUUID(jsonData.get("senderUUID").getAsString())), true);
+                        JSONObject jsonData = new JSONObject(data);
+                        String author = jsonData.getString("author");
+                        String message = jsonData.getString("message");
+                        DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(HypixelGuild.getGuildById(sbgods.getApiUtil().getGuildIDFromUUID(jsonData.getString("senderUUID"))), true);
                         if (discordServer == null) return;
                         sbgods.getUtil().handleGuildMessage(sbgods.getDiscord(), discordServer, author, message, ipAddr);
                     });

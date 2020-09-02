@@ -3,6 +3,7 @@ package com.confusinguser.sbgods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.utils.*;
+import net.dv8tion.jda.api.entities.TextChannel;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
@@ -19,10 +20,10 @@ import java.util.logging.*;
 import java.util.stream.Collectors;
 
 public class SBGods {
-    public static final String VERSION = "0.9.3.6";
+    public static final String VERSION = "0.9.4";
     public static final String VERSION_DESCRIPTION_MAJOR = ""; // Change this every major release: 0.9.6.3 -> 1.0
-    public static final String VERSION_DESCRIPTION_MINOR = "Added the verify list"; // Change this every minor release: 0.8.11.5 -> 0.8.12
-    public static final String VERSION_DESCRIPTION_PATCH = "Staff are no longer counted in the Elite, King, God requirements"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
+    public static final String VERSION_DESCRIPTION_MINOR = "Added live guild chat"; // Change this every minor release: 0.8.11.5 -> 0.8.12
+    public static final String VERSION_DESCRIPTION_PATCH = ""; // Change this every patch: 0.8.11.4 -> 0.8.11.5
     public static final String[] DEVELOPERS = {"244786205873405952", "497210228274757632"};
     private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBForceful}; // For release on main servers
     //private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
@@ -37,9 +38,9 @@ public class SBGods {
     private String[] keys = null;
     private DiscordBot discordBot;
     private int keyIndex = 0;
-    public static final ArrayList<String>[] event_messageId = new ArrayList[]{new ArrayList<String>(),new ArrayList<String>()};
+    public static final List<String>[] event_messageId = new ArrayList[]{new ArrayList<String>(),new ArrayList<String>()};
 
-    public SBGods() throws InterruptedException {
+    public SBGods() {
         ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new SimpleFormatter() {
             @Override
@@ -73,23 +74,23 @@ public class SBGods {
         this.leaderboardUpdater = new LeaderboardUpdater(this);
 
         //here temporarily, should change location
-        Runnable drawRunnable = new Runnable() {
-            public void run() {
-                try {
-                    if(getDiscord().eventCommand.started){
-                        event_messageId[1] = getDiscord().eventCommand.sendProgressLbRetId(getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527"), "slayerTotal", "Total Slayer Exp Progress\n", false);
+        Runnable drawRunnable = () -> {
+            try {
+                if(getDiscord().eventCommand.started){
+                    event_messageId[1] = getDiscord().eventCommand.sendProgressLbRetId(getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527"), "slayerTotal", "Total Slayer Exp Progress\n", false);
 
-                        if(SBGods.event_messageId[0].size() != 0) {
-                            for (String messageId : event_messageId[0]) {
-                                getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527").deleteMessageById(messageId).queue();
-                            }
+                    if(SBGods.event_messageId[0].size() != 0) {
+                        for (String messageId : event_messageId[0]) {
+                            TextChannel textChannel;
+                            if ((textChannel = getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527")) != null)
+                                textChannel.deleteMessageById(messageId).queue();
                         }
-                        event_messageId[0] = event_messageId[1];
                     }
-                } catch (InterruptedException e) {
-                    getLogger().warning(e.getMessage());
-                    Thread.currentThread().interrupt();
+                    event_messageId[0] = event_messageId[1];
                 }
+            } catch (InterruptedException e) {
+                getLogger().warning(e.getMessage());
+                Thread.currentThread().interrupt();
             }
         };
         ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);

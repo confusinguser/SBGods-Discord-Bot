@@ -5,7 +5,6 @@ import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.Player;
-import com.confusinguser.sbgods.entities.leaderboard.SkillExp;
 import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -16,10 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class EventCommand extends Command {
 
@@ -218,27 +214,19 @@ public class EventCommand extends Command {
         for (int i = 0; i < jsonArr.length(); i++) {
             jsonValues.add(jsonArr.getJSONObject(i));
         }
-        final String KEY_NAME = sortBy;
-        final Boolean SORT_ORDER = sortOrder;
-        Collections.sort( jsonValues, new Comparator<JSONObject>() {
+        jsonValues.sort((a, b) -> {
+            int valA = 0;
+            int valB = 0;
 
-            @Override
-            public int compare(JSONObject a, JSONObject b) {
-                int valA = 0;
-                int valB = 0;
-
-                try {
-                    valA = a.getJSONObject("playerProgress").getInt(KEY_NAME);
-                    valB = b.getJSONObject("playerProgress").getInt(KEY_NAME);
-                }
-                catch (JSONException e) {
-                    //exception
-                }
-                if (SORT_ORDER) {
-                    return valA-valB;
-                } else {
-                    return valB-valA;
-                }
+            try {
+                valA = a.getJSONObject("playerProgress").getInt(sortBy);
+                valB = b.getJSONObject("playerProgress").getInt(sortBy);
+            } catch (JSONException ignored) {
+            }
+            if (sortOrder) {
+                return valA - valB;
+            } else {
+                return valB - valA;
             }
         });
         for (int i = 0; i < jsonArr.length(); i++) {
@@ -270,7 +258,7 @@ public class EventCommand extends Command {
             channel.sendMessage(new EmbedBuilder().setDescription(messageSending).build()).queue();
         }
     }
-    public ArrayList<String> sendProgressLbRetId(TextChannel channel, String key, String message, boolean showLoadingMsg) {
+    public List<String> sendProgressLbRetId(TextChannel channel, String key, String message, boolean showLoadingMsg) {
         JSONArray eventProgress = getEventDataProgress(channel, showLoadingMsg);
 
         StringBuilder messageBuilder = new StringBuilder(message);
