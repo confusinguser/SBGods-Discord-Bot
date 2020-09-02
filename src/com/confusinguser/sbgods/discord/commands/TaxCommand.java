@@ -27,6 +27,11 @@ public class TaxCommand extends Command {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
+        if (!currentDiscordServer.getHypixelGuild().equals(HypixelGuild.SBG)) {
+            e.getChannel().sendMessage("This command cannot be used on this server.").queue();
+            return;
+        }
+
         if (args.length <= 1) {
             String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag());
             if (mcName.equalsIgnoreCase("")) {
@@ -50,7 +55,7 @@ public class TaxCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("paid")) {
-            if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+            if (e.getMember() != null && !e.getMember().getRoles().contains(e.getGuild().getRolesByName("Splash Tax Team",true))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -91,7 +96,7 @@ public class TaxCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("paidall")) {
-            if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+            if (e.getMember() != null && !e.getMember().getRoles().contains(e.getGuild().getRolesByName("Splash Tax Team",true))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -169,7 +174,7 @@ public class TaxCommand extends Command {
 
         if (args[1].equalsIgnoreCase("owe")) {
 
-            if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+            if (e.getMember() != null && !e.getMember().getRoles().contains(e.getGuild().getRolesByName("Splash Tax Team",true))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -220,7 +225,7 @@ public class TaxCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("oweall")) {
-            if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+            if (e.getMember() != null && !e.getMember().getRoles().contains(e.getGuild().getRolesByName("Splash Tax Team",true))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -400,7 +405,7 @@ public class TaxCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("prune")) {
-            if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+            if (e.getMember() != null && !e.getMember().getRoles().contains(e.getGuild().getRolesByName("Splash Tax Team",true))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -441,7 +446,7 @@ public class TaxCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("clearowes")) {
-            if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+            if (e.getMember() != null && !e.getMember().getRoles().contains(e.getGuild().getRolesByName("Splash Tax Team",true))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -476,7 +481,7 @@ public class TaxCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("setrole")) {
-            if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_SERVER)) {
+            if (e.getMember() != null && !e.getMember().getRoles().contains(e.getGuild().getRolesByName("Splash Tax Team",true))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }

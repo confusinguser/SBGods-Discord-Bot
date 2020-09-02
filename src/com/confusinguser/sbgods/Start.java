@@ -2,8 +2,7 @@ package com.confusinguser.sbgods;
 
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import org.json.JSONObject;
 
 import java.awt.*;
 import java.io.Console;
@@ -18,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 class Start {
 
-    public static void main(String[] args) throws UnsupportedEncodingException {
+    public static void main(String[] args) throws UnsupportedEncodingException, InterruptedException {
         ServerSocket serverSocket;
         try {
             serverSocket = new ServerSocket(35746, 10, InetAddress.getLocalHost());
