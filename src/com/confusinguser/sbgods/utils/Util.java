@@ -351,20 +351,17 @@ public class Util {
         if (discordBot == null || author.isEmpty() || message.isEmpty()) return;
         MessageChannel channel;
         if ((channel = discordBot.getJDA().getTextChannelById(discordServer.getGuildChatChannelId())) != null) {
-            if (latestGuildmessage.equals(message) && latestGuildmessageAuthor.equals(author) &&
+            if (latestGuildmessage.equals("Guild > " + author + ": " + message) && latestGuildmessageAuthor.equals(author) &&
                     !latestMessageByIP.getOrDefault(requestSenderIpAddr, "").equals(author + ":" + message)) {
                 return; // TODO fix problem: if multiple ppl send messages at almost exact time then message might come delayed and it isnt latestMessage anymore
             }
-            String discordOutput = "";
             if (latestGuildmessageAuthor.equals(author)) {
-                latestGuildmessage += "\n" + message;
+                latestGuildmessage += "\n" + "Guild > " + author + ": " + message;
                 channel.deleteMessageById(channel.getLatestMessageId()).queue();
-                discordOutput += "\n" + "Guild > " + author + ": " + message;
             } else {
-                latestGuildmessage = message;
-                discordOutput = "Guild > " + author + ": " + message;
+                latestGuildmessage = "Guild > " + author + ": " + message;
             }
-            channel.sendMessage("```css\n" + discordOutput + "\n```").queue();
+            channel.sendMessage("```css\n" + latestGuildmessage + "\n```").queue();
             latestGuildmessageAuthor = author;
             latestMessageByIP.put(requestSenderIpAddr, author + ":" + message);
         }

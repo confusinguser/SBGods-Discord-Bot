@@ -19,9 +19,9 @@ import java.nio.charset.StandardCharsets;
 class Start {
 
     public static void main(String[] args) throws UnsupportedEncodingException {
-        ServerSocket s;
+        ServerSocket serverSocket;
         try {
-            s = new ServerSocket(34583, 10, InetAddress.getLocalHost());
+            serverSocket = new ServerSocket(35746, 10, InetAddress.getLocalHost());
         } catch (IOException e) {
             // Port taken, so app is already running
             System.out.println("Application is most likely already running");
@@ -49,7 +49,7 @@ class Start {
         Thread listenerThread = new Thread(() -> {
             while (true) {
                 try {
-                    Socket socket = s.accept();
+                    Socket socket = serverSocket.accept();
                     Thread socketThread = new Thread(() -> {
                         DataInputStream dataInputStream = null;
                         String data = "";
@@ -57,13 +57,6 @@ class Start {
                         try {
                             dataInputStream = new DataInputStream(socket.getInputStream());
                             data = dataInputStream.readUTF();
-                            byte[] bytes = new byte[2500];
-                            int bytesRead = dataInputStream.read(bytes);
-                            if (!new String(bytes, 0, bytesRead).split("\n")[0].startsWith("POST /confusingaddons/registerGuildMessage ")) {
-                                socket.close();
-                                sbgods.logger.warning("Invalid request sent!");
-                                return;
-                            }
                         } catch (IOException ioException) {
                             ioException.printStackTrace();
                             try {
@@ -79,7 +72,7 @@ class Start {
                         JsonObject jsonData = JsonParser.parseString(data).getAsJsonObject();
                         String author = jsonData.get("author").getAsString();
                         String message = jsonData.get("message").getAsString();
-                        DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(HypixelGuild.getGuildById(sbgods.getApiUtil().getGuildIDFromUUID(jsonData.get("senderUUID").getAsString())));
+                        DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(HypixelGuild.getGuildById(sbgods.getApiUtil().getGuildIDFromUUID(jsonData.get("senderUUID").getAsString())), true);
                         if (discordServer == null) return;
                         sbgods.getUtil().handleGuildMessage(sbgods.getDiscord(), discordServer, author, message, ipAddr);
                     });

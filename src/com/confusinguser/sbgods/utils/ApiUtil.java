@@ -656,7 +656,7 @@ public class ApiUtil {
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setDoInput(true);
         con.setRequestMethod("GET");
-        con.setRequestProperty("User-Agent", "Mozilla/5.0");
+        con.setRequestProperty("User-Agent", USER_AGENT);
         con.setRequestProperty("Authorization", "token f159901613c898cb80cdc39b3d8f89d2eb9f51bb");
         con.setRequestProperty("Accept", "application/octet-stream");
 
@@ -680,7 +680,7 @@ public class ApiUtil {
 
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            con.setRequestProperty("User-Agent", "Mozilla/5.0");
+            con.setRequestProperty("User-Agent", USER_AGENT);
             con.setRequestProperty("Authorization", "token f159901613c898cb80cdc39b3d8f89d2eb9f51bb");
 
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));

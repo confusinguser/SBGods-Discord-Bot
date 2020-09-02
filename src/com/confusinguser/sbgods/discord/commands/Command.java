@@ -27,7 +27,7 @@ public abstract class Command extends ListenerAdapter {
 
         main.logger.info(e.getAuthor().getName() + " on " + e.getGuild().getName() + " ran command: " + e.getMessage().getContentRaw());
 
-        DiscordServer discordServer = DiscordServer.getDiscordServerFromEvent(e);
+        DiscordServer discordServer = DiscordServer.getDiscordServerFromDiscordGuild(e.getGuild());
         if (discordServer == null) {
             return;
         } // Only allowed servers may use commands

@@ -3,6 +3,8 @@ package com.confusinguser.sbgods.entities;
 import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+
 public enum DiscordServer {
     SBGods("602137436490956820", "673619910324387885", "745532614659801138", HypixelGuild.SBG), // 5cd01bdf77ce84cf1204cd61
     SBForceful("692302950126846013", "695722880754909214", "747021170397937754", HypixelGuild.SBDG), // 5e4e6d0d8ea8c9feb3f0e44f
@@ -28,8 +30,12 @@ public enum DiscordServer {
     }
 
     public static DiscordServer getDiscordServerFromHypixelGuild(HypixelGuild hypixelGuild) {
+        return getDiscordServerFromHypixelGuild(hypixelGuild, false);
+    }
+
+    public static DiscordServer getDiscordServerFromHypixelGuild(HypixelGuild hypixelGuild, boolean activeOnly) {
         for (DiscordServer discordServer : values()) {
-            if (discordServer.getHypixelGuild() == hypixelGuild) return discordServer;
+            if (discordServer.getHypixelGuild() == hypixelGuild && (!activeOnly || Arrays.asList(com.confusinguser.sbgods.SBGods.getInstance().getActiveServers()).contains(discordServer))) return discordServer;
         }
         return null;
     }
