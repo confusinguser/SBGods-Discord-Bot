@@ -4,7 +4,9 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class SettingsCommand extends Command {
 
@@ -16,8 +18,8 @@ public class SettingsCommand extends Command {
     }
 
     @Override
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
-        if (e.getMember() == null || e.getMember() != null && !e.getMember().getPermissions().contains(Permission.MANAGE_SERVER) && !main.isDeveloper(e.getAuthor().getId())) {
+    public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
+        if (!senderMember.getPermissions().contains(Permission.MANAGE_SERVER) && !main.isDeveloper(e.getAuthor().getId())) {
             e.getChannel().sendMessage("You do not have permission to change the settings!").queue();
             return;
         }

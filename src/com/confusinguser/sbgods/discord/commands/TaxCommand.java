@@ -2,13 +2,12 @@ package com.confusinguser.sbgods.discord.commands;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
-import com.confusinguser.sbgods.entities.DiscordServer;
-import com.confusinguser.sbgods.entities.HypixelGuild;
-import com.confusinguser.sbgods.entities.Player;
-import com.confusinguser.sbgods.entities.TaxPayer;
+import com.confusinguser.sbgods.entities.*;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,16 +25,16 @@ public class TaxCommand extends Command {
     }
 
     @Override
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
+    public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
         if (!currentDiscordServer.getHypixelGuild().equals(HypixelGuild.SBG)) {
-            e.getChannel().sendMessage("This command cannot be used on this server.").queue();
+            e.getChannel().sendMessage(main.getMessageByKey("command_cannot_be_used_on_server")).queue();
             return;
         }
 
         if (args.length <= 1) {
             String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag());
             if (mcName.equalsIgnoreCase("")) {
-                e.getChannel().sendMessage("You must verify your minecraft account to use this command! Run `-v <IGN>`").queue();
+                e.getChannel().sendMessage(main.getLangUtil().getMessageByKey("not_verfied")).queue();
                 return;
             }
 
@@ -49,13 +48,14 @@ public class TaxCommand extends Command {
             e.getChannel().deleteMessageById(messageId).queue();
 
             e.getChannel().sendMessage("Your tax info:").queue();
-            e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
+            e.getChannel().sendMessage(taxPayer.getDiscordEmbed()).queue();
+            if (DiscordPerms.getPerms(senderMember).getPower() >= DiscordPerms.STAFF.getPower())
             e.getChannel().sendMessage("Other arguments you can use are: `owelist`, `paidlist`, `info` and `setrole (admin)`, `paid (admin)`, `paidall (admin)`, `owe (admin)`, `oweall (admin)`!").queue();
             return;
         }
 
         if (args[1].equalsIgnoreCase("paid")) {
-            if (e.getMember() != null && e.getMember().getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
+            if (senderMember != null && senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -65,19 +65,12 @@ public class TaxCommand extends Command {
                 return;
             }
 
-            int amount;
-            try {
-                amount = -Integer.parseInt(args[3]);
-            } catch (NumberFormatException err) {
-                if (args[3].toLowerCase().endsWith("k")) {
-                    amount = -Integer.parseInt(args[3].toLowerCase().replace("k", "")) * 1000;
-                } else if (args[3].toLowerCase().endsWith("m")) {
-                    amount = -Integer.parseInt(args[3].toLowerCase().replace("m", "")) * 1000000;
-                } else {
-                    e.getChannel().sendMessage("Invalid amount! Usage: `" + discord.commandPrefix + name + " paid <IGN> <AMOUNT>`!").queue();
-                    return;
-                }
+            int amount = main.getLangUtil().parseIntegerWithSuffixes(args[3]);
+            if (amount == Integer.MIN_VALUE) {
+                e.getChannel().sendMessage("Invalid amount! Usage: `" + discord.commandPrefix + name + " paid <IGN> <AMOUNT>`!").queue();
+                return;
             }
+            amount *= -1;
 
             String messageId = e.getChannel().sendMessage("Loading (" + main.getLangUtil().getProgressBar(0.0, 20) + ")").complete().getId();
 
@@ -91,33 +84,27 @@ public class TaxCommand extends Command {
 
             e.getChannel().deleteMessageById(messageId).queue();
             e.getChannel().sendMessage("Success! The player's current tax info:").queue();
-            e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
+            e.getChannel().sendMessage(taxPayer.getDiscordEmbed()).queue();
             return;
         }
 
         if (args[1].equalsIgnoreCase("paidall")) {
-            if (e.getMember() != null && e.getMember().getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
+            if (senderMember != null && senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
 
-            if (args.length <= 2) {
+            if (args.length <= 3) {
                 e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " paidall <amount> [role]`!").queue();
                 return;
             }
 
-            int amount = 0;
-
-            try {
-                amount = -Integer.parseInt(args[2]);
-            } catch (NumberFormatException err) {
-                if (args[2].endsWith("k")) {
-                    amount = -Integer.parseInt(args[2].replace("k", "")) * 1000;
-                }
-                if (args[2].endsWith("m")) {
-                    amount = -Integer.parseInt(args[2].replace("m", "")) * 1000000;
-                }
+            int amount = main.getLangUtil().parseIntegerWithSuffixes(args[3]);
+            if (amount == Integer.MIN_VALUE) {
+                e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " paidall <amount> [role]`!").queue();
+                return;
             }
+            amount *= -1;
             String role = "";
             if (args.length == 4) {
                 role = args[3];
@@ -138,11 +125,8 @@ public class TaxCommand extends Command {
                 if (!taxData.getJSONObject("guilds").getJSONObject(HypixelGuild.SBG.getGuildId()).getJSONObject("members").has(guildMember.getUUID())) {
                     Player player = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
 
-
                     TaxPayer taxPayer = main.getApiUtil().getTaxPayer(player);
-
-
-                    if (role.equalsIgnoreCase("") || taxPayer.getRole().equalsIgnoreCase(role)) {
+                    if (role.isEmpty() || taxPayer.getRole().equalsIgnoreCase(role)) {
                         taxPayer.addOwes(amount);
 
                         try {
@@ -164,22 +148,18 @@ public class TaxCommand extends Command {
             }
 
             main.getApiUtil().setTaxData(taxData);
-
             e.getChannel().deleteMessageById(messageId).queue();
-
             e.getChannel().sendMessage("Successfully set everyone as paid!").queue();
-
             return;
         }
 
         if (args[1].equalsIgnoreCase("owe")) {
-
-            if (e.getMember() != null && e.getMember().getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
-                e.getChannel().sendMessage("You do not have permission to use this command!").queue();
+            if (senderMember != null && senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
+                e.getChannel().sendMessage(main.getMessageByKey("no_permission")).queue();
                 return;
             }
 
-            if (args.length <= 2) {
+            if (args.length <= 3) {
                 e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " owe <IGN>`!").queue();
                 return;
             }
@@ -196,36 +176,22 @@ public class TaxCommand extends Command {
 
             TaxPayer taxPayer = main.getApiUtil().getTaxPayer(thePlayer);
 
-
-            int amount = 0;
-
-            try {
-                amount = Integer.parseInt(args[3]);
-            } catch (NumberFormatException err) {
-                if (args[3].endsWith("k")) {
-                    amount = Integer.parseInt(args[3].replace("k", "")) * 1000;
-                }
-                if (args[3].endsWith("m")) {
-                    amount = Integer.parseInt(args[3].replace("m", "")) * 1000000;
-                }
+            int amount = main.getLangUtil().parseIntegerWithSuffixes(args[3]);
+            if (amount == Integer.MIN_VALUE) {
+                e.getChannel().sendMessage("Invalid amount! Usage: `" + discord.commandPrefix + name + " paid <IGN> <AMOUNT>`!").queue();
+                return;
             }
 
             taxPayer.addOwes(amount);
-
             taxPayer.sendDataToServer();
-            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(1.0, 20) + ")").queue();
-
             e.getChannel().deleteMessageById(messageId).queue();
-
             e.getChannel().sendMessage("Success, this is the player's current tax info:").queue();
-
-            e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
-
+            e.getChannel().sendMessage(taxPayer.getDiscordEmbed()).queue();
             return;
         }
 
         if (args[1].equalsIgnoreCase("oweall")) {
-            if (e.getMember() != null && e.getMember().getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
+            if (senderMember != null && senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -236,18 +202,12 @@ public class TaxCommand extends Command {
             }
             String role = "";
 
-            int amount = 0;
-
-            try {
-                amount = Integer.parseInt(args[2]);
-            } catch (NumberFormatException err) {
-                if (args[2].endsWith("k")) {
-                    amount = Integer.parseInt(args[2].replace("k", "")) * 1000;
-                }
-                if (args[2].endsWith("m")) {
-                    amount = Integer.parseInt(args[2].replace("m", "")) * 1000000;
-                }
+            int amount = main.getLangUtil().parseIntegerWithSuffixes(args[3]);
+            if (amount == Integer.MIN_VALUE) {
+                e.getChannel().sendMessage("Invalid amount! Usage: `" + discord.commandPrefix + name + " paid <IGN> <AMOUNT>`!").queue();
+                return;
             }
+
             if (args.length == 4) {
                 role = args[3].toLowerCase();
             }
@@ -292,15 +252,12 @@ public class TaxCommand extends Command {
             }
 
             main.getApiUtil().setTaxData(taxData);
-
             e.getChannel().deleteMessageById(messageId).queue();
-
             e.getChannel().sendMessage("Successfully taxed everyone!").queue();
-
             return;
         }
         if (args[1].equalsIgnoreCase("info")) {
-            if (args.length <= 2) {
+            if (args.length <= 3) {
                 e.getChannel().sendMessage("Invalid usage! Usage: `" + discord.commandPrefix + name + " info <IGN>`!").queue();
                 return;
             }
@@ -314,7 +271,7 @@ public class TaxCommand extends Command {
 
             e.getChannel().deleteMessageById(messageId).queue();
 
-            e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
+            e.getChannel().sendMessage(taxPayer.getDiscordEmbed()).queue();
             return;
         }
 
@@ -385,27 +342,28 @@ public class TaxCommand extends Command {
             e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(1.0, 20) + ")").queue();
             e.getChannel().deleteMessageById(messageId).queue();
 
+            if (taxPayers.isEmpty()) {
+                e.getChannel().sendMessage("No one in the guild has paid any tax!").queue();
+                return;
+            }
+
             StringBuilder message = new StringBuilder();
             for (TaxPayer taxPayer : taxPayers) {
                 message.append(main.getDiscord().escapeMarkdown(taxPayer.getName())).append(" owes **").append(main.getLangUtil().addNotation(taxPayer.getOwes())).append("**\n");
             }
 
             e.getChannel().deleteMessageById(messageId).queue();
-            if (message.toString().equals("")) {
-                e.getChannel().sendMessage("No one in the guild has paid any tax!").queue();
-                return;
-            }
 
             List<String> responseList = main.getUtil().processMessageForDiscord(message.toString(), 2000);
-            for (String messageI : responseList) {
-                e.getChannel().sendMessage(new EmbedBuilder().appendDescription(messageI).build()).queue();
+            for (String partMessage: responseList) {
+                e.getChannel().sendMessage(new EmbedBuilder().appendDescription(partMessage).build()).queue();
             }
 
             return;
         }
 
         if (args[1].equalsIgnoreCase("prune")) {
-            if (e.getMember() != null && e.getMember().getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
+            if (senderMember != null && senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -437,16 +395,14 @@ public class TaxCommand extends Command {
             }
 
             main.getApiUtil().setTaxData(taxData);
-
             e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(1.0, 20) + ")").queue();
-
             e.getChannel().editMessageById(messageId, "Success, removed " + playersRemoved + " from the list").queue();
 
             return;
         }
 
         if (args[1].equalsIgnoreCase("clearowes")) {
-            if (e.getMember() != null && e.getMember().getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
+            if (senderMember != null && senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -472,16 +428,14 @@ public class TaxCommand extends Command {
             }
 
             main.getApiUtil().setTaxData(taxData);
-
             e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(1.0, 20) + ")").queue();
-
             e.getChannel().editMessageById(messageId, "Success, removed " + playersUpdated + " players tax owes data").queue();
 
             return;
         }
 
         if (args[1].equalsIgnoreCase("setrole")) {
-            if (e.getMember() != null && e.getMember().getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
+            if (senderMember != null && senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -497,10 +451,8 @@ public class TaxCommand extends Command {
             TaxPayer taxPayer = main.getApiUtil().getTaxPayer(thePlayer);
             taxPayer.setRole(args[3].toLowerCase());
             taxPayer.sendDataToServer();
-            e.getChannel().editMessageById(messageId, "Loading (" + main.getLangUtil().getProgressBar(1.0, 20) + ")").queue();
-
             e.getChannel().deleteMessageById(messageId).queue();
-            e.getChannel().sendMessage(taxPayer.getDiscordEmbed().build()).queue();
+            e.getChannel().sendMessage(taxPayer.getDiscordEmbed()).queue();
             return;
         }
         e.getChannel().sendMessage("Invalid argument! Valid arguments: `paid`, `paidall`, `owe`, `oweall`, `owelist`, `paidlist`, `info`, `setrole`!").queue();

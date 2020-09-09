@@ -6,8 +6,9 @@ import com.confusinguser.sbgods.entities.DiscordPerms;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HelpMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -22,7 +23,7 @@ public class HelpCommand extends Command {
     }
 
     @Override
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
+    public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
         if (args.length >= 2) {
             HelpMessage message = HelpMessage.getHelpFromCommand(String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
             if (message != null) {
@@ -39,9 +40,10 @@ public class HelpCommand extends Command {
         StringBuilder description = new StringBuilder();
 
         for (HelpMessage helpMessage : HelpMessage.values()) {
-            if (!helpMessage.getCommand().contains(" ") && !helpMessage.getCommand().equals("help") &&
+            if (!helpMessage.getCommand().contains(" ") &&
+                    !helpMessage.getCommand().equals("help") &&
                     (!helpMessage.getHelpLines()[helpMessage.getHelpLines().length - 1].equals("Requires to be a bot dev or server admin to use.") ||
-                            (e.getMember() != null && e.getMember().hasPermission(Permission.MANAGE_SERVER, Permission.MANAGE_ROLES)))) {
+                            DiscordPerms.getPerms(senderMember).getPower() >= DiscordPerms.STAFF.getPower())) {
                 description.append(helpMessage.getUsage()).append(": \t**").append(helpMessage.getHelpLines()[0]).append("**\n\n");
             }
         }

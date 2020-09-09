@@ -6,11 +6,12 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Objects;
 
 public class GuildDiscListCommand extends Command {
 
@@ -22,8 +23,8 @@ public class GuildDiscListCommand extends Command {
     }
 
     @Override
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
-        if (!Objects.requireNonNull(e.getMember()).hasPermission(Permission.MANAGE_ROLES)) {
+    public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
+        if (senderMember.hasPermission(Permission.MANAGE_ROLES)) {
             e.getChannel().sendMessage("You don't have permission to perform this command").queue();
             return;
         }

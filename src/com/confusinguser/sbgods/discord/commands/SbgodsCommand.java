@@ -4,7 +4,9 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,8 +23,8 @@ public class SbgodsCommand extends Command {
     }
 
     @Override
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
-        if (args.length == 1 || e.getMember() == null) {
+    public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
+        if (args.length == 1 || senderMember == null) {
             e.getChannel().sendMessage("Invalid argument! Valid arguments: `version`, `update`, `stop`!").queue();
             return;
         }
@@ -43,7 +45,7 @@ public class SbgodsCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("update")) {
-            if (e.getMember() != null && e.getMember().getRoles().stream().noneMatch(role -> role.getName().toLowerCase().contains("bot") || main.isDeveloper(e.getAuthor().getId()))) {
+            if (senderMember != null && senderMember.getRoles().stream().noneMatch(role -> role.getName().toLowerCase().contains("bot") || main.isDeveloper(e.getAuthor().getId()))) {
                 e.getChannel().sendMessage("You do not have the permission to update the bot!").queue();
                 return;
             }
@@ -84,7 +86,7 @@ public class SbgodsCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("stop")) {
-            if (e.getMember() != null && e.getMember().getRoles().stream().noneMatch(role -> role.getName().toLowerCase().contains("bot") || main.isDeveloper(e.getAuthor().getId()))) {
+            if (senderMember != null && senderMember.getRoles().stream().noneMatch(role -> role.getName().toLowerCase().contains("bot") || main.isDeveloper(e.getAuthor().getId()))) {
                 e.getChannel().sendMessage("You do not have the permission to stop the bot!").queue();
                 return;
             }
@@ -93,7 +95,7 @@ public class SbgodsCommand extends Command {
             System.exit(0);
             return;
         }
-        if (main.isDeveloper(e.getMember().getId())) {
+        if (main.isDeveloper(senderMember.getId())) {
             if (args[1].contentEquals("dev")) { //for doing dev things... no-one should even know about it exept devs
                 if (args[2].contentEquals("addGApplyReact")) {
                     e.getChannel().retrievePinnedMessages().complete().get(0).addReaction("☑").queue();

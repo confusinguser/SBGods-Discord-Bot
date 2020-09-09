@@ -17,22 +17,35 @@ import java.util.concurrent.TimeUnit;
 
 public class LeaderboardUpdater {
 
-    private static LeaderboardUpdater instance;
+    public static LeaderboardUpdater instance;
     private final SBGods main;
+    private List<String> latestEventLbIds = new ArrayList<>();
 
     public LeaderboardUpdater(SBGods main) {
         this.main = main;
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
-            for (HypixelGuild hypixelGuild : HypixelGuild.values())
-                try {
+            try {
+                for (HypixelGuild hypixelGuild : HypixelGuild.values()) {
                     updateLeaderboardCache(hypixelGuild);
-                } catch (Throwable t) {
-                    TextChannel textChannel = main.getDiscord().getJDA().getTextChannelById("713870866051498086");
-                    main.logger.severe("Exception when updating leaderboard: \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t));
-                    if (textChannel != null)
-                        textChannel.sendMessage("Exception when updating leaderboard: \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t)).queue();
                 }
+                if (main.getDiscord().eventCommand.postLeaderboard) {
+                    if (latestEventLbIds.size() != 0) {
+                        for (String messageId : latestEventLbIds) {
+                            TextChannel textChannel;
+                            if ((textChannel = main.getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527")) != null)
+                                textChannel.deleteMessageById(messageId).queue();
+                        }
+                    }
+                    latestEventLbIds = main.getDiscord().eventCommand.sendProgressLbRetIds(main.getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527"), "slayerTotal", "Total Slayer Exp Progress\n", false);
+                }
+            } catch (Throwable t) {
+                TextChannel textChannel = main.getDiscord().getJDA().getTextChannelById("713870866051498086");
+                main.logger.severe("Exception when updating leaderboard: \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t));
+                if (textChannel != null)
+                    textChannel.sendMessage("Exception when updating leaderboard: \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t)).queue();
+            }
         }, 0, 15, TimeUnit.MINUTES);
+
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             try {
                 main.getDiscord().verifyAllCommand.verifyAll(main.getDiscord().getJDA().awaitReady().getTextChannelById("713012939258593290"));
@@ -40,7 +53,7 @@ public class LeaderboardUpdater {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-        }, 10, 360, TimeUnit.MINUTES); // Every 6h // Sometimes ppl complain about specific changes not coming into effect immediately
+        }, 10, 180, TimeUnit.MINUTES); // Every 3h
     }
 
     private void updateLeaderboardCache(HypixelGuild guild) {
@@ -108,5 +121,13 @@ public class LeaderboardUpdater {
         guild.setSlayerExpMap(slayerExpMap);
         guild.setAvgSkillLevelMap(skillLevelMap);
         guild.setTotalCoinsMap(totalCoinsMap);
+    }
+
+    public List<String> getLatestEventLbIds() {
+        return latestEventLbIds;
+    }
+
+    public void setLatestEventLbIds(List<String> latestEventLbIds) {
+        this.latestEventLbIds = latestEventLbIds;
     }
 }

@@ -2,6 +2,7 @@ package com.confusinguser.sbgods.entities;
 
 import com.confusinguser.sbgods.SBGods;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -69,21 +70,18 @@ public class TaxPayer {
 
         try {
             taxData.getJSONObject("guilds").getJSONObject(guildId).getJSONObject("members").remove(uuid);
+            taxData.getJSONObject("guilds").getJSONObject(guildId).getJSONObject("members").put(uuid, jsonData);
         } catch (JSONException ignore) {
         }
-
-        taxData.getJSONObject("guilds").getJSONObject(guildId).getJSONObject("members").put(uuid, jsonData);
-
         main.getApiUtil().setTaxData(taxData);
     }
 
-    public EmbedBuilder getDiscordEmbed() {
+    public MessageEmbed getDiscordEmbed() {
         EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0xb8300b).setTitle(getName() + "'s Tax Status");
 
         embedBuilder.appendDescription("Role: **" + main.getLangUtil().toLowerCaseButFirstLetter(getRole()) + "**\n");
-        embedBuilder.appendDescription("Owes: **" + main.getLangUtil().addNotation(getOwes()) + "**\n");
-        embedBuilder.appendDescription("Exact Owes: **" + getOwes() + "**");
+        embedBuilder.appendDescription("Owes: **" + main.getLangUtil().beautifyInt(getOwes()) + "**\n");
 
-        return embedBuilder;
+        return embedBuilder.build();
     }
 }
