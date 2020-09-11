@@ -67,29 +67,6 @@ public class SBGods {
         }
         this.leaderboardUpdater = new LeaderboardUpdater(this);
 
-        //here temporarily, should change location
-        Runnable drawRunnable = () -> {
-            try {
-                if(getDiscord().eventCommand.started){
-                    event_messageId[1] = getDiscord().eventCommand.sendProgressLbRetId(getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527"), "totalskill", "Total Skill Exp Progress\n", false);
-
-                    if(SBGods.event_messageId[0].size() != 0) {
-                        for (String messageId : event_messageId[0]) {
-                            TextChannel textChannel;
-                            if ((textChannel = getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527")) != null)
-                                textChannel.deleteMessageById(messageId).queue();
-                        }
-                    }
-                    event_messageId[0] = event_messageId[1];
-                }
-            } catch (InterruptedException e) {
-                getLogger().warning(e.getMessage());
-                Thread.currentThread().interrupt();
-            }
-        };
-        ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
-        exec.scheduleAtFixedRate(drawRunnable ,1, 30, TimeUnit.MINUTES);
-
     }
 
     public static SBGods getInstance() {

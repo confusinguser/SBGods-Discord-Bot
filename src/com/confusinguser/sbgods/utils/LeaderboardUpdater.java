@@ -36,7 +36,7 @@ public class LeaderboardUpdater {
                                 textChannel.deleteMessageById(messageId).queue();
                         }
                     }
-                    latestEventLbIds = main.getDiscord().eventCommand.sendProgressLbRetIds(main.getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527"), "slayerTotal", "Total Slayer Exp Progress\n", false);
+                    latestEventLbIds = main.getDiscord().eventCommand.sendProgressLbRetIds(main.getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527"), "totalskill", "Total Skill Exp Progress\n", false);
                 }
             } catch (Throwable t) {
                 TextChannel textChannel = main.getDiscord().getJDA().getTextChannelById("713870866051498086");
