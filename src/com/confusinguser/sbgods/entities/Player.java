@@ -21,9 +21,11 @@ public class Player {
     private final int lastLogin;
     private final int lastLogout;
     private final List<String> skyblockProfiles;
+    private final HypixelRank rank;
     private String guildRank = null;
 
     public Player() {
+        this.rank = HypixelRank.DEFAULT;
         this.UUID = null;
         this.displayName = null;
         this.discordTag = null;
@@ -34,10 +36,11 @@ public class Player {
         this.skyblockProfiles = new ArrayList<>();
     }
 
-    public Player(String uuid, String displayName, String discordTag, int lastLogin, int lastLogout, List<String> skyblockProfiles) {
+    public Player(String uuid, String displayName, String discordTag, int lastLogin, int lastLogout, List<String> skyblockProfiles, HypixelRank rank) {
         this.UUID = uuid;
         this.displayName = displayName;
         this.discordTag = discordTag;
+        this.rank = rank;
         this.online = lastLogin > lastLogout;
         this.lastLogin = lastLogin;
         this.lastLogout = lastLogout;
@@ -45,8 +48,9 @@ public class Player {
         this.skyblockProfiles = skyblockProfiles;
     }
 
-    public Player(String uuid, String guildRank, int guildJoined) {
+    public Player(String uuid, String guildRank, int guildJoined, HypixelRank rank) {
         this.UUID = uuid;
+        this.rank = rank;
         this.displayName = null;
         this.discordTag = null;
         this.guildRank = guildRank;
@@ -57,10 +61,11 @@ public class Player {
         this.skyblockProfiles = null;
     }
 
-    public Player(String uuid, String displayName, String discordTag, int lastLogin, int lastLogout, List<String> skyblockProfiles, String guildRank) {
+    public Player(String uuid, String displayName, String discordTag, int lastLogin, int lastLogout, List<String> skyblockProfiles, HypixelRank rank, String guildRank) {
         this.UUID = uuid;
         this.displayName = displayName;
         this.discordTag = discordTag;
+        this.rank = rank;
         this.online = lastLogin > lastLogout;
         this.lastLogin = lastLogin;
         this.lastLogout = lastLogout;
@@ -70,7 +75,7 @@ public class Player {
     }
 
     public static Player mergePlayerAndGuildMember(Player player, Player guildMember) {
-        return new Player(player.UUID, player.displayName, player.discordTag, player.lastLogin, player.lastLogout, player.skyblockProfiles, guildMember.guildRank);
+        return new Player(player.UUID, player.displayName, player.discordTag, player.lastLogin, player.lastLogout, player.skyblockProfiles, rank, guildMember.guildRank);
     }
 
     public String getUUID() {
@@ -152,5 +157,9 @@ public class Player {
             return getSlayerPos(true);
         }
         return output;
+    }
+
+    public HypixelRank getRank() {
+        return rank;
     }
 }

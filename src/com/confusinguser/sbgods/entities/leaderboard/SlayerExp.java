@@ -2,7 +2,7 @@ package com.confusinguser.sbgods.entities.leaderboard;
 
 import java.util.Map;
 
-public class SlayerExp implements LeaderboardValue{
+public class SlayerExp implements LeaderboardValue {
 
     private final int zombie;
     private final int spider;

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,8 +24,8 @@ public class VerifyListCommand extends Command {
     }
 
     @Override
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
-        if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_ROLES)) {
+    public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
+        if (!senderMember.hasPermission(Permission.MANAGE_ROLES)) {
             e.getChannel().sendMessage("You don't have permissions to perform that command!").queue();
             return;
         }

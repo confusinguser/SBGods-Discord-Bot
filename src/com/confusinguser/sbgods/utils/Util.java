@@ -34,9 +34,9 @@ public class Util {
     private final List<MessageChannel> typingChannels = new ArrayList<>();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Pattern stripColorCodesRegex = Pattern.compile("§[a-f0-9rlkmn]");
+    private final Map<InetAddress, String> latestMessageByIP = new HashMap<>();
     private String latestGuildmessageAuthor = "";
     private String latestGuildmessage = "";
-    private final Map<InetAddress, String> latestMessageByIP = new HashMap<>();
 
     public Util(SBGods main) {
         this.main = main;
@@ -365,19 +365,5 @@ public class Util {
             latestGuildmessageAuthor = author;
             latestMessageByIP.put(requestSenderIpAddr, author + ":" + message);
         }
-    }
-
-    public int getColorFromRankString(String rank) {
-        switch (rank) {
-            case "[VIP]":
-            case "[VIP+]":
-                return 0x55FF55;
-            case "[MVP]":
-            case "[MVP+]":
-                return 0x00AAAA;
-            case "[MVP++]":
-                return 0xFFAA00;
-        }
-        return 0x555555;
     }
 }

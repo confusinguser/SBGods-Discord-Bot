@@ -28,7 +28,6 @@ public enum DiscordPerms {
         if (member.hasPermission(Permission.MANAGE_ROLES)) {
             return DiscordPerms.STAFF;
         }
-
         return DiscordPerms.DEFAULT;
     }
 

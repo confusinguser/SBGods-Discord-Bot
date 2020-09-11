@@ -3,6 +3,8 @@ package com.confusinguser.sbgods.utils;
 import com.confusinguser.sbgods.SBGods;
 
 import java.text.DecimalFormat;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 public class LangUtil {
@@ -11,6 +13,8 @@ public class LangUtil {
 
     private final Pattern addCommaPattern = Pattern.compile("\\d{1,3}(?=(\\d{3})+(?=\\.))");
     private final DecimalFormat df = new DecimalFormat("#");
+
+    private final ResourceBundle resourceBundle = ResourceBundle.getBundle("language", Locale.ENGLISH);
 
     public LangUtil(SBGods main) {
         this.main = main;
@@ -159,21 +163,29 @@ public class LangUtil {
         return output.toString();
     }
 
-    /**
-     * @param notationString The string to get the integer from
-     * @return The integer, or -1 if {@code notationString} did not have a valid notation
-     */
-    public int notationToInt(String notationString) {
+    public String getMessageByKey(String key) {
+        return resourceBundle.getString(key);
+    }
+
+    public int parseIntegerWithSuffixes(String input) {
+        int amount;
         try {
-            return Integer.parseInt(notationString);
+            return Integer.parseInt(input);
         } catch (NumberFormatException err) {
-            if (notationString.toLowerCase().endsWith("k")) {
-                return Integer.parseInt(notationString.toLowerCase().replace("k", "")) * 1000;
-            } else if (notationString.toLowerCase().endsWith("m")) {
-                return Integer.parseInt(notationString.toLowerCase().replace("m", "")) * 1000000;
-            } else {
-                return -1;
+            if (input.toLowerCase().endsWith("k")) {
+                return (int) (Double.parseDouble(input.toLowerCase().replace("k", "")) * 1000);
+            } else if (input.toLowerCase().endsWith("m")) {
+                return (int) (Double.parseDouble(input.toLowerCase().replace("m", "")) * 1000000);
             }
+            return Integer.MIN_VALUE;
         }
+    }
+
+    public String beautifyInt(int integer) {
+        String intStr = addNotation(integer);
+        if (parseIntegerWithSuffixes(intStr) == integer) {
+            return intStr;
+        }
+        return addCommas(integer);
     }
 }

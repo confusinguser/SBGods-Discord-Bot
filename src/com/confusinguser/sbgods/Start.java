@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 class Start {
 
-    public static void main(String[] args) throws UnsupportedEncodingException, InterruptedException {
+    public static void main(String[] args) throws UnsupportedEncodingException {
         ServerSocket serverSocket;
         try {
             serverSocket = new ServerSocket(35746, 10, InetAddress.getLocalHost());

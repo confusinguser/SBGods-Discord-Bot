@@ -35,7 +35,8 @@ public enum DiscordServer {
 
     public static DiscordServer getDiscordServerFromHypixelGuild(HypixelGuild hypixelGuild, boolean activeOnly) {
         for (DiscordServer discordServer : values()) {
-            if (discordServer.getHypixelGuild() == hypixelGuild && (!activeOnly || Arrays.asList(com.confusinguser.sbgods.SBGods.getInstance().getActiveServers()).contains(discordServer))) return discordServer;
+            if (discordServer.getHypixelGuild() == hypixelGuild && (!activeOnly || Arrays.asList(com.confusinguser.sbgods.SBGods.getInstance().getActiveServers()).contains(discordServer)))
+                return discordServer;
         }
         return null;
     }

@@ -1,7 +1,5 @@
 package com.confusinguser.sbgods.entities;
 
-import com.confusinguser.sbgods.SBGods;
-
 public enum Perms {
     AH(DiscordPerms.DEFAULT),
     BANK(DiscordPerms.DEFAULT),
@@ -34,11 +32,13 @@ public enum Perms {
     VERIFYLIST(DiscordPerms.STAFFPLUS),
     WHATGUILD(DiscordPerms.DEFAULT);
 
-    private static final SBGods main = SBGods.getInstance();
-
     private final DiscordPerms minPerms;
 
     Perms(DiscordPerms minPerms) {
         this.minPerms = minPerms;
+    }
+
+    public DiscordPerms getMinPerms() {
+        return minPerms;
     }
 }

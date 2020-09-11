@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 
 import java.util.concurrent.TimeUnit;
@@ -23,8 +24,8 @@ public class VerifyAllCommand extends Command {
     }
 
     @Override
-    public void handleCommand(MessageReceivedEvent e, DiscordServer currentDiscordServer, String[] args) {
-        if (e.getMember() != null && !e.getMember().hasPermission(Permission.MANAGE_ROLES)) {
+    public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
+        if (!senderMember.hasPermission(Permission.MANAGE_ROLES)) {
             e.getChannel().sendMessage("You do not have permission to perform this command").queue();
             return;
         }

@@ -3,19 +3,14 @@ package com.confusinguser.sbgods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.utils.*;
-import net.dv8tion.jda.api.entities.TextChannel;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.*;
 import java.util.stream.Collectors;
 
@@ -38,7 +33,6 @@ public class SBGods {
     private String[] keys = null;
     private DiscordBot discordBot;
     private int keyIndex = 0;
-    public static final List<String>[] event_messageId = new ArrayList[]{new ArrayList<String>(),new ArrayList<String>()};
 
     public SBGods() {
         ConsoleHandler handler = new ConsoleHandler();
@@ -173,5 +167,12 @@ public class SBGods {
             keys = output.toArray(new String[0]);
         }
         return keys;
+    }
+
+    /**
+     * Alias for {@code getLangUtil().getMessageByKey(String key)}
+     */
+    public String getMessageByKey(String key) {
+        return getLangUtil().getMessageByKey(key);
     }
 }
