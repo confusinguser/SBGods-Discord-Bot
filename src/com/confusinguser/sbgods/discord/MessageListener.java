@@ -45,7 +45,7 @@ public class MessageListener extends ListenerAdapter {
             };
             new Thread(target).start();
         }
-        if(e.getChannel().getId().equals("746069131022827560")){ //Splash leech channel
+        if(e.getChannel().getId().equals("746069131022827560")){ //public Splash leech channel
             //if(e.getChannel().getId().equals("744558150426034268")){ //Splash leech channel (test server)
 
             Runnable target = () -> {

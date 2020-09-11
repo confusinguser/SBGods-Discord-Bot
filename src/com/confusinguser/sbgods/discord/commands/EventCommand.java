@@ -5,6 +5,7 @@ import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.Player;
+import com.confusinguser.sbgods.entities.leaderboard.SkillExp;
 import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -96,20 +97,20 @@ public class EventCommand extends Command {
                     playerData.put("slayerZombie", slayer.getZombie());
                     playerData.put("slayerSpider", slayer.getSpider());
                     playerData.put("slayerWolf", slayer.getWolf());
-//
-//                SkillExp skillExp = main.getApiUtil().getBestProfileSkillExp(player.getUUID());
-//
-//                playerData.put("skillTotal", skillExp.getTotalSkillExp());
-//                playerData.put("skillAlchemy", skillExp.getAlchemy());
-//                playerData.put("skillCarpentry", skillExp.getCarpentry());
-//                playerData.put("skillCombat", skillExp.getCombat());
-//                playerData.put("skillEnchanting", skillExp.getEnchanting());
-//                playerData.put("skillFarming", skillExp.getFarming());
-//                playerData.put("skillFishing", skillExp.getFishing());
-//                playerData.put("skillForaging", skillExp.getForaging());
-//                playerData.put("skillMining", skillExp.getMining());
-//                playerData.put("skillRunecrafting", skillExp.getRunecrafting());
-//                playerData.put("skillTaming", skillExp.getTaming());
+
+                SkillExp skillExp = main.getApiUtil().getBestProfileSkillExp(player.getUUID());
+
+                playerData.put("skillTotal", skillExp.getTotalSkillExp());
+                playerData.put("skillAlchemy", skillExp.getAlchemy());
+                playerData.put("skillCarpentry", skillExp.getCarpentry());
+                playerData.put("skillCombat", skillExp.getCombat());
+                playerData.put("skillEnchanting", skillExp.getEnchanting());
+                playerData.put("skillFarming", skillExp.getFarming());
+                playerData.put("skillFishing", skillExp.getFishing());
+                playerData.put("skillForaging", skillExp.getForaging());
+                playerData.put("skillMining", skillExp.getMining());
+                playerData.put("skillRunecrafting", skillExp.getRunecrafting());
+                playerData.put("skillTaming", skillExp.getTaming());
 
                 eventData.put(playerData);
             }
@@ -158,46 +159,46 @@ public class EventCommand extends Command {
                 case "zombieslayer":
                     sendProgressLb(e.getTextChannel(), "slayerZombie", "Zombie Slayer Exp Progress\n", true);
                     return;
-//
-//                case "alchemyskill":
-//                    sendProgressLb(e.getTextChannel(), "skillAlchemy", "Alchemy Skill Exp Progress\n", true);
-//                    return;
-//
-//                case "carpentryskill":
-//                    sendProgressLb(e.getTextChannel(), "skillCarpentry", "Carpentry Skill Exp Progress\n", true);
-//                    return;
-//
-//                case "combatskill":
-//                    sendProgressLb(e.getTextChannel(), "skillCombat", "Combat Skill Exp Progress\n", true);
-//                    return;
-//
-//                case "enchantingskill":
-//                    sendProgressLb(e.getTextChannel(), "skillEnchanting", "Enchanting Skill Exp Progress\n", true);
-//                    return;
-//
-//                case "farmingskill":
-//                    sendProgressLb(e.getTextChannel(), "skillFarming", "Farming Skill Exp Progress\n", true);
-//                    return;
-//
-//                case "fishingskill":
-//                    sendProgressLb(e.getTextChannel(), "skillFishing", "Fishing Skill Exp Progress\n", true);
-//                    return;
-//
-//                case "foragingskill":
-//                    sendProgressLb(e.getTextChannel(), "skillForaging", "Foraging Skill Exp Progress\n", true);
-//                    return;
-//
-//                case "miningskill":
-//                    sendProgressLb(e.getTextChannel(), "skillMining", "Mining Skill Exp Progress\n", true);
-//                    return;
-//
-//                case "runecraftingskill":
-//                    sendProgressLb(e.getTextChannel(), "skillRunecrafting", "Runecrafting Skill Exp Progress\n", true);
-//                    return;
-//
-//                case "tamingskill":
-//                    sendProgressLb(e.getTextChannel(), "skillTaming", "Taming Skill Exp Progress\n", true);
-//                    return;
+
+                case "alchemyskill":
+                    sendProgressLb(e.getTextChannel(), "skillAlchemy", "Alchemy Skill Exp Progress\n", true);
+                    return;
+
+                case "carpentryskill":
+                    sendProgressLb(e.getTextChannel(), "skillCarpentry", "Carpentry Skill Exp Progress\n", true);
+                    return;
+
+                case "combatskill":
+                    sendProgressLb(e.getTextChannel(), "skillCombat", "Combat Skill Exp Progress\n", true);
+                    return;
+
+                case "enchantingskill":
+                    sendProgressLb(e.getTextChannel(), "skillEnchanting", "Enchanting Skill Exp Progress\n", true);
+                    return;
+
+                case "farmingskill":
+                    sendProgressLb(e.getTextChannel(), "skillFarming", "Farming Skill Exp Progress\n", true);
+                    return;
+
+                case "fishingskill":
+                    sendProgressLb(e.getTextChannel(), "skillFishing", "Fishing Skill Exp Progress\n", true);
+                    return;
+
+                case "foragingskill":
+                    sendProgressLb(e.getTextChannel(), "skillForaging", "Foraging Skill Exp Progress\n", true);
+                    return;
+
+                case "miningskill":
+                    sendProgressLb(e.getTextChannel(), "skillMining", "Mining Skill Exp Progress\n", true);
+                    return;
+
+                case "runecraftingskill":
+                    sendProgressLb(e.getTextChannel(), "skillRunecrafting", "Runecrafting Skill Exp Progress\n", true);
+                    return;
+
+                case "tamingskill":
+                    sendProgressLb(e.getTextChannel(), "skillTaming", "Taming Skill Exp Progress\n", true);
+                    return;
 
                 default:
                     e.getChannel().sendMessage("Invalid progress type. Valid progress types are: `totalslayer` `totalskill` `wolfslayer` `spiderslayer` `zombieslayer` `alchemyskill` `carpentryskill` `combatskill` `enchantingskill` `farmingskill` `fishingskill` `foragingskill` `miningskill` `runecraftingskill` `tamingskill`").queue();
@@ -327,30 +328,30 @@ public class EventCommand extends Command {
                 playerProgress.put("slayerSpider", slayer.getSpider() - memberData.getInt("slayerSpider"));
                 playerProgress.put("slayerWolf", slayer.getWolf() - memberData.getInt("slayerWolf"));
                 playerProgress.put("slayerTotal", playerProgress.getInt("slayerZombie") + playerProgress.getInt("slayerSpider") + playerProgress.getInt("slayerWolf"));
-//
-//                SkillExp skillExp = main.getApiUtil().getBestProfileSkillExp(player.getUUID());
-//
-//                int totalSkillProgress = 0;
-//                playerProgress.put("skillAlchemy", (skillExp.getAlchemy() - memberData.getInt("skillAlchemy")));
-//                totalSkillProgress += playerProgress.getInt("skillAlchemy");
-//                playerProgress.put("skillCarpentry", skillExp.getCarpentry() - memberData.getInt("skillCarpentry"));
-//                playerProgress.put("skillCombat", skillExp.getCombat() - memberData.getInt("skillCombat"));
-//                totalSkillProgress += playerProgress.getInt("skillCombat");
-//                playerProgress.put("skillEnchanting", skillExp.getEnchanting() - memberData.getInt("skillEnchanting"));
-//                totalSkillProgress += playerProgress.getInt("skillEnchanting");
-//                playerProgress.put("skillFarming", skillExp.getFarming() - memberData.getInt("skillFarming"));
-//                totalSkillProgress += playerProgress.getInt("skillFarming");
-//                playerProgress.put("skillFishing", skillExp.getFishing() - memberData.getInt("skillFishing"));
-//                totalSkillProgress += playerProgress.getInt("skillFishing");
-//                playerProgress.put("skillForaging", skillExp.getForaging() - memberData.getInt("skillForaging"));
-//                totalSkillProgress += playerProgress.getInt("skillForaging");
-//                playerProgress.put("skillMining", skillExp.getMining() - memberData.getInt("skillMining"));
-//                totalSkillProgress += playerProgress.getInt("skillMining");
-//                playerProgress.put("skillRunecrafting", skillExp.getRunecrafting() - memberData.getInt("skillRunecrafting"));
-//                playerProgress.put("skillTaming", skillExp.getTaming() - memberData.getInt("skillTaming"));
-//                totalSkillProgress += playerProgress.getInt("skillTaming");
-//
-//                playerProgress.put("skillTotal", totalSkillProgress);
+
+                SkillExp skillExp = main.getApiUtil().getBestProfileSkillExp(memberData.getString("uuid"));
+
+                int totalSkillProgress = 0;
+                playerProgress.put("skillAlchemy", (skillExp.getAlchemy() - memberData.getInt("skillAlchemy")));
+                totalSkillProgress += playerProgress.getInt("skillAlchemy");
+                playerProgress.put("skillCarpentry", skillExp.getCarpentry() - memberData.getInt("skillCarpentry"));
+                playerProgress.put("skillCombat", skillExp.getCombat() - memberData.getInt("skillCombat"));
+                totalSkillProgress += playerProgress.getInt("skillCombat");
+                playerProgress.put("skillEnchanting", skillExp.getEnchanting() - memberData.getInt("skillEnchanting"));
+                totalSkillProgress += playerProgress.getInt("skillEnchanting");
+                playerProgress.put("skillFarming", skillExp.getFarming() - memberData.getInt("skillFarming"));
+                totalSkillProgress += playerProgress.getInt("skillFarming");
+                playerProgress.put("skillFishing", skillExp.getFishing() - memberData.getInt("skillFishing"));
+                totalSkillProgress += playerProgress.getInt("skillFishing");
+                playerProgress.put("skillForaging", skillExp.getForaging() - memberData.getInt("skillForaging"));
+                totalSkillProgress += playerProgress.getInt("skillForaging");
+                playerProgress.put("skillMining", skillExp.getMining() - memberData.getInt("skillMining"));
+                totalSkillProgress += playerProgress.getInt("skillMining");
+                playerProgress.put("skillRunecrafting", skillExp.getRunecrafting() - memberData.getInt("skillRunecrafting"));
+                playerProgress.put("skillTaming", skillExp.getTaming() - memberData.getInt("skillTaming"));
+                totalSkillProgress += playerProgress.getInt("skillTaming");
+
+                playerProgress.put("skillTotal", totalSkillProgress);
 
             } else {
                 playerProgress.put("slayerTotal", 0);
@@ -358,17 +359,17 @@ public class EventCommand extends Command {
                 playerProgress.put("slayerSpider", 0);
                 playerProgress.put("slayerWolf", 0);
 
-//                playerProgress.put("skillTotal", 0);
-//                playerProgress.put("skillAlchemy", 0);
-//                playerProgress.put("skillCarpentry", 0);
-//                playerProgress.put("skillCombat", 0);
-//                playerProgress.put("skillEnchanting", 0);
-//                playerProgress.put("skillFarming", 0);
-//                playerProgress.put("skillFishing", 0);
-//                playerProgress.put("skillForaging", 0);
-//                playerProgress.put("skillMining", 0);
-//                playerProgress.put("skillRunecrafting", 0);
-//                playerProgress.put("skillTaming", 0);
+                playerProgress.put("skillTotal", 0);
+                playerProgress.put("skillAlchemy", 0);
+                playerProgress.put("skillCarpentry", 0);
+                playerProgress.put("skillCombat", 0);
+                playerProgress.put("skillEnchanting", 0);
+                playerProgress.put("skillFarming", 0);
+                playerProgress.put("skillFishing", 0);
+                playerProgress.put("skillForaging", 0);
+                playerProgress.put("skillMining", 0);
+                playerProgress.put("skillRunecrafting", 0);
+                playerProgress.put("skillTaming", 0);
 
             }
             memberData.put("playerProgress", playerProgress);

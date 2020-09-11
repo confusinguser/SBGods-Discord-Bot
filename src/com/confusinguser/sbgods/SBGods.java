@@ -77,7 +77,7 @@ public class SBGods {
         Runnable drawRunnable = () -> {
             try {
                 if(getDiscord().eventCommand.started){
-                    event_messageId[1] = getDiscord().eventCommand.sendProgressLbRetId(getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527"), "slayerTotal", "Total Slayer Exp Progress\n", false);
+                    event_messageId[1] = getDiscord().eventCommand.sendProgressLbRetId(getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527"), "totalskill", "Total Skill Exp Progress\n", false);
 
                     if(SBGods.event_messageId[0].size() != 0) {
                         for (String messageId : event_messageId[0]) {
