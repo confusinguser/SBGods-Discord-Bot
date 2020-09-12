@@ -366,4 +366,16 @@ public class Util {
             latestMessageByIP.put(requestSenderIpAddr, author + ":" + message);
         }
     }
+
+    public static String getTextWithoutFormattingCodes(String text) {
+        return text == null ? null : RegexUtil.getMatcher("(?i)§[0-9A-FK-OR]", text).replaceAll("");
+    }
+
+    public String getAuthorFromGuildChatMessage(String message) {
+        return getTextWithoutFormattingCodes(message).split(":")[0].substring(8);
+    }
+
+    public String getMessageFromGuildChatMessage(String message) {
+        return getTextWithoutFormattingCodes(message.split(":")[1]);
+    }
 }

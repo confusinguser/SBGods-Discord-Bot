@@ -2,18 +2,19 @@ package com.confusinguser.sbgods;
 
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
+import com.confusinguser.sbgods.utils.EncryptionUtil;
+import com.google.gson.JsonObject;
 import org.json.JSONObject;
 
 import java.awt.*;
-import java.io.Console;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
+import java.security.PrivateKey;
 
 class Start {
 
@@ -45,6 +46,7 @@ class Start {
         SBGods sbgods = new SBGods();
         if (logTerminalError) sbgods.logger.info("Could not open terminal");
 
+        EncryptionUtil encryptionUtil = new EncryptionUtil();
         Thread listenerThread = new Thread(() -> {
             while (true) {
                 try {
@@ -57,23 +59,41 @@ class Start {
                             dataInputStream = new DataInputStream(socket.getInputStream());
                             data = dataInputStream.readUTF();
                         } catch (IOException ioException) {
-                            ioException.printStackTrace();
+                            if (!(ioException instanceof EOFException))
+                                ioException.printStackTrace();
+
+                            PrivateKey privateKey = encryptionUtil.getKeyForIP(ipAddr);
                             try {
+                                if (privateKey == null) {
+                                    KeyPair keyPair = encryptionUtil.generateKeyPair();
+
+                                    JsonObject sendBackJson = new JsonObject();
+                                    sendBackJson.addProperty("encryptionKey", new String(keyPair.getPublic().getEncoded()));
+                                    DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                                    dataOutputStream.writeUTF(sendBackJson.toString());
+
+                                    encryptionUtil.assignKeyForIP(ipAddr, keyPair.getPrivate());
+                                    return;
+                                }
+                                String decryptedData = encryptionUtil.decryptText(data, privateKey);
+
                                 socket.close();
                                 if (dataInputStream != null)
                                     dataInputStream.close();
+                                return;
                             } catch (IOException ex) {
                                 ex.printStackTrace();
                                 return;
                             }
                         }
                         System.out.println(data);
+
+
                         JSONObject jsonData = new JSONObject(data);
-                        String author = jsonData.getString("author");
                         String message = jsonData.getString("message");
                         DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(HypixelGuild.getGuildById(sbgods.getApiUtil().getGuildIDFromUUID(jsonData.getString("senderUUID"))), true);
                         if (discordServer == null) return;
-                        sbgods.getUtil().handleGuildMessage(sbgods.getDiscord(), discordServer, author, message, ipAddr);
+                        sbgods.getUtil().handleGuildMessage(sbgods.getDiscord(), discordServer, sbgods.getUtil().getAuthorFromGuildChatMessage(message), sbgods.getUtil().getMessageFromGuildChatMessage(message), ipAddr);
                     });
                     socketThread.start();
                 } catch (IOException ioException) {

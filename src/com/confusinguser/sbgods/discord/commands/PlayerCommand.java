@@ -29,19 +29,22 @@ public class PlayerCommand extends Command {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
-        if (args.length == 1) {
-
-
-
-        }
-
         String messageId = e.getChannel().sendMessage("Loading (" + main.getLangUtil().getProgressBar(0.0, 20) + ")").complete().getId();
 
-        Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
+        Player player;
+        if (args.length == 1) {
+            player = main.getApiUtil().getPlayerFromUsername(main.getApiUtil().getMcNameFromDisc(senderMember.getUser().getAsTag()));
+            if (player == null || player.getDisplayName() == null) {
+                e.getChannel().editMessageById(messageId, "Could not find you mc account, use `-player <IGN>` instead").queue();
+                return;
+            }
+        } else {
+            player = main.getApiUtil().getPlayerFromUsername(args[1]);
 
-        if (player.getDisplayName() == null) {
-            e.getChannel().editMessageById(messageId, "Invalid player " + args[1]).queue();
-            return;
+            if (player.getDisplayName() == null) {
+                e.getChannel().editMessageById(messageId, "Invalid player " + args[1]).queue();
+                return;
+            }
         }
 
         SkillLevels skillLevels = new SkillLevels();
@@ -65,7 +68,7 @@ public class PlayerCommand extends Command {
         }
         guildName = main.getApiUtil().getGuildFromUUID(player.getUUID());
 
-        EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(player.getDisplayName()).setColor(main.getUtil().getColorFromRankString()).setThumbnail("https://visage.surgeplay.com/bust/" + player.getUUID()).setFooter("SBGods");
+        EmbedBuilder embedBuilder = new EmbedBuilder().setTitle(player.getDisplayName()).setThumbnail("https://visage.surgeplay.com/bust/" + player.getUUID()).setFooter("SBGods");
         User discordUser = null;
         if (!player.getDiscordTag().equals("")) {
             discordUser = main.getDiscord().getJDA().getUserByTag(player.getDiscordTag());

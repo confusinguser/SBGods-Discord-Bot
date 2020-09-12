@@ -6,7 +6,6 @@ import com.confusinguser.sbgods.entities.banking.BankTransaction;
 import com.confusinguser.sbgods.entities.leaderboard.SkillExp;
 import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
 import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
-import com.google.gson.JsonObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -193,7 +192,7 @@ public class ApiUtil {
             String uuid = currentMember.getString("uuid");
             String guildRank = currentMember.getString("rank");
             int guildJoined = currentMember.getInt("joined");
-            output.add(new Player(uuid, guildRank, guildJoined, rank));
+            output.add(new Player(uuid, guildRank, guildJoined));
         }
 
         return output;
@@ -234,19 +233,6 @@ public class ApiUtil {
             profiles = jsonObject.getJSONObject("player").getJSONObject("stats").getJSONObject("SkyBlock").getJSONObject("profiles");
             lastLogin = jsonObject.getJSONObject("player").getInt("lastLogin");
             lastLogout = jsonObject.getJSONObject("player").getInt("lastLogout");
-            JsonObject playerData = main.getAPI().getPlayerByUuid(uuid).get().getPlayer();
-            HypixelRank rank = HypixelRank.NONE;
-            if (playerData.has("packageRank") && !playerData.get("packageRank").getAsString().equals("NONE"))
-                rank = HypixelRank.getHypixelRankFromName(playerData.get("packageRank").getAsString());
-            if (playerData.has("newPackageRank") && !playerData.get("newPackageRank").getAsString().equals("NONE"))
-                rank = HypixelRank.getHypixelRankFromName(playerData.get("newPackageRank").getAsString());
-            if (playerData.has("monthlyPackageRank") && !playerData.get("monthlyPackageRank").getAsString().equals("NONE"))
-                rank = HypixelRank.getHypixelRankFromName(playerData.get("monthlyPackageRank").getAsString());
-            if (playerData.has("rank") && !playerData.get("rank").getAsString().equals("NORMAL"))
-                rank = HypixelRank.getHypixelRankFromName(playerData.get("rank").getAsString());
-            String prefix = rank.getPrefix();
-            if (playerData.has("prefix")) prefix = playerData.get("prefix").getAsString() + " ";
-
         } catch (JSONException e) {
             return new Player();
         }
@@ -258,12 +244,12 @@ public class ApiUtil {
             discord = "";
         }
 
-        return new Player(uuid, username, discord, lastLogin, lastLogout, new ArrayList<>(profiles.keySet()), rank);
+        return new Player(uuid, username, discord, lastLogin, lastLogout, new ArrayList<>(profiles.keySet()));
     }
 
     public Player getPlayerFromUsername(String name) {
         String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&name=" + name, 300000);
-        if (response == null) return new Player(rank);
+        if (response == null) return new Player();
 
         JSONObject jsonObject = new JSONObject(response);
         String username;
@@ -279,7 +265,7 @@ public class ApiUtil {
             lastLogin = jsonObject.getJSONObject("player").getInt("lastLogin");
             lastLogout = jsonObject.getJSONObject("player").getInt("lastLogout");
         } catch (JSONException e) {
-            return new Player(rank);
+            return new Player();
         }
         try {
             // Does not necessarily exist while the other things above have to.
@@ -289,7 +275,7 @@ public class ApiUtil {
             discord = "";
         }
 
-        return new Player(uuid, username, discord, lastLogin, lastLogout, new ArrayList<>(profiles.keySet()), rank);
+        return new Player(uuid, username, discord, lastLogin, lastLogout, new ArrayList<>(profiles.keySet()));
     }
 
 
