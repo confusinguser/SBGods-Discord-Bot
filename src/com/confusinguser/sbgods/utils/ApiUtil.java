@@ -6,6 +6,7 @@ import com.confusinguser.sbgods.entities.banking.BankTransaction;
 import com.confusinguser.sbgods.entities.leaderboard.SkillExp;
 import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
 import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
+import com.google.gson.JsonObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -383,13 +384,18 @@ public class ApiUtil {
 
     public SkillExp getProfileSkillExp(String profileUUID, String playerUUID) {
 
-        String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 300000);
+        String response = getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + playerUUID, 300000);
         if (response == null) return new SkillExp();
 
         JSONObject jsonObject = new JSONObject(response);
 
         try {
-            jsonObject = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(playerUUID);
+            for(int i = 0; i < jsonObject.getJSONArray("profiles").length()-1; i++){
+                if(jsonObject.getJSONArray("profiles").getJSONObject(i).getString("profile_id") == profileUUID){
+
+                    jsonObject = jsonObject.getJSONArray("profiles").getJSONObject(i);
+                }
+            }
         } catch (JSONException e) {
             return new SkillExp();
         }
