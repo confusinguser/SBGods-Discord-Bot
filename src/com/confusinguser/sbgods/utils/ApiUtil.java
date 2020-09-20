@@ -335,7 +335,7 @@ public class ApiUtil {
 
     public SkillLevels getProfileSkills(String profileUUID, String playerUUID) {
 
-        String response = getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&profile=" + playerUUID, 300000);
+        String response = getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + playerUUID, 300000);
         if (response == null) return new SkillLevels();
 
         JSONObject jsonObject = new JSONObject(response);
