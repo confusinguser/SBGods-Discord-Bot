@@ -335,12 +335,19 @@ public class ApiUtil {
 
     public SkillLevels getProfileSkills(String profileUUID, String playerUUID) {
 
-        String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 300000);
+        String response = getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&profile=" + playerUUID, 300000);
         if (response == null) return new SkillLevels();
 
         JSONObject jsonObject = new JSONObject(response);
 
         try {
+            for(int i = 0;i<jsonObject.getJSONArray("profiles").length();i++){
+                if(jsonObject.getJSONArray("profiles").getJSONObject(i).getString("profile_id").equalsIgnoreCase(profileUUID)){
+                    jsonObject = jsonObject.getJSONArray("profiles").getJSONObject(i);
+                    break;
+                }
+            }
+
             jsonObject = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(playerUUID);
         } catch (JSONException e) {
             return new SkillLevels();

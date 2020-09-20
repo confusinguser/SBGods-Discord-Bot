@@ -55,14 +55,16 @@ public class EventCommand extends Command {
             return;
         }
         if (args[1].equals("sendLb")) {
-            if (LeaderboardUpdater.instance.getLatestEventLbIds().size() != 0) {
-                for (String messageId : LeaderboardUpdater.instance.getLatestEventLbIds()) {
-                    TextChannel textChannel;
-                    if ((textChannel = main.getDiscord().getJDA().getTextChannelById("747881093444796527")) != null)
-                        textChannel.deleteMessageById(messageId).queue();
+            if(LeaderboardUpdater.instance.getLatestEventLbIds() != null) {
+                if (LeaderboardUpdater.instance.getLatestEventLbIds().size() != 0) {
+                    for (String messageId : LeaderboardUpdater.instance.getLatestEventLbIds()) {
+                        TextChannel textChannel;
+                        if ((textChannel = main.getDiscord().getJDA().getTextChannelById("753934993788633170")) != null)
+                            textChannel.deleteMessageById(messageId).queue();
+                    }
                 }
             }
-            LeaderboardUpdater.instance.setLatestEventLbIds(main.getDiscord().eventCommand.sendProgressLbRetIds(main.getDiscord().getJDA().getTextChannelById("747881093444796527"), "slayerTotal", "Total Slayer Exp Progress\n", false));
+            LeaderboardUpdater.instance.setLatestEventLbIds(main.getDiscord().eventCommand.sendProgressLbRetIds(main.getDiscord().getJDA().getTextChannelById("753934993788633170"), "skillTotal", "Total Skill Exp Progress\n", true));
             return;
         }
 
@@ -247,7 +249,7 @@ public class EventCommand extends Command {
 
         for (int i = 0; i < leaderboardList.length(); i++) {
             JSONObject player = leaderboardList.getJSONObject(i);
-            messageBuilder.append("#").append(i + 1).append(" ").append(player.getString("displayName")).append(": ").append(main.getLangUtil().addNotation(player.getJSONObject("playerProgress").getInt(key))).append("\n");
+            messageBuilder.append("#").append(i + 1).append(" ").append(player.getString("displayName").replace("_","\\_")).append(": ").append(main.getLangUtil().addNotation(player.getJSONObject("playerProgress").getInt(key))).append("\n");
         }
         message = messageBuilder.toString();
 
@@ -271,7 +273,7 @@ public class EventCommand extends Command {
 
         for (int i = 0; i < leaderboardList.length(); i++) {
             JSONObject player = leaderboardList.getJSONObject(i);
-            messageBuilder.append("#").append(i + 1).append(" ").append(player.getString("displayName")).append(": ").append(main.getLangUtil().addNotation(player.getJSONObject("playerProgress").getInt(key))).append("\n");
+            messageBuilder.append("#").append(i + 1).append(" ").append(player.getString("displayName").replace("_","\\_")).append(": ").append(main.getLangUtil().addNotation(player.getJSONObject("playerProgress").getInt(key))).append("\n");
         }
         message = messageBuilder.toString();
 
@@ -279,7 +281,8 @@ public class EventCommand extends Command {
 
         ArrayList<String> res = new ArrayList<>();
         for (String messageSending : messageSend) {
-            res.add(channel.sendMessage(new EmbedBuilder().setDescription(messageSending).build()).complete().getId());
+            String id = channel.sendMessage(new EmbedBuilder().setDescription(messageSending).build()).complete().getId();
+            res.add(id);
         }
 
         return res;

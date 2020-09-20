@@ -22,6 +22,7 @@ public class LeaderboardUpdater {
     private List<String> latestEventLbIds = new ArrayList<>();
 
     public LeaderboardUpdater(SBGods main) {
+        instance = this;
         this.main = main;
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
             try {
@@ -32,11 +33,11 @@ public class LeaderboardUpdater {
                     if (latestEventLbIds.size() != 0) {
                         for (String messageId : latestEventLbIds) {
                             TextChannel textChannel;
-                            if ((textChannel = main.getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527")) != null)
+                            if ((textChannel = main.getDiscord().getJDA().awaitReady().getTextChannelById("753934993788633170")) != null)
                                 textChannel.deleteMessageById(messageId).queue();
                         }
                     }
-                    latestEventLbIds = main.getDiscord().eventCommand.sendProgressLbRetIds(main.getDiscord().getJDA().awaitReady().getTextChannelById("747881093444796527"), "totalskill", "Total Skill Exp Progress\n", false);
+                    latestEventLbIds = main.getDiscord().eventCommand.sendProgressLbRetIds(main.getDiscord().getJDA().awaitReady().getTextChannelById("753934993788633170"), "skillTotal", "Total Skill Exp Progress\n", false);
                 }
             } catch (Throwable t) {
                 TextChannel textChannel = main.getDiscord().getJDA().getTextChannelById("713870866051498086");

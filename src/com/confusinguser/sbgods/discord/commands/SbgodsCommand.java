@@ -40,7 +40,9 @@ public class SbgodsCommand extends Command {
             return;
         }
 
-        if (args[1].equalsIgnoreCase("test") && currentDiscordServer.equals(DiscordServer.Test)) {
+        if (args[1].equalsIgnoreCase("test")) {
+
+            //e.getGuild().addRoleToMember("747232589961625665", e.getGuild().getRoleById("668262322904498210")).queue();
             return;
         }
 
