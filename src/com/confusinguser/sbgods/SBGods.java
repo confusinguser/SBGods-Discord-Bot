@@ -142,6 +142,7 @@ public class SBGods {
             List<String> output = Arrays.asList(fileContent.split("\r\n"));
             output = output.stream().filter(s -> s.length() >= 36 && !s.substring(0, 36).contains("//")).map(s -> s.substring(0, 36)).collect(Collectors.toList());
             keys = output.toArray(new String[0]);
+            logger.info("Loaded " + keys.length + " api keys!");
         }
         return keys;
     }
