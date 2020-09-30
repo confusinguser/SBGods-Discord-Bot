@@ -54,15 +54,15 @@ public class ApiUtil {
         if (allowance > REQUEST_RATE) {
             allowance = REQUEST_RATE; // throttle
         }
-        if (allowance < 1) {
+        while (allowance < 1) {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-        } else {
-            allowance -= 1;
         }
+        allowance -= 1;
+
 
         StringBuffer response = null;
         HttpURLConnection con = null;
@@ -346,12 +346,10 @@ public class ApiUtil {
         try {
             for (int i = 0; i < jsonObject.getJSONArray("profiles").length(); i++) {
                 if (jsonObject.getJSONArray("profiles").getJSONObject(i).getString("profile_id").equalsIgnoreCase(profileUUID)) {
-                    jsonObject = jsonObject.getJSONArray("profiles").getJSONObject(i);
+                    jsonObject = jsonObject.getJSONArray("profiles").getJSONObject(i).getJSONObject("members").getJSONObject(playerUUID);
                     break;
                 }
             }
-
-            jsonObject = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(playerUUID);
         } catch (JSONException e) {
             return new SkillLevels();
         }
@@ -402,7 +400,7 @@ public class ApiUtil {
         try {
             for (int i = 0; i < jsonObject.getJSONArray("profiles").length() - 1; i++) {
                 if (jsonObject.getJSONArray("profiles").getJSONObject(i).getString("profile_id").equals(profileUUID)) {
-                    jsonObject = jsonObject.getJSONArray("profiles").getJSONObject(i);
+                    jsonObject = jsonObject.getJSONArray("profiles").getJSONObject(i).getJSONObject("members").getJSONObject(playerUUID);
                 }
             }
         } catch (JSONException e) {
