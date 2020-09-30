@@ -4,9 +4,11 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
+import com.confusinguser.sbgods.entities.HypixelRank;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
 import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -241,7 +243,7 @@ public class Util {
                         }
                     }
                 }
-                if (highestLeaderboardPos < 45 && hypixelGuild != HypixelGuild.SBDG) {
+                if (highestLeaderboardPos < 45 && hypixelGuild != HypixelGuild.SBF) {
                     for (Role role : discord.getRolesByName("Elite", true)) {
                         try {
                             discord.addRoleToMember(member, role).queue();
@@ -357,11 +359,15 @@ public class Util {
             }
             if (latestGuildmessageAuthor.equals(author)) {
                 latestGuildmessage += "\n" + "Guild > " + author + ": " + message;
-                channel.deleteMessageById(channel.getLatestMessageId()).queue();
+                try {
+                    channel.deleteMessageById(channel.getLatestMessageId()).queue();
+                } catch (IllegalStateException ignored) {
+                } // If no last message id found
             } else {
                 latestGuildmessage = "Guild > " + author + ": " + message;
             }
-            channel.sendMessage("```css\n" + latestGuildmessage + "\n```").queue();
+            channel.sendMessage(new EmbedBuilder().setColor(HypixelRank.getHypixelRankFromName(author.substring(0, author.contains("]") ? author.indexOf("]") + 1 : 0)).getColor()).setDescription(latestGuildmessage).build()).queue();
+//            channel.sendMessage("```css\n" + latestGuildmessage + "\n```").queue();
             latestGuildmessageAuthor = author;
             latestMessageByIP.put(requestSenderIpAddr, author + ":" + message);
         }

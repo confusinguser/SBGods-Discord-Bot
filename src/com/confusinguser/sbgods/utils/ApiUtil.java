@@ -6,7 +6,6 @@ import com.confusinguser.sbgods.entities.banking.BankTransaction;
 import com.confusinguser.sbgods.entities.leaderboard.SkillExp;
 import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
 import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
-import com.google.gson.JsonObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,7 +97,7 @@ public class ApiUtil {
             }
         }
 
-        if (responseCode == 429) {
+        if (responseCode == 429 || responseCode == 400) {
             try {
                 Thread.sleep(17000);
             } catch (InterruptedException e) {
@@ -108,7 +107,7 @@ public class ApiUtil {
 
         } else if (responseCode == 403) {
             main.logger.severe("The API key \"" + main.getCurrentApiKey() + "\" is invalid!");
-            System.exit(-1);
+//            System.exit(-1);
         } else if (ioException != null) {
             fails++;
             if (fails % 10 == 0) {
@@ -117,8 +116,10 @@ public class ApiUtil {
             return getResponse(url_string, cacheTime);
         }
         fails = 0;
-        main.getCacheUtil().addToCache(main.getCacheUtil().stripUnnecesaryInfo(url_string), response.toString());
-        return response.toString();
+        if (response != null) {
+            main.getCacheUtil().addToCache(main.getCacheUtil().stripUnnecesaryInfo(url_string), response.toString());
+            return response.toString();
+        } else return null;
     }
 
     public String getNonHypixelResponse(String url_string) {
@@ -165,7 +166,7 @@ public class ApiUtil {
 
         } else if (responseCode == 403) {
             main.logger.severe("The API key \"" + main.getCurrentApiKey() + "\" is invalid!");
-            System.exit(-1);
+//            System.exit(-1);
         } else if (ioException != null) {
             fails++;
             if (fails % 10 == 0) {
@@ -174,7 +175,9 @@ public class ApiUtil {
             return getNonHypixelResponse(url_string);
         }
         fails = 0;
-        return response.toString();
+        if (response != null) {
+            return response.toString();
+        } else return null;
     }
 
     public List<Player> getGuildMembers(HypixelGuild guild) {
@@ -341,8 +344,8 @@ public class ApiUtil {
         JSONObject jsonObject = new JSONObject(response);
 
         try {
-            for(int i = 0;i<jsonObject.getJSONArray("profiles").length();i++){
-                if(jsonObject.getJSONArray("profiles").getJSONObject(i).getString("profile_id").equalsIgnoreCase(profileUUID)){
+            for (int i = 0; i < jsonObject.getJSONArray("profiles").length(); i++) {
+                if (jsonObject.getJSONArray("profiles").getJSONObject(i).getString("profile_id").equalsIgnoreCase(profileUUID)) {
                     jsonObject = jsonObject.getJSONArray("profiles").getJSONObject(i);
                     break;
                 }
@@ -397,9 +400,8 @@ public class ApiUtil {
         JSONObject jsonObject = new JSONObject(response);
 
         try {
-            for(int i = 0; i < jsonObject.getJSONArray("profiles").length()-1; i++){
-                if(jsonObject.getJSONArray("profiles").getJSONObject(i).getString("profile_id") == profileUUID){
-
+            for (int i = 0; i < jsonObject.getJSONArray("profiles").length() - 1; i++) {
+                if (jsonObject.getJSONArray("profiles").getJSONObject(i).getString("profile_id").equals(profileUUID)) {
                     jsonObject = jsonObject.getJSONArray("profiles").getJSONObject(i);
                 }
             }

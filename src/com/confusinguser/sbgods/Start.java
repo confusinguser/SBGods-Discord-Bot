@@ -4,17 +4,19 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.utils.EncryptionUtil;
 import com.google.gson.JsonObject;
-import org.json.JSONObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 
 import java.awt.*;
-import java.io.*;
+import java.io.Console;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyPair;
-import java.security.PrivateKey;
 
 class Start {
 
@@ -52,46 +54,64 @@ class Start {
                 try {
                     Socket socket = serverSocket.accept();
                     Thread socketThread = new Thread(() -> {
-                        DataInputStream dataInputStream = null;
-                        String data = "";
+                        DataInputStream dataInputStream;
+                        String data;
                         InetAddress ipAddr = socket.getInetAddress();
+                        JsonObject parsedJson;
                         try {
                             dataInputStream = new DataInputStream(socket.getInputStream());
-                            data = dataInputStream.readUTF();
-                        } catch (IOException ioException) {
-                            if (!(ioException instanceof EOFException))
-                                ioException.printStackTrace();
+                            data = DataInputStream.readUTF(dataInputStream);
+                            parsedJson = JsonParser.parseString(data).getAsJsonObject();
+                        } catch (IOException | JsonParseException ex) {
+                            ex.printStackTrace();
+                            return;
+                        }
 
-                            PrivateKey privateKey = encryptionUtil.getKeyForIP(ipAddr);
-                            try {
-                                if (privateKey == null) {
-                                    KeyPair keyPair = encryptionUtil.generateKeyPair();
+                        //<editor-fold desc="Encryption Attempt that wasn't successful :(">
+/*                        // Encryption Attempt that didn't wasn't successful :(
+                        PrivateKey privateKey = encryptionUtil.getKeyForIP(ipAddr);
+                        try {
+                            if (privateKey == null || parsedJson.get("needPublicKey") != null && parsedJson.get("needPublicKey").getAsBoolean()) {
+                                KeyPair keyPair = encryptionUtil.generateKeyPair();
 
-                                    JsonObject sendBackJson = new JsonObject();
-                                    sendBackJson.addProperty("encryptionKey", new String(keyPair.getPublic().getEncoded()));
-                                    DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                                    dataOutputStream.writeUTF(sendBackJson.toString());
+                                JsonObject sendBackJson = new JsonObject();
+                                sendBackJson.addProperty("encryptionKey", new String(Base64.getEncoder().encode(keyPair.getPublic().getEncoded())));
+                                DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                                dataOutputStream.writeUTF(sendBackJson.toString());
 
-                                    encryptionUtil.assignKeyForIP(ipAddr, keyPair.getPrivate());
-                                    return;
-                                }
-                                String decryptedData = encryptionUtil.decryptText(data, privateKey);
-
-                                socket.close();
-                                if (dataInputStream != null)
-                                    dataInputStream.close();
-                                return;
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
+                                encryptionUtil.assignKeyForIP(ipAddr, keyPair.getPrivate());
                                 return;
                             }
+                            String decryptedData = encryptionUtil.decryptText(data, privateKey);
+
+                            dataInputStream.close();
+                            socket.close();
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                            return;
+                        } catch (BadPaddingException | IllegalBlockSizeException | InvalidKeyException e) {
+                            e.printStackTrace();
+                            KeyPair keyPair = encryptionUtil.generateKeyPair();
+
+                            JsonObject sendBackJson = new JsonObject();
+                            sendBackJson.addProperty("encryptionKey", new String(Base64.getEncoder().encode(keyPair.getPublic().getEncoded())));
+                            DataOutputStream dataOutputStream;
+                            encryptionUtil.assignKeyForIP(ipAddr, keyPair.getPrivate());
+                            try {
+                                dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                                dataOutputStream.writeUTF(sendBackJson.toString());
+                            } catch (IOException exception) {
+                                exception.printStackTrace();
+                            }
+
+                            encryptionUtil.assignKeyForIP(ipAddr, keyPair.getPrivate());
+                            return;
                         }
-                        System.out.println(data);
+ */
+                        //</editor-fold>
 
-
-                        JSONObject jsonData = new JSONObject(data);
-                        String message = jsonData.getString("message");
-                        DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(HypixelGuild.getGuildById(sbgods.getApiUtil().getGuildIDFromUUID(jsonData.getString("senderUUID"))), true);
+                        String message = parsedJson.get("message").getAsString();
+                        DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(HypixelGuild.getGuildById(sbgods.getApiUtil().getGuildIDFromUUID(parsedJson.get("senderUUID").getAsString())), true);
                         if (discordServer == null) return;
                         sbgods.getUtil().handleGuildMessage(sbgods.getDiscord(), discordServer, sbgods.getUtil().getAuthorFromGuildChatMessage(message), sbgods.getUtil().getMessageFromGuildChatMessage(message), ipAddr);
                     });

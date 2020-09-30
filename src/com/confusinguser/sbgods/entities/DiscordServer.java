@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public enum DiscordServer {
     SBGods("602137436490956820", "673619910324387885", "745532614659801138", HypixelGuild.SBG), // 5cd01bdf77ce84cf1204cd61
-    SBForceful("692302950126846013", "695722880754909214", "747021170397937754", HypixelGuild.SBDG), // 5e4e6d0d8ea8c9feb3f0e44f
+    SBForceful("692302950126846013", "695722880754909214", "747021170397937754", HypixelGuild.SBF), // 5e4e6d0d8ea8c9feb3f0e44f
     Test("385431231975653377", "673143091342868481", "745632663456579664", null);
 
     private final String serverId;
@@ -35,6 +35,8 @@ public enum DiscordServer {
 
     public static DiscordServer getDiscordServerFromHypixelGuild(HypixelGuild hypixelGuild, boolean activeOnly) {
         for (DiscordServer discordServer : values()) {
+            if (discordServer.hypixelGuild == null && (!activeOnly || Arrays.asList(com.confusinguser.sbgods.SBGods.getInstance().getActiveServers()).contains(discordServer)))
+                return discordServer;
             if (discordServer.getHypixelGuild() == hypixelGuild && (!activeOnly || Arrays.asList(com.confusinguser.sbgods.SBGods.getInstance().getActiveServers()).contains(discordServer)))
                 return discordServer;
         }
