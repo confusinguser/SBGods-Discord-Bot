@@ -60,6 +60,13 @@ public class ApiUtil {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+            // rate limiting
+            int timePassedLoop = (int) ((current - LAST_CHECK) / 1000);
+            LAST_CHECK = current;
+            allowance += timePassed * (REQUEST_RATE / PER);
+            if (allowance > REQUEST_RATE) {
+                allowance = REQUEST_RATE; // throttle
+            }
         }
         allowance -= 1;
 
