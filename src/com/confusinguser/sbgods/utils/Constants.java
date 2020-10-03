@@ -234,4 +234,16 @@ public class Constants {
             "concoctor",
             "domesticator"
     };
+
+    public static final String[] dungeon_classes = {
+            "healer",
+            "mage",
+            "berserk",
+            "archer",
+            "tank"
+    };
+
+    public static final String[] dungeons = {
+            "catacombs"
+    };
 }

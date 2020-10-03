@@ -27,10 +27,7 @@ public class SkillExpCommand extends Command {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
-        if (currentDiscordServer.getBotChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getBotChannelId())) {
-            e.getChannel().sendMessage(main.getMessageByKey("command_cannot_be_used_on_server")).queue();
-            return;
-        }
+        if (main.getLeaderboardUtil().cannotRunLeaderboardCommandInChannel(e, currentDiscordServer)) return;
 
         if (args.length == 1) {
             player(e.getChannel(), main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag()));
@@ -44,9 +41,10 @@ public class SkillExpCommand extends Command {
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
             List<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
-            Map<Player, SkillLevels> usernameSkillExpHashMap = currentDiscordServer.getHypixelGuild().getSkillExpMap();
+            @SuppressWarnings("unchecked")
+            Map<Player, SkillLevels> playerStatMap = (Map<Player, SkillLevels>) main.getLeaderboardUtil().convertPlayerStatMap(currentDiscordServer.getHypixelGuild().getPlayerStatMap(), entry -> entry.getValue().getSkillLevels());
 
-            if (usernameSkillExpHashMap.size() == 0) {
+            if (playerStatMap.size() == 0) {
                 if (currentDiscordServer.getHypixelGuild().getLeaderboardProgress() == 0) {
                     e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards have a higher priority)").queue();
                 } else {
@@ -55,25 +53,15 @@ public class SkillExpCommand extends Command {
                 return;
             }
 
-            int topX;
-            if (args.length >= 3) {
-                if (args[2].equalsIgnoreCase("all")) {
-                    topX = usernameSkillExpHashMap.size();
-                } else {
-                    try {
-                        topX = Math.min(usernameSkillExpHashMap.size(), Integer.parseInt(args[2]));
-                    } catch (NumberFormatException exception) {
-                        e.getChannel().sendMessage("**" + args[2] + "** is not a valid number!").queue();
-                        return;
-                    }
-                }
-            } else {
-                topX = 10;
+            int topX = main.getLeaderboardUtil().calculateTopXFromArgs(args, playerStatMap.size());
+            if (topX < 0) {
+                e.getChannel().sendMessage("**" + args[2] + "** is not a valid number!").queue();
+                return;
             }
 
             StringBuilder response = new StringBuilder();
 
-            List<Map.Entry<Player, SkillLevels>> leaderboardList = usernameSkillExpHashMap.entrySet().stream()
+            List<Map.Entry<Player, SkillLevels>> leaderboardList = playerStatMap.entrySet().stream()
                     .sorted(Comparator.comparingDouble(entry -> -entry.getValue().getAvgSkillLevel()))
                     .collect(Collectors.toList())
                     .subList(0, topX);
@@ -104,13 +92,13 @@ public class SkillExpCommand extends Command {
             List<String> responseList = main.getUtil().processMessageForDiscord(responseString, 2000);
             for (int j = 0; j < responseList.size(); j++) {
                 String message = responseList.get(j);
-                if (j == 0 && !spreadsheet) {
+                if (j != 0 && !spreadsheet) {
                     e.getChannel().sendMessage(new EmbedBuilder().setDescription(message).build()).queue();
                 } else {
                     if (spreadsheet) {
                         e.getChannel().sendMessage("```arm\n" + message + "```").queue();
                     } else {
-                        e.getChannel().sendMessage(new EmbedBuilder().setTitle("Average Skill XP leaderboard").setDescription(message).build()).queue();
+                        e.getChannel().sendMessage(new EmbedBuilder().setTitle("Average Skill XP Leaderboard").setDescription(message).build()).queue();
                     }
                 }
             }

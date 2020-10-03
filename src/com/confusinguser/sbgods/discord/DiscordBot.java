@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -112,5 +113,13 @@ public class DiscordBot {
     public String escapeMarkdown(String text) {
         String unescaped = text.replaceAll("\\\\([*_`~\\\\])", "$1"); // unescape any "backslashed" character
         return unescaped.replaceAll("([*_`~\\\\])", "\\\\$1"); // escape *, _, `, ~, \
+    }
+
+    public void reportFail(Throwable throwable, String place) {
+        String stackTraceView = main.getLangUtil().generateStackTraceView(throwable);
+        TextChannel textChannel = main.getDiscord().getJDA().getTextChannelById("713870866051498086");
+        main.logger.severe("Exception in " + place.toLowerCase() + ": \n" + stackTraceView);
+        if (textChannel != null)
+            textChannel.sendMessage("Exception in \"" + place + "\": \n" + stackTraceView).queue();
     }
 }

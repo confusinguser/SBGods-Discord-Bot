@@ -30,6 +30,7 @@ public class SBGods {
     private final LangUtil langUtil;
     private final CacheUtil cacheUtil;
     private final LeaderboardUpdater leaderboardUpdater;
+    private final LeaderboardUtil leaderboardUtil;
     private String[] keys = null;
     private DiscordBot discordBot;
     private int keyIndex = 0;
@@ -66,7 +67,7 @@ public class SBGods {
             System.exit(-1);
         }
         this.leaderboardUpdater = new LeaderboardUpdater(this);
-
+        leaderboardUtil = new LeaderboardUtil(this);
     }
 
     public static SBGods getInstance() {
@@ -109,6 +110,10 @@ public class SBGods {
 
     public LeaderboardUpdater getLeaderboardUpdater() {
         return leaderboardUpdater;
+    }
+
+    public LeaderboardUtil getLeaderboardUtil() {
+        return leaderboardUtil;
     }
 
     public Logger getLogger() {

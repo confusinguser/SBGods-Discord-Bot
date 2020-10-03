@@ -3,8 +3,7 @@ package com.confusinguser.sbgods.utils;
 import com.confusinguser.sbgods.SBGods;
 
 import java.text.DecimalFormat;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class LangUtil {
@@ -154,13 +153,61 @@ public class LangUtil {
         return output.toString();
     }
 
-    public String beautifyStackTrace(StackTraceElement[] trace, Throwable t) {
-        StringBuilder output = new StringBuilder('\t' + t.toString());
-        for (StackTraceElement traceElement : trace) {
-            output.append("\n\tat ").append(traceElement);
-        }
+    /**
+     * Got From {@link Throwable#printStackTrace()}
+     */
+    public String generateStackTraceView(Throwable throwable) {
+        StringBuilder output = new StringBuilder(throwable.toString() + "\n");
+        Set<Throwable> dejaVu = Collections.newSetFromMap(new IdentityHashMap<>());
+        dejaVu.add(throwable);
 
+        // Print our stack trace
+        StackTraceElement[] trace = throwable.getStackTrace();
+        for (StackTraceElement traceElement : trace)
+            output.append("\tat ").append(traceElement).append('\n');
+
+        // Print suppressed exceptions, if any
+        for (Throwable se : throwable.getSuppressed())
+            generateEnclosedStackTrace(se, output, trace, "Suppressed: ", "\t", dejaVu);
+
+        // Print cause, if any
+        Throwable ourCause = throwable.getCause();
+        if (ourCause != null)
+            generateEnclosedStackTrace(ourCause, output, trace, "Caused by: ", "", dejaVu);
         return output.toString();
+    }
+
+    private void generateEnclosedStackTrace(Throwable throwable, StringBuilder output, StackTraceElement[] enclosingTrace, String caption, String prefix, Set<Throwable> dejaVu) {
+        if (dejaVu.contains(throwable)) {
+            output.append(prefix).append(caption).append("[CIRCULAR REFERENCE: ").append(throwable).append("]");
+        } else {
+            dejaVu.add(throwable);
+            // Compute number of frames in common between this and enclosing trace
+            StackTraceElement[] trace = throwable.getStackTrace();
+            int m = trace.length - 1;
+            int n = enclosingTrace.length - 1;
+            while (m >= 0 && n >= 0 && trace[m].equals(enclosingTrace[n])) {
+                m--;
+                n--;
+            }
+            int framesInCommon = trace.length - 1 - m;
+
+            // Print our stack trace
+            output.append(prefix).append(caption).append(this);
+            for (int i = 0; i <= m; i++)
+                output.append(prefix).append("\tat ").append(trace[i]);
+            if (framesInCommon != 0)
+                output.append(prefix).append("\t... ").append(framesInCommon).append(" more");
+
+            // Print suppressed exceptions, if any
+            for (Throwable se : throwable.getSuppressed())
+                generateEnclosedStackTrace(se, output, trace, "Suppressed: ", prefix + "\t", dejaVu);
+
+            // Print cause, if any
+            Throwable ourCause = throwable.getCause();
+            if (ourCause != null)
+                generateEnclosedStackTrace(ourCause, output, trace, "Caused by: ", prefix, dejaVu);
+        }
     }
 
     public String getMessageByKey(String key) {

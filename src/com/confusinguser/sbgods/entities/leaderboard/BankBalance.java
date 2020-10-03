@@ -1,6 +1,6 @@
 package com.confusinguser.sbgods.entities.leaderboard;
 
-public class BankBalance implements LeaderboardValue {
+public class BankBalance extends LeaderboardValue {
 
     private final double balance;
 
@@ -8,12 +8,22 @@ public class BankBalance implements LeaderboardValue {
         this.balance = balance;
     }
 
-    public double getBalance() {
+    public double getCoins() {
         return balance;
     }
 
     @Override
     public double getValue() {
-        return getBalance();
+        return getCoins();
+    }
+
+    @Override
+    public double getSecondaryValue() {
+        return 0;
+    }
+
+    @Override
+    public boolean isApproximate() {
+        return false;
     }
 }

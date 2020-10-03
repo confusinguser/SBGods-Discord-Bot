@@ -45,7 +45,7 @@ public class EventCommand extends Command {
             return;
         }
         if (args.length <= 1) {
-            e.getChannel().sendMessage("Invalid usage! Usage: `" + this.usage + "`").queue();
+            e.getChannel().sendMessage("Invalid usage! Usage: " + this.usage).queue();
             return;
         }
 

@@ -4,6 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
+import com.confusinguser.sbgods.entities.leaderboard.LeaderboardValue;
 import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -11,11 +12,9 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 public class SkillCommand extends Command {
 
@@ -28,10 +27,7 @@ public class SkillCommand extends Command {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
-        if (currentDiscordServer.getBotChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getBotChannelId())) {
-            e.getChannel().sendMessage(main.getMessageByKey("command_cannot_be_used_on_server")).queue();
-            return;
-        }
+        if (main.getLeaderboardUtil().cannotRunLeaderboardCommandInChannel(e, currentDiscordServer)) return;
 
         if (args.length == 1) {
             player(e.getChannel(), main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag()));
@@ -40,37 +36,27 @@ public class SkillCommand extends Command {
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
             List<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
-            Map<Player, SkillLevels> usernameSkillExpHashMap = currentDiscordServer.getHypixelGuild().getSkillExpMap();
+            @SuppressWarnings("unchecked")
+            Map<Player, SkillLevels> playerStatMap = (Map<Player, SkillLevels>) main.getLeaderboardUtil().convertPlayerStatMap(
+                    currentDiscordServer.getHypixelGuild().getPlayerStatMap(),
+                    entry -> entry.getValue().getSkillLevels());
 
-            if (usernameSkillExpHashMap.size() == 0) {
+            if (playerStatMap.size() == 0) {
                 if (currentDiscordServer.getHypixelGuild().getLeaderboardProgress() == 0) {
-                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards have a higher priority)").queue();
+                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards might have a higher priority)").queue();
                 } else {
                     e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getLeaderboardProgress() + " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
                 }
                 return;
             }
 
-            int topX;
-            if (args.length >= 3) {
-                if (args[2].equalsIgnoreCase("all")) {
-                    topX = usernameSkillExpHashMap.size();
-                } else {
-                    try {
-                        topX = Math.min(usernameSkillExpHashMap.size(), Integer.parseInt(args[2]));
-                    } catch (NumberFormatException exception) {
-                        e.getChannel().sendMessage("**" + args[2] + "** is not a valid number!").queue();
-                        return;
-                    }
-                }
-            } else {
-                topX = 10;
+            int topX = main.getLeaderboardUtil().calculateTopXFromArgs(args, playerStatMap.size());
+            if (topX < 0) {
+                e.getChannel().sendMessage("**" + args[2] + "** is not a valid number!").queue();
+                return;
             }
 
-            List<Entry<Player, SkillLevels>> leaderboardList = usernameSkillExpHashMap.entrySet().stream()
-                    .sorted(Comparator.comparingDouble(entry -> -entry.getValue().getAvgSkillLevel()))
-                    .collect(Collectors.toList())
-                    .subList(0, topX);
+            List<? extends Entry<Player, ? extends LeaderboardValue>> leaderboardList = main.getLeaderboardUtil().sortLeaderboard(playerStatMap, topX);
 
             StringBuilder response = new StringBuilder();
             boolean spreadsheet = false;
@@ -78,20 +64,20 @@ public class SkillCommand extends Command {
                 spreadsheet = true;
             }
             if (spreadsheet) {
-                for (Entry<Player, SkillLevels> currentEntry : leaderboardList) {
+                for (Entry<Player, ? extends LeaderboardValue> currentEntry : leaderboardList) {
                     if (!currentEntry.getValue().isApproximate()) {
-                        response.append(currentEntry.getKey().getDisplayName()).append("    ").append(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2)).append("\n");
+                        response.append(currentEntry.getKey().getDisplayName()).append("    ").append(main.getUtil().round(currentEntry.getValue().getValue(), 2)).append("\n");
                     }
                 }
             } else {
                 int totalAvgSkillLvl = 0;
-                for (Entry<Player, SkillLevels> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(main.getUtil().round(currentEntry.getValue().getAvgSkillLevel(), 2));
+                for (Entry<Player, ? extends LeaderboardValue> currentEntry : leaderboardList) {
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(main.getUtil().round(currentEntry.getValue().getValue(), 2));
                     if (currentEntry.getValue().isApproximate()) {
                         response.append(" *(appr.)*");
                     }
                     response.append("\n");
-                    totalAvgSkillLvl += currentEntry.getValue().getAvgSkillLevel();
+                    totalAvgSkillLvl += currentEntry.getValue().getValue();
                 }
                 if (topX == guildMemberUuids.size())
                     response.append("\n**Average guild skill level: ");
@@ -105,7 +91,7 @@ public class SkillCommand extends Command {
             List<String> responseList = main.getUtil().processMessageForDiscord(responseString, 2000);
             for (int j = 0; j < responseList.size(); j++) {
                 String message = responseList.get(j);
-                if (j == 0 && !spreadsheet) {
+                if (j != 0 && !spreadsheet) {
                     e.getChannel().sendMessage(new EmbedBuilder().setDescription(message).build()).queue();
                 } else {
                     if (spreadsheet) {

@@ -5,7 +5,6 @@ import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordPerms;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -40,10 +39,7 @@ public abstract class Command extends ListenerAdapter {
             try {
                 handleCommand(e, discordServer, member, e.getMessage().getContentRaw().split(" "));
             } catch (Throwable t) {
-                TextChannel textChannel = main.getDiscord().getJDA().getTextChannelById("713870866051498086");
-                main.logger.severe("Exception when handling command '" + e.getMessage().getContentRaw() + "': \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t));
-                if (textChannel != null)
-                    textChannel.sendMessage("Exception when handling command '" + e.getMessage().getContentRaw() + "': \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t)).queue();
+                main.getDiscord().reportFail(t, "Command Handler");
             } finally {
                 main.getUtil().setTyping(false, e.getChannel());
             }

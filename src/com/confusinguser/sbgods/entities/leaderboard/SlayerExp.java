@@ -2,7 +2,7 @@ package com.confusinguser.sbgods.entities.leaderboard;
 
 import java.util.Map;
 
-public class SlayerExp implements LeaderboardValue {
+public class SlayerExp extends LeaderboardValue {
 
     private final int zombie;
     private final int spider;
@@ -58,5 +58,15 @@ public class SlayerExp implements LeaderboardValue {
     @Override
     public double getValue() {
         return getTotalExp();
+    }
+
+    @Override
+    public double getSecondaryValue() {
+        return 0;
+    }
+
+    @Override
+    public boolean isApproximate() {
+        return false;
     }
 }

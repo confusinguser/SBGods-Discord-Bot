@@ -4,6 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.leaderboard.BankBalance;
+import com.confusinguser.sbgods.entities.leaderboard.LeaderboardValues;
 import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
 import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -40,10 +41,7 @@ public class LeaderboardUpdater {
                     latestEventLbIds = main.getDiscord().eventCommand.sendProgressLbRetIds(main.getDiscord().getJDA().awaitReady().getTextChannelById("753934993788633170"), "skillTotal", "Total Skill Exp Progress\n", false);
                 }
             } catch (Throwable t) {
-                TextChannel textChannel = main.getDiscord().getJDA().getTextChannelById("713870866051498086");
-                main.logger.severe("Exception when updating leaderboard: \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t));
-                if (textChannel != null)
-                    textChannel.sendMessage("Exception when updating leaderboard: \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t)).queue();
+                main.getDiscord().reportFail(t, "Leaderboard Updater");
             }
         }, 0, 15, TimeUnit.MINUTES);
 
@@ -58,9 +56,7 @@ public class LeaderboardUpdater {
     }
 
     private void updateLeaderboardCache(HypixelGuild guild) {
-        Map<Player, SkillLevels> skillLevelMap = new HashMap<>();
-        Map<Player, SlayerExp> slayerExpMap = new HashMap<>();
-        Map<Player, BankBalance> totalCoinsMap = new HashMap<>();
+        Map<Player, LeaderboardValues> playerStatMap = new HashMap<>();
 
         List<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
 
@@ -71,57 +67,14 @@ public class LeaderboardUpdater {
             Player.mergePlayerAndGuildMember(thePlayer, guildMember);
             SkillLevels highestSkillLevels = main.getApiUtil().getBestProfileSkillLevels(thePlayer.getUUID());
             SlayerExp totalSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer.getUUID());
-            double totalCoins = main.getApiUtil().getTotalCoinsInPlayer(thePlayer.getUUID());
-            skillLevelMap.put(thePlayer, highestSkillLevels == null ? new SkillLevels() : highestSkillLevels);
-            slayerExpMap.put(thePlayer, totalSlayerExp);
-            totalCoinsMap.put(thePlayer, new BankBalance(totalCoins));
+            BankBalance totalCoins = main.getApiUtil().getTotalCoinsInPlayer(thePlayer.getUUID());
+
+
+            playerStatMap.put(thePlayer, new LeaderboardValues(totalSlayerExp, totalCoins, highestSkillLevels));
             guild.setLeaderboardProgress(i++);
         }
 
-        guild.setSlayerExpMap(slayerExpMap);
-        guild.setAvgSkillLevelMap(skillLevelMap);
-        guild.setTotalCoinsMap(totalCoinsMap);
-    }
-
-    private void updateLeaderboardCacheFast(HypixelGuild guild) {
-        Map<Player, SkillLevels> skillLevelMap = new HashMap<>();
-        Map<Player, SlayerExp> slayerExpMap = new HashMap<>();
-        Map<Player, BankBalance> totalCoinsMap = new HashMap<>();
-
-        List<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
-
-
-        final int[] i = {0};
-
-        List<Thread> threads = new ArrayList<>();
-
-        for (Player guildMember : guildMembers) {
-            Runnable target = () -> {
-                Player thePlayer = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
-                thePlayer = Player.mergePlayerAndGuildMember(thePlayer, guildMember);
-                SkillLevels highestSkillLevels = main.getApiUtil().getBestProfileSkillLevels(thePlayer.getUUID());
-                SlayerExp totalSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer.getUUID());
-                double totalCoins = main.getApiUtil().getTotalCoinsInPlayer(thePlayer.getUUID());
-                skillLevelMap.put(thePlayer, highestSkillLevels == null ? new SkillLevels() : highestSkillLevels);
-                slayerExpMap.put(thePlayer, totalSlayerExp);
-                totalCoinsMap.put(thePlayer, new BankBalance(totalCoins));
-                guild.setLeaderboardProgress(i[0]++);
-            };
-            threads.add(new Thread(target));
-            threads.get(threads.size() - 1).start();
-        }
-
-        for (Thread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        guild.setSlayerExpMap(slayerExpMap);
-        guild.setAvgSkillLevelMap(skillLevelMap);
-        guild.setTotalCoinsMap(totalCoinsMap);
+        guild.setPlayerStatMap(playerStatMap);
     }
 
     public List<String> getLatestEventLbIds() {

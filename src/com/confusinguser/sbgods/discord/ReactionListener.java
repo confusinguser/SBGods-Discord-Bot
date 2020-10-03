@@ -137,10 +137,7 @@ public class ReactionListener extends ListenerAdapter {
             e.getChannel().deleteMessageById(messageId).queue();
 
         } catch (Throwable t) {
-            TextChannel textChannel = main.getDiscord().getJDA().getTextChannelById("713870866051498086");
-            main.logger.severe("Exception in reaction listener: \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t));
-            if (textChannel != null)
-                textChannel.sendMessage("Exception in reaction listener: \n" + main.getLangUtil().beautifyStackTrace(t.getStackTrace(), t)).queue();
+            main.getDiscord().reportFail(t, "Reaction Listener");
 
             e.getChannel().sendMessage(user.getAsMention() + " there was an error somewhere, get in contact with a bot dev to help fix the error.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
             e.getChannel().deleteMessageById(messageId).queue();

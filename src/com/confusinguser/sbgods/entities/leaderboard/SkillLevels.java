@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class SkillLevels implements LeaderboardValue {
+public class SkillLevels extends LeaderboardValue {
 
     private final double farming;
     private final double mining;
@@ -124,5 +124,10 @@ public class SkillLevels implements LeaderboardValue {
     @Override
     public double getValue() {
         return getAvgSkillLevel();
+    }
+
+    @Override
+    public double getSecondaryValue() {
+        return 0;
     }
 }

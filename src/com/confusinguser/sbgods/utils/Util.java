@@ -309,14 +309,6 @@ public class Util {
         return gotVerified ? 1 : 0;
     }
 
-    public List<JSONObject> getJSONObjectListByJSONArray(JSONArray jsonArray) {
-        List<JSONObject> output = new ArrayList<>();
-        jsonArray.forEach((object) -> {
-            if (object instanceof JSONObject) output.add((JSONObject) object);
-        });
-        return output;
-    }
-
     public void scheduleCommandAfter(Runnable command, int delay, TimeUnit unit) {
         scheduler.schedule(command, delay, unit);
     }
@@ -383,5 +375,10 @@ public class Util {
 
     public String getMessageFromGuildChatMessage(String message) {
         return getTextWithoutFormattingCodes(message.split(":")[1]);
+    }
+
+    public <T> List<T> turnListIntoSubClassList(List<?> list, Class<T> subclass) { // Looked at like 8 different stackoverflow threads to write this
+        if (list.isEmpty()) return new ArrayList<>();
+        return list.stream().filter(e -> subclass.isAssignableFrom(list.get(0).getClass())).map(subclass::cast).collect(Collectors.toList());
     }
 }

@@ -3,14 +3,10 @@ package com.confusinguser.sbgods.discord.commands;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
-import com.confusinguser.sbgods.entities.Player;
-import com.confusinguser.sbgods.entities.leaderboard.SkillExp;
-import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,12 +19,12 @@ public class SbgodsCommand extends Command {
         this.main = main;
         this.discord = discord;
         this.name = "sbgods";
-        this.aliases = new String[]{};
+        this.aliases = new String[]{"sbg"};
     }
 
     @Override
     public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
-        if (args.length == 1 || senderMember == null) {
+        if (args.length == 1) {
             e.getChannel().sendMessage("Invalid argument! Valid arguments: `version`, `update`, `stop`!").queue();
             return;
         }
@@ -50,7 +46,7 @@ public class SbgodsCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("update")) {
-            if (senderMember != null && senderMember.getRoles().stream().noneMatch(role -> role.getName().toLowerCase().contains("bot") || main.isDeveloper(e.getAuthor().getId()))) {
+            if (senderMember.getRoles().stream().noneMatch(role -> role.getName().toLowerCase().contains("bot") || main.isDeveloper(e.getAuthor().getId()))) {
                 e.getChannel().sendMessage("You do not have the permission to update the bot!").queue();
                 return;
             }
@@ -69,7 +65,7 @@ public class SbgodsCommand extends Command {
                 newFilePath = main.getApiUtil().downloadFile(latestReleaseUrl.getValue(), file);
             } catch (IOException ex) {
                 e.getChannel().sendMessage("There was a problem when downloading the latest release").queue();
-                main.logger.severe("Exception when downloading the latest release: \n" + main.getLangUtil().beautifyStackTrace(ex.getStackTrace(), ex));
+                main.getDiscord().reportFail(ex, "Release Downloader");
                 file.delete();
                 return;
             }
@@ -84,14 +80,15 @@ public class SbgodsCommand extends Command {
                 new ProcessBuilder("cmd /c start cmd /k java -jar \"" + newFilePath.toString() + "\"").start().waitFor();
                 System.exit(0);
             } catch (IOException | InterruptedException ex) {
-                e.getChannel().editMessageById(messageId, "Could not start new version, try stopping the bot").queue();
+//                e.getChannel().editMessageById(messageId, "Could not start new version, try stopping the bot").queue();
+                System.exit(0);
                 return;
             }
             return;
         }
 
         if (args[1].equalsIgnoreCase("stop")) {
-            if (senderMember != null && senderMember.getRoles().stream().noneMatch(role -> role.getName().toLowerCase().contains("bot") || main.isDeveloper(e.getAuthor().getId()))) {
+            if (senderMember.getRoles().stream().noneMatch(role -> role.getName().toLowerCase().contains("bot") || main.isDeveloper(e.getAuthor().getId()))) {
                 e.getChannel().sendMessage("You do not have the permission to stop the bot!").queue();
                 return;
             }

@@ -5,8 +5,6 @@ import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.SkyblockProfile;
-import com.confusinguser.sbgods.entities.banking.BankTransaction;
-import com.confusinguser.sbgods.entities.banking.TransactionType;
 import com.confusinguser.sbgods.entities.leaderboard.BankBalance;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -15,7 +13,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,10 +29,7 @@ public class BankCommand extends Command {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
-        if (currentDiscordServer.getBotChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getBotChannelId())) {
-            e.getChannel().sendMessage(main.getMessageByKey("command_cannot_be_used_on_server")).queue();
-            return;
-        }
+        if (main.getLeaderboardUtil().cannotRunLeaderboardCommandInChannel(e, currentDiscordServer)) return;
 
         if (args.length == 1) {
             player(e.getChannel(), main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag()));
@@ -49,9 +43,12 @@ public class BankCommand extends Command {
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
             List<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
-            Map<Player, BankBalance> usernameTotalCoinsMap = currentDiscordServer.getHypixelGuild().getTotalCoinsMap();
+            @SuppressWarnings("unchecked")
+            Map<Player, BankBalance> playerStatMap = (Map<Player, BankBalance>) main.getLeaderboardUtil().convertPlayerStatMap(
+                    currentDiscordServer.getHypixelGuild().getPlayerStatMap(),
+                    entry -> entry.getValue().getBankBalance());
 
-            if (usernameTotalCoinsMap.size() == 0) {
+            if (playerStatMap.size() == 0) {
                 if (currentDiscordServer.getHypixelGuild().getLeaderboardProgress() == 0) {
                     e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards have a higher priority)").queue();
                 } else {
@@ -60,21 +57,13 @@ public class BankCommand extends Command {
                 return;
             }
 
-            int topX = 10;
-            if (args.length >= 3) {
-                if (args[2].equalsIgnoreCase("all")) {
-                    topX = guildMemberUuids.size();
-                } else {
-                    try {
-                        topX = Math.min(guildMemberUuids.size(), Integer.parseInt(args[2]));
-                    } catch (NumberFormatException exception) {
-                        e.getChannel().sendMessage("**" + args[2] + "** is not a valid number!").queue();
-                        return;
-                    }
-                }
+            int topX = main.getLeaderboardUtil().calculateTopXFromArgs(args, playerStatMap.size());
+            if (topX < 0) {
+                e.getChannel().sendMessage("**" + args[2] + "** is not a valid number!").queue();
+                return;
             }
 
-            List<Entry<Player, BankBalance>> leaderboardList = usernameTotalCoinsMap.entrySet().stream()
+            List<Entry<Player, BankBalance>> leaderboardList = playerStatMap.entrySet().stream()
                     .sorted(Comparator.comparingDouble(entry -> -entry.getValue().getValue()))
                     .collect(Collectors.toList())
                     .subList(0, topX - 1);
@@ -112,13 +101,13 @@ public class BankCommand extends Command {
             List<String> responseList = main.getUtil().processMessageForDiscord(responseString, 2000);
             for (int j = 0; j < responseList.size(); j++) {
                 String message = responseList.get(j);
-                if (j == 0 && !spreadsheet) {
-                    e.getChannel().sendMessage(message).queue();
+                if (j != 0 && !spreadsheet) {
+                    e.getChannel().sendMessage(new EmbedBuilder().setDescription(message).build()).queue();
                 } else {
                     if (spreadsheet) {
                         e.getChannel().sendMessage("```arm\n" + message + "```").queue();
                     } else {
-                        e.getChannel().sendMessage(new EmbedBuilder().setTitle("Total Coins Leaderboard:").setDescription(message).build()).queue();
+                        e.getChannel().sendMessage(new EmbedBuilder().setTitle("Total Coins Leaderboard").setDescription(message).build()).queue();
                     }
                 }
             }
@@ -130,58 +119,25 @@ public class BankCommand extends Command {
     public void player(MessageChannel channel, String playerName) {
         Player thePlayer = main.getApiUtil().getPlayerFromUsername(playerName);
         boolean bankingApi = false;
+        double totalCoins = 0;
+        StringBuilder description = new StringBuilder();
         for (String profile : thePlayer.getSkyblockProfiles()) {
             SkyblockProfile skyblockProfile = main.getApiUtil().getSkyblockProfileByProfileUUID(profile);
-            if (skyblockProfile.getBankHistory().isEmpty()) {
+            if (skyblockProfile.getBalance().getCoins() == 0) {
                 continue;
             }
             bankingApi = true;
-
-            Map<String, BankBalance> personalBankMap = new HashMap<>();
-            Map<String, BankBalance> personalBankMapWithoutForegin = new HashMap<>();
-            EmbedBuilder profileEmbed = new EmbedBuilder();
-
-            for (Player member : skyblockProfile.getMembers()) {
-                personalBankMap.put(member.getDisplayName(), new BankBalance(0d));
-                personalBankMapWithoutForegin.put(member.getDisplayName(), new BankBalance(0d));
-            }
-
-            double amountInterest = 0;
-            for (BankTransaction transaction : skyblockProfile.getBankHistory()) {
-                if (!personalBankMap.containsKey(transaction.getInitiatorName())) { // If it's a foreign transaction (ex-coop-member or bank interest)
-                    for (Player member : skyblockProfile.getMembers()) {
-                        if (transaction.getType() == TransactionType.DEPOSIT) {
-                            personalBankMap.put(member.getDisplayName(), new BankBalance(personalBankMap.get(member.getDisplayName()).getBalance() + (transaction.getAmount() / skyblockProfile.getMembers().size())));
-                        } else if (transaction.getType() == TransactionType.WITHDRAW) {
-                            personalBankMap.put(member.getDisplayName(), new BankBalance(personalBankMap.get(member.getDisplayName()).getBalance() - (transaction.getAmount() / skyblockProfile.getMembers().size())));
-                        }
-                    }
-
-                } else if (transaction.getType() == TransactionType.DEPOSIT) {
-                    personalBankMap.put(transaction.getInitiatorName(), new BankBalance(personalBankMap.get(transaction.getInitiatorName()).getBalance() + transaction.getAmount()));
-                    personalBankMapWithoutForegin.put(transaction.getInitiatorName(), new BankBalance(personalBankMapWithoutForegin.get(transaction.getInitiatorName()).getBalance() + transaction.getAmount()));
-                } else if (transaction.getType() == TransactionType.WITHDRAW) {
-                    personalBankMap.put(transaction.getInitiatorName(), new BankBalance(personalBankMap.get(transaction.getInitiatorName()).getBalance() - transaction.getAmount()));
-                    personalBankMapWithoutForegin.put(transaction.getInitiatorName(), new BankBalance(personalBankMapWithoutForegin.get(transaction.getInitiatorName()).getBalance() - transaction.getAmount()));
-                }
-            }
-
-            StringBuilder description = new StringBuilder();
-            StringBuilder title = new StringBuilder();
-            personalBankMap.entrySet().stream().sorted((entry, otherEntry) -> Double.compare(otherEntry.getValue().getBalance(), entry.getValue().getBalance()))
-                    .forEach(entry -> {
-                        description.append(entry.getKey()).append(" has ").append(entry.getValue().getBalance() < 0 ? "taken out " : "contributed ")
-                                .append(main.getLangUtil().addNotation(Math.abs(entry.getValue().getBalance()))).append(" coins (")
-                                .append(main.getLangUtil().addNotation(personalBankMapWithoutForegin.get(entry.getKey()).getBalance())).append(" coins without interest)\n");
-                        title.append(entry.getKey()).append(", ");
-                    });
-
-            profileEmbed.setTitle(title.toString().substring(0, title.length() - 2));
-            profileEmbed.addField("Total coins", main.getLangUtil().addNotation(skyblockProfile.getBalance()) + " coins", false);
-            profileEmbed.addField("Members", description.toString(), false);
-            channel.sendMessage(profileEmbed.build()).queue();
+            totalCoins += skyblockProfile.getBalance().getCoins();
+            description.append("**").append(skyblockProfile.getCuteName()).append("**  ").append(skyblockProfile.getBalance().getCoins()).append('\n');
         }
-        if (!bankingApi) {
+        if (bankingApi) {
+            EmbedBuilder embed = new EmbedBuilder();
+            embed.setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " coins");
+            embed.setColor(0xfcd303);
+            embed.addField("Total coins", main.getLangUtil().addNotation(Math.round(totalCoins)) + " coins", false);
+            embed.addField("Profiles", description.substring(0, description.toString().length() - 1) /* Remove trailing \n */, false);
+            channel.sendMessage(embed.build()).queue();
+        } else {
             channel.sendMessage("Banking API is off for all profiles").queue();
         }
     }

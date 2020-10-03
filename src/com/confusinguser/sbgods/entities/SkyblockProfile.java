@@ -1,6 +1,6 @@
 package com.confusinguser.sbgods.entities;
 
-import com.confusinguser.sbgods.entities.banking.BankTransaction;
+import com.confusinguser.sbgods.entities.leaderboard.BankBalance;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,30 +8,30 @@ import java.util.List;
 public class SkyblockProfile {
 
     private final List<Player> members;
-    private final List<BankTransaction> bankHistory;
-    private final double balance;
+    private final String cuteName;
+    private final BankBalance balance;
 
-    public SkyblockProfile(List<Player> members, List<BankTransaction> bankHistory, double balance) {
+    public SkyblockProfile(List<Player> members, String cuteName, BankBalance balance) {
         this.members = members;
-        this.bankHistory = bankHistory;
+        this.cuteName = cuteName;
         this.balance = balance;
     }
 
     public SkyblockProfile() {
         this.members = new ArrayList<>();
-        this.bankHistory = new ArrayList<>();
-        this.balance = 0;
+        this.cuteName = "";
+        this.balance = new BankBalance(0);
     }
 
     public List<Player> getMembers() {
         return members;
     }
 
-    public List<BankTransaction> getBankHistory() {
-        return bankHistory;
+    public String getCuteName() {
+        return cuteName;
     }
 
-    public double getBalance() {
+    public BankBalance getBalance() {
         return balance;
     }
 }

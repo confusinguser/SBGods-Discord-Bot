@@ -1,26 +1,22 @@
 package com.confusinguser.sbgods.entities;
 
-import com.confusinguser.sbgods.entities.leaderboard.BankBalance;
-import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
-import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
+import com.confusinguser.sbgods.entities.leaderboard.LeaderboardValues;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public enum HypixelGuild {
-    SBG("5cd01bdf77ce84cf1204cd61", 500000, 26, "Skyblock Gods", "SBG Guild Member", "SBG"),
-    SBF("5e4e6d0d8ea8c9feb3f0e44f", 100000, 20, "Skyblock Forceful", "SBF", "SBF Guild Member", "SBDG Guild Member", "Skyblock Demigods", "SBDG", "Skyblock Demi Gods");
+    SBG("5cd01bdf77ce84cf1204cd61", 750000, 30, "Skyblock Gods", "SBG Guild Member", "SBG"),
+    SBF("5e4e6d0d8ea8c9feb3f0e44f", 150000, 24, "Skyblock Forceful", "SBF Guild Member", "SBF");
 
     private final String guildId;
     private final int skillReq;
     private final int slayerReq;
     private final String[] names;
-    private int playerSize = 125;
 
-    private Map<Player, SkillLevels> skillExpMap = new HashMap<>();
-    private Map<Player, SlayerExp> slayerExpMap = new HashMap<>();
-    private Map<Player, BankBalance> totalCoinsMap = new HashMap<>();
+    private Map<Player, LeaderboardValues> playerStatMap = new HashMap<>();
     private int leaderboardProgress;
+    private int playerSize = 125;
 
     HypixelGuild(String guildId, int slayerReq, int skillReq, String... names) {
         this.guildId = guildId;
@@ -50,28 +46,12 @@ public enum HypixelGuild {
         return guildId;
     }
 
-    public Map<Player, SkillLevels> getSkillExpMap() {
-        return skillExpMap;
+    public Map<Player, LeaderboardValues> getPlayerStatMap() {
+        return playerStatMap;
     }
 
-    public void setAvgSkillLevelMap(Map<Player, SkillLevels> skillLevelMap) {
-        this.skillExpMap = skillLevelMap;
-    }
-
-    public Map<Player, SlayerExp> getSlayerExpMap() {
-        return slayerExpMap;
-    }
-
-    public void setSlayerExpMap(Map<Player, SlayerExp> slayerExpMap) {
-        this.slayerExpMap = slayerExpMap;
-    }
-
-    public Map<Player, BankBalance> getTotalCoinsMap() {
-        return totalCoinsMap;
-    }
-
-    public void setTotalCoinsMap(Map<Player, BankBalance> totalCoinsMap) {
-        this.totalCoinsMap = totalCoinsMap;
+    public void setPlayerStatMap(Map<Player, LeaderboardValues> playerStatMap) {
+        this.playerStatMap = playerStatMap;
     }
 
     public boolean isAltNameIgnoreCase(String input) {
@@ -81,14 +61,6 @@ public enum HypixelGuild {
             }
         }
         return false;
-    }
-
-    public int getPlayerSize() {
-        return playerSize;
-    }
-
-    public void setPlayerSize(int playerSize) {
-        this.playerSize = playerSize;
     }
 
     public int getSkillReq() {
@@ -109,5 +81,13 @@ public enum HypixelGuild {
 
     public String getDisplayName() {
         return names[0];
+    }
+
+    public int getPlayerSize() {
+        return playerSize;
+    }
+
+    public void setPlayerSize(int playerSize) {
+        this.playerSize = playerSize;
     }
 }

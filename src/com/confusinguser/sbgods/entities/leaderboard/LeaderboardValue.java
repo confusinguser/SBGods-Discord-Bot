@@ -1,5 +1,9 @@
 package com.confusinguser.sbgods.entities.leaderboard;
 
-public interface LeaderboardValue {
-    double getValue();
+public abstract class LeaderboardValue {
+    public abstract double getValue();
+
+    public abstract double getSecondaryValue();
+
+    public abstract boolean isApproximate();
 }

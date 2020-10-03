@@ -45,16 +45,15 @@ public class MessageListener extends ListenerAdapter {
         if(e.getChannel().getId().equals("746069131022827560")){ //public Splash leech channel
             //if(e.getChannel().getId().equals("744558150426034268")){ //Splash leech channel (test server)
 
-            Runnable target = () -> {
-                String message = null;
+            new Thread(() -> {
+                String message;
                 try {
                     message = URLEncoder.encode("&2" + member.getEffectiveName() + ": &c" + e.getMessage().getContentDisplay(), StandardCharsets.UTF_8.toString());
                     SBGods.getInstance().getApiUtil().getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/newLeechMessage.json?key=HoVoiuWfpdAjJhfTj0YN&timestamp=" + new Date().getTime() + "&sbgods=false&message=" + message);
                 } catch (UnsupportedEncodingException unsupportedEncodingException) {
                     unsupportedEncodingException.printStackTrace();
                 }
-            };
-            new Thread(target).start();
+            }).start();
         }
 
         if (e.getChannel().getName().contains("verif") &&
