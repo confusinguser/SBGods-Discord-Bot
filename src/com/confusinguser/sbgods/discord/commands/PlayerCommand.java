@@ -62,7 +62,7 @@ public class PlayerCommand extends Command {
             List<Pet> pets = main.getApiUtil().getProfilePets(profileId, player.getUUID()); // Pets in profile
             totalPets.addAll(pets);
 
-            skillLevels = main.getApiUtil().getBestProfileSkillLevels(player.getUUID());
+            skillLevels = main.getApiUtil().getBestPlayerSkillLevels(player.getUUID());
             totalMoney += main.getApiUtil().getTotalCoinsInProfile(profileId);
             slayerExp = SlayerExp.addExps(slayerExp, main.getApiUtil().getProfileSlayerExp(profileId, player.getUUID()));
         }

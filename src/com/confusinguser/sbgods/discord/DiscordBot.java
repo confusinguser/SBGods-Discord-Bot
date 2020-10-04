@@ -48,6 +48,7 @@ public class DiscordBot {
         eventCommand = new EventCommand(main, this);
         VerifyListCommand verifyListCommand = new VerifyListCommand(main, this);
         GuildDiscListCommand guildDiscListCommand = new GuildDiscListCommand(main, this);
+        DungeonCommand dungeonCommand = new DungeonCommand(main, this);
 
         MessageListener messageListener = new MessageListener(main, this);
         ReactionListener reactionListener = new ReactionListener(main, this);
@@ -71,6 +72,7 @@ public class DiscordBot {
                 eventCommand,
                 verifyListCommand,
                 guildDiscListCommand,
+                dungeonCommand,
                 messageListener,
                 reactionListener
         ));
@@ -78,13 +80,13 @@ public class DiscordBot {
         JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT)
                 .setToken(token)
                 .setStatus(OnlineStatus.ONLINE)
-                .setActivity(Activity.playing("Use " + helpCommand.getName() + " to get started"));
+                .setActivity(Activity.playing("The SBG / SBF Discord Bot" + "\nMade by ConfusingUser#5712 & Soopyboo32#3042"));
 
         for (ListenerAdapter listener : commands) {
             jdaBuilder.addEventListeners(listener);
         }
         jda = jdaBuilder.build();
-        jda.getPresence().setActivity(Activity.playing("Use " + commandPrefix + "help to get started. \nMade by ConfusingUser#5712 & Soopyboo32#3042"));
+        jda.getPresence().setActivity(Activity.playing("The SBG / SBF Discord Bot" + "\nMade by ConfusingUser#5712 & Soopyboo32#3042"));
         main.logger.info("Bot ready to take commands on " + Arrays.stream(main.getActiveServers()).map(DiscordServer::toString).collect(Collectors.joining(", ")));
     }
 
@@ -119,7 +121,10 @@ public class DiscordBot {
         String stackTraceView = main.getLangUtil().generateStackTraceView(throwable);
         TextChannel textChannel = main.getDiscord().getJDA().getTextChannelById("713870866051498086");
         main.logger.severe("Exception in " + place.toLowerCase() + ": \n" + stackTraceView);
-        if (textChannel != null)
-            textChannel.sendMessage("Exception in \"" + place + "\": \n" + stackTraceView).queue();
+        if (textChannel != null) {
+            for (String message : main.getLangUtil().processMessageForDiscord("Exception in \"" + place + "\": \n" + stackTraceView, 2000)) {
+                textChannel.sendMessage(message).queue();
+            }
+        }
     }
 }

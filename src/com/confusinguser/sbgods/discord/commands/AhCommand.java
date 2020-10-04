@@ -54,9 +54,9 @@ public class AhCommand extends Command {
 
             EmbedBuilder embedBuilder = new EmbedBuilder().setColor(item.getItemTierColor()).setTitle(item.getItemTier() + " | " + item.getItemName() + ":");
 
-            embedBuilder.appendDescription("**" + item.getBids().toString() + "** bids\n");
-            embedBuilder.appendDescription("Going for: **" + main.getLangUtil().addNotation(item.getHighestBid() == 0 ? item.getStartingBid() : item.getHighestBid()) + "** (Starting bid: " + main.getLangUtil().addNotation(item.getStartingBid()) + ")\n");
-            embedBuilder.appendDescription("Category: **" + item.getCategory() + "**");
+            embedBuilder.appendDescription("**" + item.getBids() + "** " + (item.getBids() == 1 ? "bid" : "bids") + "\n");
+            embedBuilder.appendDescription("Going for: **" + main.getLangUtil().addNotationOrCommas(item.getHighestBid()) + "** (Starting bid: " + main.getLangUtil().addNotationOrCommas(item.getStartingBid()) + ")\n");
+            embedBuilder.appendDescription("Category: **" + main.getLangUtil().toLowerCaseButFirstLetter(item.getCategory()) + "**");
 
             e.getChannel().sendMessage(embedBuilder.build()).queue();
         }

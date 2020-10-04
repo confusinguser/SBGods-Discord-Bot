@@ -74,27 +74,6 @@ public class Util {
         return list.get(position);
     }
 
-    public List<String> processMessageForDiscord(String message, int limit) {
-        return processMessageForDiscord(message, limit, new ArrayList<>());
-    }
-
-    private List<String> processMessageForDiscord(String message, int limit, List<String> currentOutput) {
-        if (message.length() > limit) {
-            int lastIndex = 0;
-            for (int index = message.indexOf('\n'); index >= 0; index = message.indexOf('\n', index + 1)) {
-                if (index >= limit) {
-                    currentOutput.add(message.substring(0, lastIndex));
-                    message = message.substring(lastIndex);
-                    return processMessageForDiscord(message, limit, currentOutput);
-                }
-                lastIndex = index;
-            }
-        } else {
-            currentOutput.add(message);
-        }
-        return currentOutput;
-    }
-
     public double getAverageFromDoubleList(List<Double> list) {
         double output = 0;
         for (Double aDouble : list) {

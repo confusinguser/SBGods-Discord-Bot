@@ -115,18 +115,22 @@ public class Player {
     /**
      * @return The skill leaderboard position or {@code -1} if player is not in guild or {@code -2} if bot is still loading
      */
+    @SuppressWarnings("unchecked")
     public int getSkillPos(boolean includeStaff) {
         if (getGuildId() == null) return -1;
         HypixelGuild guild = HypixelGuild.getGuildById(getGuildId());
-        if (guild == null) return -1;
-        if (guild.getSkillExpMap().isEmpty()) return -2;
 
-        List<Map.Entry<Player, SkillLevels>> list = new ArrayList<>(guild.getSkillExpMap().entrySet());
+        if (guild == null) return -1;
+
+        List<Map.Entry<Player, SkillLevels>> skillExpList = new ArrayList<>(((Map<Player, SkillLevels>) main.getLeaderboardUtil().convertPlayerStatMap(
+                guild.getPlayerStatMap(), entry -> entry.getValue().getSkillLevels())).entrySet());
+        if (skillExpList.isEmpty()) return -2;
+
         if (!includeStaff) {
-            list = list.stream().filter(player -> Stream.of("Trial Helper", "Helper", "Moderator", "Officer", "Bot Developer", "Co Owner").anyMatch(s -> !player.getKey().getGuildRank().contains(s))).collect(Collectors.toList());
+            skillExpList = skillExpList.stream().filter(player -> Stream.of("Trial Helper", "Helper", "Moderator", "Officer", "Bot Developer", "Co Owner").anyMatch(s -> !player.getKey().getGuildRank().contains(s))).collect(Collectors.toList());
         }
-        list.sort(Comparator.comparingDouble(entry -> -entry.getValue().getAvgSkillLevel()));
-        int output = list.stream().map(Map.Entry::getKey).map(Player::getDisplayName).collect(Collectors.toList()).indexOf(getDisplayName());
+        skillExpList.sort(Comparator.comparingDouble(entry -> -entry.getValue().getAvgSkillLevel()));
+        int output = skillExpList.stream().map(Map.Entry::getKey).map(Player::getDisplayName).collect(Collectors.toList()).indexOf(getDisplayName());
         if (output == -1) {
             return getSkillPos(true);
         }
@@ -136,13 +140,17 @@ public class Player {
     /**
      * @return The slayer leaderboard position or {@code -1} if player is not in guild or {@code -2} if bot is still loading
      */
+    @SuppressWarnings("unchecked")
     public int getSlayerPos(boolean includeStaff) {
         if (getGuildId() == null) return -1;
         HypixelGuild guild = HypixelGuild.getGuildById(getGuildId());
         if (guild == null) return -1;
-        if (guild.getSlayerExpMap().isEmpty()) return -2;
 
-        List<Map.Entry<Player, SlayerExp>> list = new ArrayList<>(guild.getSlayerExpMap().entrySet());
+        List<Map.Entry<Player, SlayerExp>> slayerExpList = new ArrayList<>(((Map<Player, SlayerExp>) main.getLeaderboardUtil().convertPlayerStatMap(
+                guild.getPlayerStatMap(), entry -> entry.getValue().getSlayerExp())).entrySet());
+        if (slayerExpList.isEmpty()) return -2;
+
+        List<Map.Entry<Player, SlayerExp>> list = new ArrayList<>(slayerExpList);
         if (!includeStaff) {
             list = list.stream().filter(player -> Stream.of("Trial Helper", "Helper", "Moderator", "Officer", "Bot Developer", "Co Owner").anyMatch(s -> !player.getKey().getGuildRank().contains(s))).collect(Collectors.toList());
         }

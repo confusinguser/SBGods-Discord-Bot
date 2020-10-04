@@ -8,6 +8,10 @@ public class BankBalance extends LeaderboardValue {
         this.balance = balance;
     }
 
+    public BankBalance() {
+        this.balance = -1;
+    }
+
     public double getCoins() {
         return balance;
     }

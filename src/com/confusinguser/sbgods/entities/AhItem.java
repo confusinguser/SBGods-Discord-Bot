@@ -4,13 +4,13 @@ public class AhItem {
 
     private final String itemName;
     private final String itemTier;
-    private final Long startingBid;
-    private final Long highestBid;
+    private final long startingBid;
+    private final long highestBid;
     private final String category;
-    private final Long end;
-    private final Integer bids; //number of bids on the item
+    private final long end;
+    private final int bids; //number of bids on the item
 
-    public AhItem(String itemName, String itemTier, Long startingBid, Long highestBid, String category, Long end, Integer bids) {
+    public AhItem(String itemName, String itemTier, long startingBid, long highestBid, String category, long end, int bids) {
         this.itemName = itemName;
         this.itemTier = itemTier;
         this.startingBid = startingBid;
@@ -45,11 +45,11 @@ public class AhItem {
         }
     }
 
-    public Long getStartingBid() {
+    public long getStartingBid() {
         return startingBid;
     }
 
-    public Long getHighestBid() {
+    public long getHighestBid() {
         return highestBid;
     }
 
@@ -57,11 +57,11 @@ public class AhItem {
         return category;
     }
 
-    public Long getEnd() {
+    public long getEnd() {
         return end;
     }
 
-    public Integer getBids() {
+    public int getBids() {
         return bids;
     }
 }

@@ -20,7 +20,7 @@ public class VerifyCommand extends Command {
     @Override
     public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
         if (!e.getChannel().getName().toLowerCase().contains("verify") && !e.getChannel().getName().toLowerCase().contains("bot")) {
-            e.getChannel().sendMessage(main.getMessageByKey("command_cannot_be_used_on_server")).queue();
+            e.getChannel().sendMessage(main.getMessageByKey("command_cannot_be_used_in_channel")).queue();
             return;
         }
 

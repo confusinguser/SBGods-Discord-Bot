@@ -61,7 +61,7 @@ public class GuildDiscListCommand extends Command {
         }
 
         e.getChannel().deleteMessageById(messageId).queue();
-        List<String> sendMessage = main.getUtil().processMessageForDiscord(message.toString(), 2000);
+        List<String> sendMessage = main.getLangUtil().processMessageForDiscord(message.toString(), 2000);
 
         for (String messagePart : sendMessage) {
             e.getChannel().sendMessage(new EmbedBuilder().setDescription(messagePart).build()).queue();

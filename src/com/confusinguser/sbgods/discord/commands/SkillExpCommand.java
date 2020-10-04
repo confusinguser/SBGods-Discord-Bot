@@ -11,11 +11,10 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 public class SkillExpCommand extends Command {
 
     public SkillExpCommand(SBGods main, DiscordBot discord) {
@@ -27,7 +26,8 @@ public class SkillExpCommand extends Command {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
-        if (main.getLeaderboardUtil().cannotRunLeaderboardCommandInChannel(e, currentDiscordServer)) return;
+        if (main.getLeaderboardUtil().cannotRunLeaderboardCommandInChannel(e.getChannel(), currentDiscordServer))
+            return;
 
         if (args.length == 1) {
             player(e.getChannel(), main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag()));
@@ -41,14 +41,13 @@ public class SkillExpCommand extends Command {
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
             List<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
-            @SuppressWarnings("unchecked")
             Map<Player, SkillLevels> playerStatMap = (Map<Player, SkillLevels>) main.getLeaderboardUtil().convertPlayerStatMap(currentDiscordServer.getHypixelGuild().getPlayerStatMap(), entry -> entry.getValue().getSkillLevels());
 
             if (playerStatMap.size() == 0) {
                 if (currentDiscordServer.getHypixelGuild().getLeaderboardProgress() == 0) {
-                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards have a higher priority)").queue();
+                    e.getChannel().sendMessage(main.getMessageByKey("bot_is_still_indexing_names")).queue();
                 } else {
-                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getLeaderboardProgress() + " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
+                    e.getChannel().sendMessage(String.format(main.getMessageByKey("bot_is_still_indexing_names_progress"), currentDiscordServer.getHypixelGuild().getLeaderboardProgress(), currentDiscordServer.getHypixelGuild().getPlayerSize())).queue();
                 }
                 return;
             }
@@ -61,10 +60,7 @@ public class SkillExpCommand extends Command {
 
             StringBuilder response = new StringBuilder();
 
-            List<Map.Entry<Player, SkillLevels>> leaderboardList = playerStatMap.entrySet().stream()
-                    .sorted(Comparator.comparingDouble(entry -> -entry.getValue().getAvgSkillLevel()))
-                    .collect(Collectors.toList())
-                    .subList(0, topX);
+            List<Map.Entry<Player, SkillLevels>> leaderboardList = (List<Map.Entry<Player, SkillLevels>>) main.getLeaderboardUtil().sortLeaderboard(playerStatMap, topX);
 
             // print it like a spreadsheet
             if (spreadsheet) {
@@ -77,19 +73,19 @@ public class SkillExpCommand extends Command {
                 int totalAvgSkillExp = 0;
 
                 for (Map.Entry<Player, SkillLevels> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(main.getLangUtil().addCommas(currentEntry.getValue().getAvgSkillLevel())).append("\n");
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(main.getLangUtil().addCommas(main.getSBUtil().toSkillExp(currentEntry.getValue().getAvgSkillLevel()))).append("\n");
                     totalAvgSkillExp += currentEntry.getValue().getAvgSkillLevel();
                 }
                 if (topX == guildMemberUuids.size())
-                    response.append("\n**Average guild slayer exp: ");
+                    response.append("\n**Average guild skill exp: ");
                 else
-                    response.append("\n**Average slayer exp top #").append(topX).append(": ");
+                    response.append("\n**Average skill exp top #").append(topX).append(": ");
                 response.append(main.getLangUtil().addNotation(Math.round((double) totalAvgSkillExp / topX))).append("**");
             }
 
             String responseString = response.toString();
             // Split the message every 2000 characters in a nice looking way because of discord limitations
-            List<String> responseList = main.getUtil().processMessageForDiscord(responseString, 2000);
+            List<String> responseList = main.getLangUtil().processMessageForDiscord(responseString, 2000);
             for (int j = 0; j < responseList.size(); j++) {
                 String message = responseList.get(j);
                 if (j != 0 && !spreadsheet) {

@@ -5,7 +5,8 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.leaderboard.LeaderboardValue;
 import com.confusinguser.sbgods.entities.leaderboard.LeaderboardValues;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
@@ -28,9 +29,9 @@ public class LeaderboardUtil {
                 .subList(0, topX);
     }
 
-    public boolean cannotRunLeaderboardCommandInChannel(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer) {
-        if (currentDiscordServer.getBotChannelId() != null && !e.getChannel().getId().contentEquals(currentDiscordServer.getBotChannelId())) {
-            e.getChannel().sendMessage(main.getMessageByKey("command_cannot_be_used_on_server")).queue();
+    public boolean cannotRunLeaderboardCommandInChannel(MessageChannel channel, @NotNull DiscordServer currentDiscordServer) {
+        if (currentDiscordServer.getBotChannelId() != null && !channel.getId().contentEquals(currentDiscordServer.getBotChannelId())) {
+            channel.sendMessage(main.getMessageByKey("command_cannot_be_used_in_channel")).queue();
             return true;
         }
         return false;
@@ -54,5 +55,20 @@ public class LeaderboardUtil {
 
     public Map<Player, ? extends LeaderboardValue> convertPlayerStatMap(Map<Player, LeaderboardValues> playerStatMap, Function<Map.Entry<Player, LeaderboardValues>, ? extends LeaderboardValue> conversationFunction) {
         return playerStatMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, conversationFunction));
+    }
+
+    public void sendLeaderboard(List<String> data, String title, MessageChannel channel, boolean spreadsheet) {
+        for (int j = 0; j < data.size(); j++) {
+            String message = data.get(j);
+            if (j != 0 && !spreadsheet) {
+                channel.sendMessage(new EmbedBuilder().setDescription(message).build()).queue();
+            } else {
+                if (spreadsheet) {
+                    channel.sendMessage("```arm\n" + message + "```").queue();
+                } else {
+                    channel.sendMessage(new EmbedBuilder().setTitle(title).setDescription(message).build()).queue();
+                }
+            }
+        }
     }
 }

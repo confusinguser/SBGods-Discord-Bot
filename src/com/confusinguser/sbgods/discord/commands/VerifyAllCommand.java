@@ -62,7 +62,7 @@ public class VerifyAllCommand extends Command {
             e.getChannel().sendMessage("Removed everyone's verified and guild roles!").queue();
             return;
         }
-        verifyAll(e.getChannel(), e.getGuild()); // TODO - do this with all other commands
+        verifyAll(e.getChannel(), e.getGuild());
     }
 
     private void verifyAll(MessageChannel channel, Guild discord) {

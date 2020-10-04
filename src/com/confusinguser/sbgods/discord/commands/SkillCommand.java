@@ -27,7 +27,8 @@ public class SkillCommand extends Command {
 
     @Override
     public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
-        if (main.getLeaderboardUtil().cannotRunLeaderboardCommandInChannel(e, currentDiscordServer)) return;
+        if (main.getLeaderboardUtil().cannotRunLeaderboardCommandInChannel(e.getChannel(), currentDiscordServer))
+            return;
 
         if (args.length == 1) {
             player(e.getChannel(), main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag()));
@@ -43,9 +44,9 @@ public class SkillCommand extends Command {
 
             if (playerStatMap.size() == 0) {
                 if (currentDiscordServer.getHypixelGuild().getLeaderboardProgress() == 0) {
-                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (Please note that other leaderboards might have a higher priority)").queue();
+                    e.getChannel().sendMessage(main.getMessageByKey("bot_is_still_indexing_names")).queue();
                 } else {
-                    e.getChannel().sendMessage("Bot is still indexing names, please try again in a few minutes! (" + currentDiscordServer.getHypixelGuild().getLeaderboardProgress() + " / " + currentDiscordServer.getHypixelGuild().getPlayerSize() + ")").queue();
+                    e.getChannel().sendMessage(String.format(main.getMessageByKey("bot_is_still_indexing_names_progress"), currentDiscordServer.getHypixelGuild().getLeaderboardProgress(), currentDiscordServer.getHypixelGuild().getPlayerSize())).queue();
                 }
                 return;
             }
@@ -88,19 +89,8 @@ public class SkillCommand extends Command {
 
             String responseString = response.toString();
             // Split the message every 2000 characters in a nice looking way because of discord limitations
-            List<String> responseList = main.getUtil().processMessageForDiscord(responseString, 2000);
-            for (int j = 0; j < responseList.size(); j++) {
-                String message = responseList.get(j);
-                if (j != 0 && !spreadsheet) {
-                    e.getChannel().sendMessage(new EmbedBuilder().setDescription(message).build()).queue();
-                } else {
-                    if (spreadsheet) {
-                        e.getChannel().sendMessage("```arm\n" + message + "```").queue();
-                    } else {
-                        e.getChannel().sendMessage(new EmbedBuilder().setTitle("Average Skill Level Leaderboard").setDescription(message).build()).queue();
-                    }
-                }
-            }
+            List<String> responseList = main.getLangUtil().processMessageForDiscord(responseString, 2000);
+            main.getLeaderboardUtil().sendLeaderboard(responseList, "Average Skill Level Leaderboard", e.getChannel(), spreadsheet);
         } else {
             player(e.getChannel(), args[1]);
         }
@@ -110,53 +100,38 @@ public class SkillCommand extends Command {
         Player thePlayer = main.getApiUtil().getPlayerFromUsername(playerName);
 
         if (thePlayer.getSkyblockProfiles().isEmpty()) {
-            channel.sendMessage("Player **" + playerName + "** does not exist!").queue();
+            channel.sendMessage("Player **" + playerName + "** has never played skyblock!").queue();
             return;
         }
 
-        SkillLevels highestSkillLevels = new SkillLevels();
-        for (String profile : thePlayer.getSkyblockProfiles()) {
-            SkillLevels skillLevels = main.getApiUtil().getProfileSkills(profile, thePlayer.getUUID());
-
-            if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
-                highestSkillLevels = skillLevels;
-            }
-        }
-
-        if (highestSkillLevels.getAvgSkillLevel() == 0) {
-            SkillLevels skillLevels = main.getApiUtil().getProfileSkillsAlternate(thePlayer.getUUID());
-
-            if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
-                highestSkillLevels = skillLevels;
-            }
-        }
+        SkillLevels skillLevels = main.getApiUtil().getBestPlayerSkillLevels(thePlayer.getUUID());
 
         EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x03731d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " skill levels");
         StringBuilder descriptionBuilder = embedBuilder.getDescriptionBuilder();
 
-        if (highestSkillLevels.isApproximate()) {
-            descriptionBuilder.append("Approximate average skill level: **").append(main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3)).append("**\n\n");
+        if (skillLevels.isApproximate()) {
+            descriptionBuilder.append("Approximate average skill level: **").append(main.getUtil().round(skillLevels.getAvgSkillLevel(), 3)).append("**\n\n");
         } else {
-            descriptionBuilder.append("Average skill level: **").append(main.getUtil().round(highestSkillLevels.getAvgSkillLevel(), 3)).append("**\n\n");
+            descriptionBuilder.append("Average skill level: **").append(main.getUtil().round(skillLevels.getAvgSkillLevel(), 3)).append("**\n\n");
         }
 
         descriptionBuilder
-                .append("Farming: **").append(highestSkillLevels.getFarming()).append("**\n")
-                .append("Mining: **").append(highestSkillLevels.getMining()).append("**\n")
-                .append("Combat: **").append(highestSkillLevels.getCombat()).append("**\n")
-                .append("Foraging: **").append(highestSkillLevels.getForaging()).append("**\n")
-                .append("Fishing: **").append(highestSkillLevels.getFishing()).append("**\n")
-                .append("Enchanting: **").append(highestSkillLevels.getEnchanting()).append("**\n");
-        if (!highestSkillLevels.isApproximate())
-            descriptionBuilder.append("Taming: **").append(highestSkillLevels.getTaming()).append("**\n");
-        descriptionBuilder.append("Alchemy: **").append(highestSkillLevels.getAlchemy()).append("**\n");
+                .append("Farming: **").append(skillLevels.getFarming()).append("**\n")
+                .append("Mining: **").append(skillLevels.getMining()).append("**\n")
+                .append("Combat: **").append(skillLevels.getCombat()).append("**\n")
+                .append("Foraging: **").append(skillLevels.getForaging()).append("**\n")
+                .append("Fishing: **").append(skillLevels.getFishing()).append("**\n")
+                .append("Enchanting: **").append(skillLevels.getEnchanting()).append("**\n");
+        if (!skillLevels.isApproximate())
+            descriptionBuilder.append("Taming: **").append(skillLevels.getTaming()).append("**\n");
+        descriptionBuilder.append("Alchemy: **").append(skillLevels.getAlchemy()).append("**\n");
 
         embedBuilder.setDescription(descriptionBuilder.toString());
 
         StringBuilder footerBuilder = new StringBuilder();
         embedBuilder.setFooter(footerBuilder
-                .append("Carpentry: ").append(highestSkillLevels.getCarpentry())
-                .append(", runecrafting: ").append(highestSkillLevels.getRunecrafting())
+                .append("Carpentry: ").append(skillLevels.getCarpentry())
+                .append(", runecrafting: ").append(skillLevels.getRunecrafting())
                 .toString());
 
         channel.sendMessage(embedBuilder.build()).queue();

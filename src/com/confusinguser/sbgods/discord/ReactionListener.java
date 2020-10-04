@@ -63,7 +63,7 @@ public class ReactionListener extends ListenerAdapter {
 
         e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar(0.5, 20) + ")").queue();
 
-        SkillLevels skillLevels = main.getApiUtil().getBestProfileSkillLevels(player.getUUID());
+        SkillLevels skillLevels = main.getApiUtil().getBestPlayerSkillLevels(player.getUUID());
 
         e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar(0.75, 20) + ")").queue();
 

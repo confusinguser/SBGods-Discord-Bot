@@ -59,7 +59,7 @@ public class VerifyListCommand extends Command {
         e.getChannel().deleteMessageById(messageId).queue();
 
         // Split the message every 2000 characters in a nice looking way because of discord limitations
-        List<String> responseList = main.getUtil().processMessageForDiscord(discordMessage.toString(), 2000);
+        List<String> responseList = main.getLangUtil().processMessageForDiscord(discordMessage.toString(), 2000);
         for (String message : responseList) {
 
             e.getChannel().sendMessage(new EmbedBuilder().setDescription(message).build()).queue();

@@ -20,7 +20,7 @@ public class SkyblockProfile {
     public SkyblockProfile() {
         this.members = new ArrayList<>();
         this.cuteName = "";
-        this.balance = new BankBalance(0);
+        this.balance = new BankBalance();
     }
 
     public List<Player> getMembers() {

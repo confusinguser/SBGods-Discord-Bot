@@ -3,10 +3,7 @@ package com.confusinguser.sbgods.utils;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.Player;
-import com.confusinguser.sbgods.entities.leaderboard.BankBalance;
 import com.confusinguser.sbgods.entities.leaderboard.LeaderboardValues;
-import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
-import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.util.ArrayList;
@@ -20,7 +17,7 @@ public class LeaderboardUpdater {
 
     public static LeaderboardUpdater instance;
     private final SBGods main;
-    private List<String> latestEventLbIds = new ArrayList<>();
+    private List<String> latestEventLeaderboardIds = new ArrayList<>();
 
     public LeaderboardUpdater(SBGods main) {
         instance = this;
@@ -30,15 +27,17 @@ public class LeaderboardUpdater {
                 for (HypixelGuild hypixelGuild : HypixelGuild.values()) {
                     updateLeaderboardCache(hypixelGuild);
                 }
-                if (main.getDiscord().eventCommand.postLeaderboard) {
-                    if (latestEventLbIds.size() != 0) {
-                        for (String messageId : latestEventLbIds) {
+                if (!main.getDiscord().eventCommand.progressTypeToPost.isEmpty()) {
+                    String title = main.getDiscord().eventCommand.getLeaderboardTitleForProgressType(main.getDiscord().eventCommand.progressTypeToPost);
+                    if (title == null) return;
+                    if (latestEventLeaderboardIds.size() != 0) {
+                        for (String messageId : latestEventLeaderboardIds) {
                             TextChannel textChannel;
                             if ((textChannel = main.getDiscord().getJDA().awaitReady().getTextChannelById("753934993788633170")) != null)
                                 textChannel.deleteMessageById(messageId).queue();
                         }
                     }
-                    latestEventLbIds = main.getDiscord().eventCommand.sendProgressLbRetIds(main.getDiscord().getJDA().awaitReady().getTextChannelById("753934993788633170"), "skillTotal", "Total Skill Exp Progress\n", false);
+                    latestEventLeaderboardIds = main.getDiscord().eventCommand.sendProgressLeaderboard(main.getDiscord().getJDA().awaitReady().getTextChannelById("753934993788633170"), main.getDiscord().eventCommand.progressTypeToPost, title, false);
                 }
             } catch (Throwable t) {
                 main.getDiscord().reportFail(t, "Leaderboard Updater");
@@ -65,23 +64,20 @@ public class LeaderboardUpdater {
         for (Player guildMember : guildMembers) {
             Player thePlayer = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
             Player.mergePlayerAndGuildMember(thePlayer, guildMember);
-            SkillLevels highestSkillLevels = main.getApiUtil().getBestProfileSkillLevels(thePlayer.getUUID());
-            SlayerExp totalSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer.getUUID());
-            BankBalance totalCoins = main.getApiUtil().getTotalCoinsInPlayer(thePlayer.getUUID());
 
-
-            playerStatMap.put(thePlayer, new LeaderboardValues(totalSlayerExp, totalCoins, highestSkillLevels));
+            LeaderboardValues leaderboardValues = main.getApiUtil().getBestLeaderboardValues(thePlayer.getUUID());
+            playerStatMap.put(thePlayer, leaderboardValues);
             guild.setLeaderboardProgress(i++);
         }
 
         guild.setPlayerStatMap(playerStatMap);
     }
 
-    public List<String> getLatestEventLbIds() {
-        return latestEventLbIds;
+    public List<String> getLatestEventLeaderboardIds() {
+        return latestEventLeaderboardIds;
     }
 
-    public void setLatestEventLbIds(List<String> latestEventLbIds) {
-        this.latestEventLbIds = latestEventLbIds;
+    public void setLatestEventLeaderboardIds(List<String> latestEventLeaderboardIds) {
+        this.latestEventLeaderboardIds = latestEventLeaderboardIds;
     }
 }

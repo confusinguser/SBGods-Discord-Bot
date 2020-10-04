@@ -27,7 +27,7 @@ public class TaxCommand extends Command {
     @Override
     public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
         if (!currentDiscordServer.getHypixelGuild().equals(HypixelGuild.SBG)) {
-            e.getChannel().sendMessage(main.getMessageByKey("command_cannot_be_used_on_server")).queue();
+            e.getChannel().sendMessage(main.getMessageByKey("command_cannot_be_used_in_channel")).queue();
             return;
         }
 
@@ -55,7 +55,7 @@ public class TaxCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("paid")) {
-            if (senderMember != null && senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
+            if (senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -89,7 +89,7 @@ public class TaxCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("paidall")) {
-            if (senderMember != null && senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
+            if (senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -154,7 +154,7 @@ public class TaxCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("owe")) {
-            if (senderMember != null && senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
+            if (senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
                 e.getChannel().sendMessage(main.getMessageByKey("no_permission")).queue();
                 return;
             }
@@ -191,7 +191,7 @@ public class TaxCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("oweall")) {
-            if (senderMember != null && senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
+            if (senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -310,7 +310,7 @@ public class TaxCommand extends Command {
                 return;
             }
 
-            List<String> responseList = main.getUtil().processMessageForDiscord(message.toString(), 2000);
+            List<String> responseList = main.getLangUtil().processMessageForDiscord(message.toString(), 2000);
             for (String messageI : responseList) {
                 e.getChannel().sendMessage(new EmbedBuilder().appendDescription(messageI).build()).queue();
             }
@@ -354,7 +354,7 @@ public class TaxCommand extends Command {
 
             e.getChannel().deleteMessageById(messageId).queue();
 
-            List<String> responseList = main.getUtil().processMessageForDiscord(message.toString(), 2000);
+            List<String> responseList = main.getLangUtil().processMessageForDiscord(message.toString(), 2000);
             for (String partMessage: responseList) {
                 e.getChannel().sendMessage(new EmbedBuilder().appendDescription(partMessage).build()).queue();
             }
@@ -363,7 +363,7 @@ public class TaxCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("prune")) {
-            if (senderMember != null && senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
+            if (senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -402,7 +402,7 @@ public class TaxCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("clearowes")) {
-            if (senderMember != null && senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
+            if (senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }
@@ -435,7 +435,7 @@ public class TaxCommand extends Command {
         }
 
         if (args[1].equalsIgnoreCase("setrole")) {
-            if (senderMember != null && senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
+            if (senderMember.getRoles().stream().map(Role::getName).noneMatch(roleName -> roleName.equals("Splash Tax Team"))) {
                 e.getChannel().sendMessage("You do not have permission to use this command!").queue();
                 return;
             }

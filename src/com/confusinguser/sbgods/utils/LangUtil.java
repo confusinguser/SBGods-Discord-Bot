@@ -100,7 +100,7 @@ public class LangUtil {
                     returnVal = Math.floor(returnVal);
                     returnVal = (returnVal / Math.pow(10, o)) * 10;
                     returnValStr = "" + main.getUtil().round(returnVal, o - 1);
-                    if (returnValStr.endsWith("0")) {
+                    if (returnValStr.endsWith(".0")) {
                         returnValStr = returnValStr.replace(".0", "");
                     }
                     returnValStr += notValue;
@@ -112,13 +112,20 @@ public class LangUtil {
     }
 
     /**
-     * Adds commas to a number
+     * Adds commas to a number.
      *
      * @param num The number (eg. 150385.6725)
      * @return Returns the number but with commas (eg. 150,385.6725)
      */
     public String addCommas(double num) {
         return addCommaPattern.matcher(String.valueOf(num)).replaceAll("$1,");
+    }
+
+    public String addNotationOrCommas(double num) {
+        String notationNum = addNotation(num);
+        int toHellAndBack = parseIntegerWithSuffixes(notationNum);
+        if (num == toHellAndBack) return notationNum; // notationNum does not affect the value of the number
+        else return addCommas(num);
     }
 
     /**
@@ -234,5 +241,26 @@ public class LangUtil {
             return intStr;
         }
         return addCommas(integer);
+    }
+
+    public List<String> processMessageForDiscord(String message, int limit) {
+        return processMessageForDiscord(message, limit, new ArrayList<>());
+    }
+
+    private List<String> processMessageForDiscord(String message, int limit, List<String> currentOutput) {
+        if (message.length() > limit) {
+            int lastIndex = 0;
+            for (int index = message.indexOf('\n'); index >= 0; index = message.indexOf('\n', index + 1)) {
+                if (index >= limit) {
+                    currentOutput.add(message.substring(0, lastIndex));
+                    message = message.substring(lastIndex);
+                    return processMessageForDiscord(message, limit, currentOutput);
+                }
+                lastIndex = index;
+            }
+        } else {
+            currentOutput.add(message);
+        }
+        return currentOutput;
     }
 }

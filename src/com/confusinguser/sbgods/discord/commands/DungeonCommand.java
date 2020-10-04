@@ -4,7 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
-import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
+import com.confusinguser.sbgods.entities.leaderboard.DungeonExps;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -16,13 +16,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 @SuppressWarnings("unchecked")
-public class SlayerCommand extends Command {
+public class DungeonCommand extends Command {
 
-    public SlayerCommand(SBGods main, DiscordBot discord) {
+    public DungeonCommand(SBGods main, DiscordBot discord) {
         this.main = main;
         this.discord = discord;
-        this.name = "slayer";
-        this.aliases = new String[]{};
+        this.name = "dungeon";
+        this.aliases = new String[]{"dungeons"};
     }
 
     @Override
@@ -37,7 +37,7 @@ public class SlayerCommand extends Command {
 
         if (args[1].equalsIgnoreCase("leaderboard") || args[1].equalsIgnoreCase("lb")) {
             List<Player> guildMemberUuids = main.getApiUtil().getGuildMembers(currentDiscordServer.getHypixelGuild());
-            Map<Player, SlayerExp> playerStatMap = (Map<Player, SlayerExp>) main.getLeaderboardUtil().convertPlayerStatMap(currentDiscordServer.getHypixelGuild().getPlayerStatMap(), entry -> entry.getValue().getSlayerExp());
+            Map<Player, DungeonExps> playerStatMap = (Map<Player, DungeonExps>) main.getLeaderboardUtil().convertPlayerStatMap(currentDiscordServer.getHypixelGuild().getPlayerStatMap(), entry -> entry.getValue().getDungeonLevels());
 
             if (playerStatMap.size() == 0) {
                 if (currentDiscordServer.getHypixelGuild().getLeaderboardProgress() == 0) {
@@ -54,24 +54,24 @@ public class SlayerCommand extends Command {
                 return;
             }
 
-            List<Entry<Player, SlayerExp>> leaderboardList = (List<Entry<Player, SlayerExp>>) main.getLeaderboardUtil().sortLeaderboard(playerStatMap, topX);
+            List<Entry<Player, DungeonExps>> leaderboardList = (List<Entry<Player, DungeonExps>>) main.getLeaderboardUtil().sortLeaderboard(playerStatMap, topX);
 
             StringBuilder response = new StringBuilder();
             if (args.length >= 4 && args[3].equalsIgnoreCase("spreadsheet")) {
-                for (Entry<Player, SlayerExp> currentEntry : leaderboardList) {
-                    response.append(currentEntry.getKey().getDisplayName()).append("    ").append(main.getLangUtil().addNotation(Math.round(currentEntry.getValue().getTotalExp()))).append("\n");
+                for (Entry<Player, DungeonExps> currentEntry : leaderboardList) {
+                    response.append(currentEntry.getKey().getDisplayName()).append("    ").append(Math.round(currentEntry.getValue().getAverageDungeonExp())).append("\n");
                 }
             } else {
-                int totalSlayer = 0;
-                for (Entry<Player, SlayerExp> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue().getTotalExp())).append("\n");
-                    totalSlayer += currentEntry.getValue().getTotalExp();
+                int dungeonExp = 0;
+                for (Entry<Player, DungeonExps> currentEntry : leaderboardList) {
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(main.getLangUtil().addNotation(currentEntry.getValue().getAverageDungeonExp())).append("\n");
+                    dungeonExp += currentEntry.getValue().getAverageDungeonExp();
                 }
                 if (topX == guildMemberUuids.size())
-                    response.append("\n**Average guild slayer exp: ");
+                    response.append("\n**Average guild dungeon exp: ");
                 else
-                    response.append("\n**Average slayer exp top #").append(topX).append(": ");
-                response.append(main.getLangUtil().addNotation(Math.round((double) totalSlayer / topX))).append("**");
+                    response.append("\n**Average dungeon exp top #").append(topX).append(": ");
+                response.append(main.getLangUtil().addNotation(Math.round((double) dungeonExp / topX))).append("**");
             }
 
             String responseString = response.toString();
@@ -83,7 +83,7 @@ public class SlayerCommand extends Command {
                 spreadsheet = true;
             }
 
-            main.getLeaderboardUtil().sendLeaderboard(responseList, "Total Slayer XP Leaderboard", e.getChannel(), spreadsheet);
+            main.getLeaderboardUtil().sendLeaderboard(responseList, "Average Dungeon XP Leaderboard", e.getChannel(), spreadsheet);
         } else {
             player(e.getChannel(), args[1]);
         }
@@ -100,14 +100,17 @@ public class SlayerCommand extends Command {
             return;
         }
 
-        SlayerExp playerSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer.getUUID());
+        DungeonExps dungeonExps = main.getApiUtil().getBestDungeonExpsForPlayer(thePlayer.getUUID());
 
-        EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x51047d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " Slayer XP");
-        embedBuilder.addField("Total Slayer XP: ", main.getLangUtil().addCommas(playerSlayerExp.getTotalExp()), false);
-        embedBuilder.addField("Slayers",
-                "**Zombie**  " + main.getLangUtil().addCommas(playerSlayerExp.getZombie()) + "\n" +
-                        "**Spider**  " + main.getLangUtil().addCommas(playerSlayerExp.getSpider()) + "\n" +
-                        "**Wolf**    " + main.getLangUtil().addCommas(playerSlayerExp.getWolf()) + "\n",
+        EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x51047d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " Dungeon XP");
+        embedBuilder.addField("Average Dungeon Level", "" + main.getUtil().round(main.getSBUtil().toSkillLevelDungeoneering(dungeonExps.getAverageDungeonExp()), 2), false);
+        embedBuilder.addField("Dungeons and Classes",
+                "**Catacombs** " + main.getLangUtil().addCommas(dungeonExps.getCatacombsExp()) + "\n" +
+                        "**Healer**    " + main.getLangUtil().addCommas(dungeonExps.getHealerExp()) + "\n" +
+                        "**Mage**      " + main.getLangUtil().addCommas(dungeonExps.getMageExp()) + "\n" +
+                        "**Berserk**   " + main.getLangUtil().addCommas(dungeonExps.getBerserkExp()) + "\n" +
+                        "**Archer**    " + main.getLangUtil().addCommas(dungeonExps.getArcherExp()) + "\n" +
+                        "**Tank**      " + main.getLangUtil().addCommas(dungeonExps.getTankExp()) + "\n",
                 false);
 
         channel.sendMessage(embedBuilder.build()).queue();
