@@ -68,9 +68,9 @@ public class ApiUtil {
         allowance -= 1;
 
 
-        StringBuffer response = null;
+        StringBuffer response;
         HttpURLConnection con = null;
-        IOException ioException = null;
+        IOException ioException;
         try {
             URL url = new URL(url_string);
 
@@ -86,7 +86,9 @@ public class ApiUtil {
                 response.append(inputLine);
             }
             in.close();
-
+            fails = 0;
+            main.getCacheUtil().addToCache(main.getCacheUtil().stripUnnecesaryInfo(url_string), response.toString());
+            return response.toString();
         } catch (IOException e) {
             ioException = e;
         }
@@ -112,8 +114,10 @@ public class ApiUtil {
 
         } else if (responseCode == 403) {
             main.logger.severe("The API key \"" + main.getCurrentApiKey() + "\" is invalid!");
+            main.removeApiKey(main.getCurrentApiKey());
 //            System.exit(-1);
-        } else if (ioException != null) {
+            return null;
+        } else {
             if (fails > 20) return null;
             fails++;
             if (fails % 10 == 0) {
@@ -121,11 +125,6 @@ public class ApiUtil {
             }
             return getResponse(url_string, cacheTime);
         }
-        fails = 0;
-        if (response != null) {
-            main.getCacheUtil().addToCache(main.getCacheUtil().stripUnnecesaryInfo(url_string), response.toString());
-            return response.toString();
-        } else return null;
     }
 
     public String getNonHypixelResponse(String url_string) {
@@ -147,7 +146,8 @@ public class ApiUtil {
                 response.append(inputLine);
             }
             in.close();
-
+            fails = 0;
+            return response.toString();
         } catch (IOException e) {
             ioException = e;
         }
@@ -173,8 +173,10 @@ public class ApiUtil {
 
         } else if (responseCode == 403) {
             main.logger.severe("The API key \"" + main.getCurrentApiKey() + "\" is invalid!");
+            main.removeApiKey(main.getCurrentApiKey());
 //            System.exit(-1);
-        } else if (ioException != null) {
+            return null;
+        } else {
             if (fails > 20) return null;
             fails++;
             if (fails % 10 == 0) {
@@ -182,10 +184,6 @@ public class ApiUtil {
             }
             return getNonHypixelResponse(url_string);
         }
-        fails = 0;
-        if (response != null) {
-            return response.toString();
-        } else return null;
     }
 
     public void sendData(String dataString, String urlString) {

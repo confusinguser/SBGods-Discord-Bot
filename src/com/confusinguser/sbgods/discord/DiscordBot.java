@@ -118,13 +118,18 @@ public class DiscordBot {
     }
 
     public void reportFail(Throwable throwable, String place) {
-        String stackTraceView = main.getLangUtil().generateStackTraceView(throwable);
-        TextChannel textChannel = main.getDiscord().getJDA().getTextChannelById("713870866051498086");
-        main.logger.severe("Exception in " + place.toLowerCase() + ": \n" + stackTraceView);
-        if (textChannel != null) {
-            for (String message : main.getLangUtil().processMessageForDiscord("Exception in \"" + place + "\": \n" + stackTraceView, 2000)) {
-                textChannel.sendMessage(message).queue();
+        try {
+            String stackTraceView = main.getLangUtil().generateStackTraceView(throwable);
+            TextChannel textChannel = main.getDiscord().getJDA().getTextChannelById("713870866051498086");
+            main.logger.severe("Exception in " + place.toLowerCase() + ": \n" + stackTraceView);
+            if (textChannel != null) {
+                for (String message : main.getLangUtil().processMessageForDiscord("Exception in \"" + place + "\": \n" + stackTraceView, 2000)) {
+                    textChannel.sendMessage(message).queue();
+                }
             }
+        } catch (Throwable t) {
+            main.logger.severe("EXCEPTION IN FAIL REPORTER!!! THIS HAS TO BE FIXED ASAP!");
+            t.printStackTrace();
         }
     }
 }

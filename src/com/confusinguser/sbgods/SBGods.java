@@ -15,13 +15,13 @@ import java.util.logging.*;
 import java.util.stream.Collectors;
 
 public class SBGods {
-    public static final String VERSION = "0.9.4.1";
+    public static final String VERSION = "0.9.4.2";
     public static final String VERSION_DESCRIPTION_MAJOR = ""; // Change this every major release: 0.9.6.3 -> 1.0
     public static final String VERSION_DESCRIPTION_MINOR = "Added live guild chat"; // Change this every minor release: 0.8.11.5 -> 0.8.12
-    public static final String VERSION_DESCRIPTION_PATCH = "Fixed live guild chat"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
+    public static final String VERSION_DESCRIPTION_PATCH = "Lots of QOL and bug fixes"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
     public static final String[] DEVELOPERS = {"244786205873405952", "497210228274757632"};
-    //private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBForceful}; // For release on main servers
-    private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
+    private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBForceful}; // For release on main servers
+    //    private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
     private static SBGods instance;
     public final Logger logger = Logger.getLogger(this.getClass().getName());
     private final ApiUtil apiutil;
@@ -82,6 +82,12 @@ public class SBGods {
 
     public String getCurrentApiKey() {
         return getKeys()[keyIndex];
+    }
+
+    public void removeApiKey(String key) {
+        List<String> keysTemp = Arrays.asList(keys);
+        keysTemp.remove(key);
+        keys = keysTemp.toArray(keys);
     }
 
     public ApiUtil getApiUtil() {
