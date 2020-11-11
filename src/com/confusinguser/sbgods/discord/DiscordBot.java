@@ -3,7 +3,6 @@ package com.confusinguser.sbgods.discord;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.commands.*;
 import com.confusinguser.sbgods.entities.DiscordServer;
-import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -11,6 +10,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public class DiscordBot {
     public String commandPrefix = "-";
 
     public DiscordBot(SBGods main) throws LoginException {
-        String token = "NjY0OTAwNzM0NTk2NDE1NDg4.XreLHQ.l2viqcJ-uYvB3rAGcBa3OWhRuf0";
+        String token = "NjY0OTAwNzM0NTk2NDE1NDg4.XhdzEA.wNcSnHx9ds-FD8f4lT_vboA_P1k";
 
         this.main = main;
         SlayerCommand slayerCommand = new SlayerCommand(main, this);
@@ -77,8 +77,15 @@ public class DiscordBot {
                 reactionListener
         ));
 
-        JDABuilder jdaBuilder = new JDABuilder(AccountType.BOT)
-                .setToken(token)
+        List<GatewayIntent> intents = new ArrayList<>();
+        intents.add(GatewayIntent.GUILD_MESSAGES);
+        intents.add(GatewayIntent.GUILD_MESSAGE_TYPING);
+        intents.add(GatewayIntent.GUILD_MEMBERS);
+        intents.add(GatewayIntent.GUILD_EMOJIS);
+        intents.add(GatewayIntent.GUILD_MESSAGE_REACTIONS);
+        intents.add(GatewayIntent.DIRECT_MESSAGES);
+        intents.add(GatewayIntent.DIRECT_MESSAGE_TYPING);
+        JDABuilder jdaBuilder = JDABuilder.create(token, intents)
                 .setStatus(OnlineStatus.ONLINE)
                 .setActivity(Activity.playing("The SBG / SBF Discord Bot" + "\nMade by ConfusingUser#5712 & Soopyboo32#3042"));
 

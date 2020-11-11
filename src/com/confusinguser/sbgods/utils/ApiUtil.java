@@ -128,9 +128,9 @@ public class ApiUtil {
     }
 
     public String getNonHypixelResponse(String url_string) {
-        StringBuffer response = null;
+        StringBuffer response;
         HttpURLConnection con = null;
-        IOException ioException = null;
+        IOException ioException;
         try {
             URL url = new URL(url_string);
 
@@ -419,9 +419,9 @@ public class ApiUtil {
 
     public LeaderboardValues getBestLeaderboardValues(String uuid) {
         SlayerExp slayerExp = getPlayerSlayerExp(uuid);
-        BankBalance bankBalance = getTotalCoinsInPlayer(uuid);
         SkillLevels skillLevels = getBestPlayerSkillLevels(uuid);
         DungeonExps dungeonExps = getBestDungeonExpsForPlayer(uuid);
+        BankBalance bankBalance = getTotalCoinsInPlayer(uuid);
         return new LeaderboardValues(slayerExp, bankBalance, skillLevels, dungeonExps);
     }
 
