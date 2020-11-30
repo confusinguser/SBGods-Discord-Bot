@@ -200,7 +200,7 @@ public class LangUtil {
             int framesInCommon = trace.length - 1 - m;
 
             // Print our stack trace
-            output.append(prefix).append(caption).append(this);
+            output.append(prefix).append(caption).append(throwable);
             for (int i = 0; i <= m; i++)
                 output.append(prefix).append("\tat ").append(trace[i]);
             if (framesInCommon != 0)

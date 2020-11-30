@@ -70,7 +70,6 @@ public class ApiUtil {
 
         StringBuffer response;
         HttpURLConnection con = null;
-        IOException ioException;
         try {
             URL url = new URL(url_string);
 
@@ -89,41 +88,39 @@ public class ApiUtil {
             fails = 0;
             main.getCacheUtil().addToCache(main.getCacheUtil().stripUnnecesaryInfo(url_string), response.toString());
             return response.toString();
-        } catch (IOException e) {
-            ioException = e;
-        }
+        } catch (IOException ioException) {
 
-        int responseCode = -1;
-        try {
-            if (con != null) responseCode = con.getResponseCode();
-        } catch (IOException ex) {
-            if (fails > 20) return null;
-            fails++;
-            if (fails % 10 == 0) {
-                main.logger.warning("Failed to connect to the Hypixel API " + fails + " times: " + ex);
-            }
-        }
-
-        if (responseCode == 429 || responseCode == 400) {
+            int responseCode = -1;
             try {
-                Thread.sleep(17000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                if (con != null) responseCode = con.getResponseCode();
+            } catch (IOException ex) {
+                if (fails > 20) return null;
+                fails++;
+                if (fails % 10 == 0) {
+                    main.logger.warning("Failed to connect to the Hypixel API " + fails + " times: " + ex);
+                }
             }
-            return getResponse(url_string, cacheTime);
 
-        } else if (responseCode == 403) {
-            main.logger.severe("The API key \"" + main.getCurrentApiKey() + "\" is invalid!");
-            main.removeApiKey(main.getCurrentApiKey());
-//            System.exit(-1);
-            return null;
-        } else {
-            if (fails > 20) return null;
-            fails++;
-            if (fails % 10 == 0) {
-                main.logger.warning("Failed to connect to the Hypixel API " + fails + " times: " + ioException);
+            if (responseCode == 429) {
+                try {
+                    Thread.sleep(17000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                return getResponse(url_string, cacheTime);
+
+            } else if (responseCode == 403) {
+                main.logger.severe("The API key \"" + main.getCurrentApiKey() + "\" is invalid!");
+                main.removeApiKey(main.getCurrentApiKey());
+                return null;
+            } else {
+                if (fails > 20) return null;
+                fails++;
+                if (fails % 10 == 0) {
+                    main.logger.warning("Failed to connect to the Hypixel API " + fails + " times: " + ioException);
+                }
+                return getResponse(url_string, cacheTime);
             }
-            return getResponse(url_string, cacheTime);
         }
     }
 
@@ -749,7 +746,7 @@ public class ApiUtil {
     }
 
     public List<SkyblockProfile> getSkyblockProfilesByPlayerUUID(String playerUUID) {
-        String response = main.getApiUtil().getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&player=" + playerUUID, 600000);
+        String response = main.getApiUtil().getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + playerUUID, 600000);
         if (response == null) return new ArrayList<>();
         JSONObject jsonObject = new JSONObject(response);
 
@@ -793,7 +790,7 @@ public class ApiUtil {
     }*/
 
     public DungeonExps getBestDungeonExpsForPlayer(String playerUUID) {
-        String response = main.getApiUtil().getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&player=" + playerUUID, 600000);
+        String response = main.getApiUtil().getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + playerUUID, 600000);
         if (response == null) return null;
         JSONObject jsonObject = new JSONObject(response);
 
