@@ -1,14 +1,11 @@
 package com.confusinguser.sbgods.utils;
 
 import com.confusinguser.sbgods.SBGods;
-import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
-import com.confusinguser.sbgods.entities.HypixelRank;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
 import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -18,9 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,9 +31,6 @@ public class Util {
     private final List<MessageChannel> typingChannels = new ArrayList<>();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Pattern stripColorCodesRegex = Pattern.compile("§[a-f0-9rlkmn]");
-    private final Map<InetAddress, String> latestMessageByIP = new HashMap<>();
-    private String latestGuildmessageAuthor = "";
-    private String latestGuildmessage = "";
 
     public Util(SBGods main) {
         this.main = main;
@@ -320,40 +312,22 @@ public class Util {
         return file;
     }
 
-    public void handleGuildMessage(DiscordBot discordBot, DiscordServer discordServer, String author, String message, InetAddress requestSenderIpAddr) {
-        if (discordBot == null || author.isEmpty() || message.isEmpty()) return;
-        MessageChannel channel;
-        if ((channel = discordBot.getJDA().getTextChannelById(discordServer.getGuildChatChannelId())) != null) {
-            if (latestGuildmessage.equals("Guild > " + author + ": " + message) && latestGuildmessageAuthor.equals(author) &&
-                    !latestMessageByIP.getOrDefault(requestSenderIpAddr, "").equals(author + ":" + message)) {
-                return; // TODO fix problem: if multiple ppl send messages at almost exact time then message might come delayed and it isnt latestMessage anymore
-            }
-            if (latestGuildmessageAuthor.equals(author)) {
-                latestGuildmessage += "\n" + "Guild > " + author + ": " + message;
-                try {
-                    channel.deleteMessageById(channel.getLatestMessageId()).queue();
-                } catch (IllegalStateException ignored) {
-                } // If no last message id found
-            } else {
-                latestGuildmessage = "Guild > " + author + ": " + message;
-            }
-            channel.sendMessage(new EmbedBuilder().setColor(HypixelRank.getHypixelRankFromName(author.substring(0, author.contains("]") ? author.indexOf("]") + 1 : 0)).getColor()).setDescription(latestGuildmessage).build()).queue();
-//            channel.sendMessage("```css\n" + latestGuildmessage + "\n```").queue();
-            latestGuildmessageAuthor = author;
-            latestMessageByIP.put(requestSenderIpAddr, author + ":" + message);
-        }
-    }
-
     public static String getTextWithoutFormattingCodes(String text) {
         return text == null ? null : RegexUtil.getMatcher("(?i)§[0-9A-FK-OR]", text).replaceAll("");
     }
 
     public String getAuthorFromGuildChatMessage(String message) {
-        return getTextWithoutFormattingCodes(message).split(":")[0].substring(8);
+        message = getTextWithoutFormattingCodes(message);
+        if (message.startsWith("Guild > ")) message = message.substring(8);
+        return message.split(":")[0];
     }
 
     public String getMessageFromGuildChatMessage(String message) {
-        return getTextWithoutFormattingCodes(message.split(":")[1]);
+        try {
+            return getTextWithoutFormattingCodes(message.split(":")[1]);
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return getTextWithoutFormattingCodes(message);
+        }
     }
 
     public <T> List<T> turnListIntoSubClassList(List<?> list, Class<T> subclass) { // Looked at like 8 different stackoverflow threads to write this

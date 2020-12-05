@@ -7,6 +7,7 @@ import com.confusinguser.sbgods.utils.*;
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ServerSocket;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -15,13 +16,13 @@ import java.util.logging.*;
 import java.util.stream.Collectors;
 
 public class SBGods {
-    public static final String VERSION = "0.9.4.3";
+    public static final String VERSION = "0.9.4.4";
     public static final String VERSION_DESCRIPTION_MAJOR = ""; // Change this every major release: 0.9.6.3 -> 1.0
     public static final String VERSION_DESCRIPTION_MINOR = "Added live guild chat"; // Change this every minor release: 0.8.11.5 -> 0.8.12
-    public static final String VERSION_DESCRIPTION_PATCH = "Fixed Leaderboards"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
+    public static final String VERSION_DESCRIPTION_PATCH = "Fixed live GC"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
     public static final String[] DEVELOPERS = {"244786205873405952", "497210228274757632"};
-        private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBForceful}; // For release on main servers
-//    private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
+    private static final DiscordServer[] servers = {DiscordServer.SBGods, DiscordServer.SBForceful}; // For release on main servers
+    //    private static final DiscordServer[] servers = {DiscordServer.Test}; // For testing
     private static SBGods instance;
     public final Logger logger = Logger.getLogger(this.getClass().getName());
     private final ApiUtil apiutil;
@@ -31,11 +32,12 @@ public class SBGods {
     private final CacheUtil cacheUtil;
     private final LeaderboardUpdater leaderboardUpdater;
     private final LeaderboardUtil leaderboardUtil;
+    private final RemoteGuildChatManager remoteGuildChatManager;
     private String[] keys = null;
     private DiscordBot discordBot;
     private int keyIndex = 0;
 
-    public SBGods() {
+    public SBGods(ServerSocket serverSocket) {
         ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new SimpleFormatter() {
             @Override
@@ -59,6 +61,8 @@ public class SBGods {
         this.sbUtil = new SBUtil(this);
         this.langUtil = new LangUtil(this);
         this.cacheUtil = new CacheUtil(this);
+        this.remoteGuildChatManager = new RemoteGuildChatManager(this);
+        remoteGuildChatManager.startListener(serverSocket);
         instance = this;
         try {
             this.discordBot = new DiscordBot(this);
@@ -112,6 +116,10 @@ public class SBGods {
 
     public DiscordBot getDiscord() {
         return discordBot;
+    }
+
+    public RemoteGuildChatManager getRemoteGuildChatManager() {
+        return remoteGuildChatManager;
     }
 
     public LeaderboardUpdater getLeaderboardUpdater() {
