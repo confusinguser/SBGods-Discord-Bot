@@ -326,7 +326,7 @@ public class Util {
         if ((channel = discordBot.getJDA().getTextChannelById(discordServer.getGuildChatChannelId())) != null) {
             if (latestGuildmessage.equals("Guild > " + author + ": " + message) && latestGuildmessageAuthor.equals(author) &&
                     !latestMessageByIP.getOrDefault(requestSenderIpAddr, "").equals(author + ":" + message)) {
-                return; // TODO fix problem: if multiple ppl send messages at almost exact time then message might come delayed and it isnt latestMessage anymore
+                return; // TODO fix problem: if multiple ppl send messages at almost exact time in game then message might come delayed and it isnt latestMessage anymore
             }
             if (latestGuildmessageAuthor.equals(author)) {
                 latestGuildmessage += "\n" + "Guild > " + author + ": " + message;
@@ -349,11 +349,17 @@ public class Util {
     }
 
     public String getAuthorFromGuildChatMessage(String message) {
-        return getTextWithoutFormattingCodes(message).split(":")[0].substring(8);
+        message = getTextWithoutFormattingCodes(message);
+        if (message.startsWith("Guild > ")) message = message.substring(8);
+        return message.split(":")[0];
     }
 
     public String getMessageFromGuildChatMessage(String message) {
-        return getTextWithoutFormattingCodes(message.split(":")[1]);
+        try {
+            return getTextWithoutFormattingCodes(message.split(":")[1]);
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return getTextWithoutFormattingCodes(message);
+        }
     }
 
     public <T> List<T> turnListIntoSubClassList(List<?> list, Class<T> subclass) { // Looked at like 8 different stackoverflow threads to write this

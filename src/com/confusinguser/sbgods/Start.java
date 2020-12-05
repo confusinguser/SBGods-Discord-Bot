@@ -23,7 +23,7 @@ class Start {
     public static void main(String[] args) throws UnsupportedEncodingException {
         ServerSocket serverSocket;
         try {
-            serverSocket = new ServerSocket(35746, 10, InetAddress.getLocalHost());
+            serverSocket = new ServerSocket(35746, 10, InetAddress.getByName("0.0.0.0"));
         } catch (IOException e) {
             // Port taken, so app is already running
             System.out.println("Application is most likely already running");
@@ -113,7 +113,10 @@ class Start {
                         String message = parsedJson.get("message").getAsString();
                         DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(HypixelGuild.getGuildById(sbgods.getApiUtil().getGuildIDFromUUID(parsedJson.get("senderUUID").getAsString())), true);
                         if (discordServer == null) return;
-                        sbgods.getUtil().handleGuildMessage(sbgods.getDiscord(), discordServer, sbgods.getUtil().getAuthorFromGuildChatMessage(message), sbgods.getUtil().getMessageFromGuildChatMessage(message), ipAddr);
+                        sbgods.getUtil().handleGuildMessage(sbgods.getDiscord(), discordServer,
+                                sbgods.getUtil().getAuthorFromGuildChatMessage(message),
+                                sbgods.getUtil().getMessageFromGuildChatMessage(message),
+                                ipAddr);
                     });
                     socketThread.start();
                 } catch (IOException ioException) {
