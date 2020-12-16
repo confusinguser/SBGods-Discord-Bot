@@ -44,14 +44,17 @@ public class RemoteGuildChatManager {
                             return;
                         }
 
-                        DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(HypixelGuild.getGuildById(main.getApiUtil().getGuildIDFromUUID(parsedJson.get("senderUUID").getAsString())), true);
-                        if (discordServer == null) return;
-                        String message = parsedJson.get("message").getAsString();
-
-                        main.getRemoteGuildChatManager().handleGuildMessage(
-                                discordServer,
-                                message,
-                                ipAddr);
+                        try {
+                            DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(HypixelGuild.getGuildById(main.getApiUtil().getGuildIDFromUUID(parsedJson.get("senderUUID").getAsString())), true);
+                            if (discordServer == null) return;
+                            String message = parsedJson.get("message").getAsString();
+                            main.getRemoteGuildChatManager().handleGuildMessage(
+                                    discordServer,
+                                    message,
+                                    ipAddr);
+                        } catch (Throwable t) {
+                            main.getDiscord().reportFail(t, "Remote Guild Chat Manager");
+                        }
                     });
                     socketThread.start();
                 } catch (IOException ioException) {

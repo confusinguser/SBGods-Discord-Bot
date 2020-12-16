@@ -1,7 +1,5 @@
 package com.confusinguser.sbgods;
 
-import com.confusinguser.sbgods.utils.EncryptionUtil;
-
 import java.awt.*;
 import java.io.Console;
 import java.io.IOException;
@@ -32,15 +30,17 @@ class Start {
                 try {
                     Runtime.getRuntime().exec(new String[]{"cmd", "/c", "start", "cmd", "/k", "java -jar \"" + filename + "\""});
                     System.exit(0);
-                } catch (IOException e) {
-                    logTerminalError = true;
+                } catch (IOException ignored) {
                 }
             }
         }
 
-        SBGods sbgods = new SBGods(serverSocket);
-        if (logTerminalError) sbgods.logger.info("Could not open terminal");
-
-        EncryptionUtil encryptionUtil = new EncryptionUtil();
+        try {
+            new SBGods(serverSocket);
+        } catch (Throwable t) {
+            if (SBGods.getInstance() != null && SBGods.getInstance().getDiscord() != null) {
+                SBGods.getInstance().getDiscord().reportFail(t, "General Bot");
+            }
+        }
     }
 }

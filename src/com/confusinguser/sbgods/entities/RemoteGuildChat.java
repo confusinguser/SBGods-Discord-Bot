@@ -1,12 +1,16 @@
 package com.confusinguser.sbgods.entities;
 
 import com.confusinguser.sbgods.SBGods;
+import com.confusinguser.sbgods.utils.Multithreading;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class RemoteGuildChat {
     private final Map<InetAddress, String> latestMessageByIP = new HashMap<>();
@@ -14,6 +18,7 @@ public class RemoteGuildChat {
     private final DiscordServer discordServer;
     private String latestGuildmessageAuthor = "";
     private String latestGuildmessage = "";
+    private final List<String> blockedMessages = new ArrayList<>();
 
     public RemoteGuildChat(DiscordServer discordServer) {
         this.discordServer = discordServer;
@@ -21,13 +26,29 @@ public class RemoteGuildChat {
 
     public void handleGuildMessage(String author, String message, HypixelRank rank, InetAddress requestSenderIpAddr) {
         if (SBGods.getInstance().getDiscord() == null || author.isEmpty() || message.isEmpty()) return;
-        boolean shouldSendMessage = latestGuildmessage.equals("Guild > " + author + ": " + message) && latestGuildmessageAuthor.equals(author) &&
+        boolean shouldSendMessage = !blockedMessages.contains(author + ":" + message) && latestGuildmessage.equals("Guild > " + author + ": " + message) && latestGuildmessageAuthor.equals(author) &&
                 !latestMessageByIP.getOrDefault(requestSenderIpAddr, "").equals(author + ":" + message);
 
         if (shouldSendMessage && !latestMessageByIGN.getOrDefault(author, "").equals(message)) {
             latestMessageByIGN.put(author, message);
             latestMessageByIP.put(requestSenderIpAddr, author + ":" + message);
+            blockedMessages.add(author + ":" + message);
+            Multithreading.scheduleOnce(() -> blockedMessages.remove(author + ":" + message), 12, TimeUnit.SECONDS);
             sendMessage(author, message, rank);
+        }
+    }
+
+    public void handleJoinLeaveMessage(String player, boolean leaving, HypixelRank rank, InetAddress requestSenderIpAddr) {
+        if (SBGods.getInstance().getDiscord() == null || player.isEmpty()) return;
+        boolean shouldSendMessage = latestGuildmessage.equals("Guild > " + player + " " + (leaving ? "left" : "joined") + ".") && latestGuildmessageAuthor.equals(player) &&
+                !latestMessageByIP.getOrDefault(requestSenderIpAddr, "").equals(player + " " + (leaving ? "left" : "joined") + ".");
+
+        if (shouldSendMessage && !latestMessageByIGN.getOrDefault(player, "").equals((leaving ? "left" : "joined") + ".")) {
+            latestMessageByIGN.put(player, (leaving ? "left" : "joined") + ".");
+            latestMessageByIP.put(requestSenderIpAddr, player + " " + (leaving ? "left" : "joined") + ".");
+            blockedMessages.add(player + " " + (leaving ? "left" : "joined") + ".");
+            Multithreading.scheduleOnce(() -> blockedMessages.remove(player + " " + (leaving ? "left" : "joined") + "."), 12, TimeUnit.SECONDS);
+            sendJoinLeaveMessage(player, rank, leaving);
         }
     }
 
@@ -47,18 +68,6 @@ public class RemoteGuildChat {
                     .setColor(rank.getColor())
                     .setDescription(SBGods.getInstance().getDiscord().escapeMarkdown(latestGuildmessage)).build()).queue();
             latestGuildmessageAuthor = author;
-        }
-    }
-
-    public void handleJoinLeaveMessage(String player, boolean leaving, HypixelRank rank, InetAddress requestSenderIpAddr) {
-        if (SBGods.getInstance().getDiscord() == null || player.isEmpty()) return;
-        boolean shouldSendMessage = latestGuildmessage.equals("Guild > " + player + " " + (leaving ? "left" : "joined") + ".") && latestGuildmessageAuthor.equals(player) &&
-                !latestMessageByIP.getOrDefault(requestSenderIpAddr, "").equals(player + " " + (leaving ? "left" : "joined") + ".");
-
-        if (shouldSendMessage && !latestMessageByIGN.getOrDefault(player, "").equals((leaving ? "left" : "joined") + ".")) {
-            latestMessageByIGN.put(player, (leaving ? "left" : "joined") + ".");
-            latestMessageByIP.put(requestSenderIpAddr, player + " " + (leaving ? "left" : "joined") + ".");
-            sendJoinLeaveMessage(player, rank, leaving);
         }
     }
 

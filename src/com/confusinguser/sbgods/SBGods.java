@@ -145,7 +145,7 @@ public class SBGods {
     public String[] getKeys() {
         if (keys == null) {
             byte[] bytes;
-            try (InputStream stream = getClass().getResourceAsStream("/resources/keys.txt")) {
+            try (InputStream stream = getClass().getResourceAsStream("/keys.txt")) {
                 if (stream != null) {
                     bytes = stream.readAllBytes();
                 } else {
