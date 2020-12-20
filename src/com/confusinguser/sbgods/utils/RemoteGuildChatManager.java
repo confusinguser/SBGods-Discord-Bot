@@ -45,7 +45,10 @@ public class RemoteGuildChatManager {
                         }
 
                         try {
-                            DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(HypixelGuild.getGuildById(main.getApiUtil().getGuildIDFromUUID(parsedJson.get("senderUUID").getAsString())), true);
+                            DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(
+                                    HypixelGuild.getGuildById(
+                                            main.getApiUtil().getGuildIDFromUUID(
+                                                    parsedJson.get("senderUUID").getAsString())), true);
                             if (discordServer == null) return;
                             String message = parsedJson.get("message").getAsString();
                             main.getRemoteGuildChatManager().handleGuildMessage(

@@ -26,7 +26,8 @@ public class RemoteGuildChat {
 
     public void handleGuildMessage(String author, String message, HypixelRank rank, InetAddress requestSenderIpAddr) {
         if (SBGods.getInstance().getDiscord() == null || author.isEmpty() || message.isEmpty()) return;
-        boolean shouldSendMessage = !blockedMessages.contains(author + ":" + message) && latestGuildmessage.equals("Guild > " + author + ": " + message) && latestGuildmessageAuthor.equals(author) &&
+        boolean shouldSendMessage = !blockedMessages.contains(author + ":" + message) && !latestGuildmessage.equals("Guild > " + author + ": " + message) &&
+                !latestGuildmessageAuthor.equals(author) &&
                 !latestMessageByIP.getOrDefault(requestSenderIpAddr, "").equals(author + ":" + message);
 
         if (shouldSendMessage && !latestMessageByIGN.getOrDefault(author, "").equals(message)) {

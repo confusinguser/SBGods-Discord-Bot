@@ -79,18 +79,22 @@ public class SBUtil {
     }
 
     public int toSkillExp(int level) {
-        return toSkillExp((double) level);
-    }
-
-    public int toSkillExp(double level) {
         int exp = 0;
+        if (level == 50) return Constants.skill_exp_levels[49];
         for (int i = 0; i < level && i < Constants.skill_exp_levels.length; i++) {
             exp += Constants.skill_exp_levels[i];
         }
-        if (level == 50) return Constants.skill_exp_levels[49];
-        exp += (Constants.skill_exp_levels[(int) Math.floor(level) + 1] - Constants.skill_exp_levels[(int) Math.floor(level) - 1]) *
-                (level - Math.floor(level));
+        return exp;
+    }
 
+    public int toSkillExp(double level) {
+        int exp = toSkillExp((int) Math.floor(level));
+        try {
+            exp += (Constants.skill_exp_levels[(int) Math.floor(level) + 1] - Constants.skill_exp_levels[(int) Math.floor(level) - 1]) *
+                    (level - Math.floor(level));
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            SBGods.getInstance().getDiscord().reportFail(ex, "Skill Exp Converter");
+        }
         return exp;
     }
 

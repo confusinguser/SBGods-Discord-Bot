@@ -126,15 +126,13 @@ public class Player {
                 guild.getPlayerStatMap(), entry -> entry.getValue().getSkillLevels())).entrySet());
         if (skillExpList.isEmpty()) return -2;
 
+        List<Map.Entry<Player, SkillLevels>> list = new ArrayList<>(skillExpList);
         if (!includeStaff) {
-            skillExpList = skillExpList.stream().filter(player -> Stream.of("Trial Helper", "Helper", "Moderator", "Officer", "Bot Developer", "Co Owner").anyMatch(s -> !player.getKey().getGuildRank().contains(s))).collect(Collectors.toList());
+            list = list.stream().filter(player -> Stream.of("Trial Helper", "Helper", "Moderator", "Officer", "Bot Developer", "Co Owner").allMatch(s -> player.getKey().getGuildRank() != null && !player.getKey().getGuildRank().contains(s))).collect(Collectors.toList());
         }
-        skillExpList.sort(Comparator.comparingDouble(entry -> -entry.getValue().getAvgSkillLevel()));
-        int output = skillExpList.stream().map(Map.Entry::getKey).map(Player::getDisplayName).collect(Collectors.toList()).indexOf(getDisplayName());
-        if (output == -1) {
-            return getSkillPos(true);
-        }
-        return output;
+        list.sort(Comparator.comparingDouble(entry -> -entry.getValue().getAvgSkillLevel()));
+        int output = list.stream().map(Map.Entry::getKey).map(Player::getDisplayName).collect(Collectors.toList()).indexOf(getDisplayName());
+        return output == -1 ? getSkillPos(true) : output;
     }
 
     /**
@@ -152,7 +150,7 @@ public class Player {
 
         List<Map.Entry<Player, SlayerExp>> list = new ArrayList<>(slayerExpList);
         if (!includeStaff) {
-            list = list.stream().filter(player -> Stream.of("Trial Helper", "Helper", "Moderator", "Officer", "Bot Developer", "Co Owner").anyMatch(s -> !player.getKey().getGuildRank().contains(s))).collect(Collectors.toList());
+            list = list.stream().filter(player -> Stream.of("Trial Helper", "Helper", "Moderator", "Officer", "Bot Developer", "Co Owner").allMatch(s -> player.getKey().getGuildRank() != null && !player.getKey().getGuildRank().contains(s))).collect(Collectors.toList());
         }
         list.sort(Comparator.comparingDouble(entry -> -entry.getValue().getTotalExp()));
         int output = list.stream().map(Map.Entry::getKey).map(Player::getDisplayName).collect(Collectors.toList()).indexOf(getDisplayName());
