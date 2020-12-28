@@ -14,11 +14,13 @@ import net.dv8tion.jda.api.exceptions.HierarchyException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +33,24 @@ public class Util {
     private final List<MessageChannel> typingChannels = new ArrayList<>();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Pattern stripColorCodesRegex = Pattern.compile("§[a-f0-9rlkmn]");
+    private final int[] colorCodes = new int[]{
+            0x000000, // 0
+            0x0000aa, // 1
+            0x00aa00, // 2
+            0x00aaaa, // 3
+            0xaa0000, // 4
+            0xaa00aa, // 5
+            0xffaa00, // 6
+            0xaaaaaa, // 7
+            0x555555, // 8
+            0x5555ff, // 9
+            0x55ff55, // A
+            0x55ffff, // B
+            0xff5555, // C
+            0xff55ff, // D
+            0xffff55, // E
+            0xffffff  // F
+    };
 
     public Util(SBGods main) {
         this.main = main;
@@ -333,5 +353,53 @@ public class Util {
     public <T> List<T> turnListIntoSubClassList(List<?> list, Class<T> subclass) { // Looked at like 8 different stackoverflow threads to write this
         if (list.isEmpty()) return new ArrayList<>();
         return list.stream().filter(e -> subclass.isAssignableFrom(list.get(0).getClass())).map(subclass::cast).collect(Collectors.toList());
+    }
+
+    public int singleHexDigitToInt(char hex) {
+        if (hex >= '0' && hex <= '9')
+            return hex - '0';
+        if (hex >= 'A' && hex <= 'F')
+            return hex - 'A' + 10;
+        if (hex >= 'a' && hex <= 'f')
+            return hex - 'a' + 10;
+        return -1;
+    }
+
+    public Character closestMCColorCode(Color color) {
+        if (color == null) return null;
+        int leastTotalDiff = Integer.MAX_VALUE;
+        Character closestColorCode = null;
+        for (int i = 0; i < colorCodes.length; i++) {
+            int rawColorCode = colorCodes[i];
+            Color colorCode = new Color(rawColorCode);
+            int rDiff = Math.abs(color.getRed() - colorCode.getRed());
+            int gDiff = Math.abs(color.getGreen() - colorCode.getGreen());
+            int bDiff = Math.abs(color.getBlue() - colorCode.getBlue());
+            int totalDiff = rDiff + gDiff + bDiff;
+            if (leastTotalDiff > totalDiff) {
+                leastTotalDiff = totalDiff;
+                closestColorCode = String.format("%x", i).charAt(0);
+            }
+        }
+        return closestColorCode;
+    }
+
+    public Color mcColorCodeToColor(char colorCode) {
+        int colorCodeIndex = singleHexDigitToInt(colorCode);
+        if (colorCodeIndex < 0 || colorCodeIndex >= 16) return null;
+        return new Color(colorCodes[colorCodeIndex]);
+    }
+
+    public String bypassAntiSpam(String message) {
+        final char[] chars = new char[]{
+                '⭍',
+                'ࠀ'
+        };
+        Random random = new Random();
+        StringBuilder messageBuilder = new StringBuilder(message);
+        for (int i = 0; i < (256 - messageBuilder.length()); i++) {
+            messageBuilder.append(chars[random.nextInt(2)]);
+        }
+        return messageBuilder.toString();
     }
 }

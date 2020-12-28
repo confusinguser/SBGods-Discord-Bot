@@ -1,5 +1,7 @@
 package com.confusinguser.sbgods.utils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,7 +31,7 @@ public class Multithreading {
                 private final AtomicInteger counter = new AtomicInteger(0);
 
                 @Override
-                public Thread newThread(Runnable r) {
+                public Thread newThread(@NotNull Runnable r) {
                     return new Thread(r, "Thread " + counter.incrementAndGet());
                 }
             });
@@ -42,7 +44,7 @@ public class Multithreading {
                 private final AtomicInteger counter = new AtomicInteger(0);
 
                 @Override
-                public Thread newThread(Runnable r) {
+                public Thread newThread(@NotNull Runnable r) {
                     return new Thread(r, "Thread " + counter.incrementAndGet());
                 }
             });

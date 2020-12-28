@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum HypixelGuild {
-    SBG("5cd01bdf77ce84cf1204cd61", 750000, 30, "Skyblock Gods", "SBG Guild Member", "SBG"),
+    SBG("5fea32eb8ea8c9724b8e3f3c", 750000, 30, "Skyblock Gods", "SBG Guild Member", "SBG"),
     SBF("5e4e6d0d8ea8c9feb3f0e44f", 150000, 24, "Skyblock Forceful", "SBF Guild Member", "SBF");
 
     private final String guildId;
