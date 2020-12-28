@@ -80,7 +80,6 @@ public class SBUtil {
 
     public int toSkillExp(int level) {
         int exp = 0;
-        if (level == 50) return Constants.skill_exp_levels[49];
         for (int i = 0; i < level && i < Constants.skill_exp_levels.length; i++) {
             exp += Constants.skill_exp_levels[i];
         }

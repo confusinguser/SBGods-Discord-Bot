@@ -6,7 +6,8 @@ public enum HypixelRank {
     VIP_PLUS(0x55FF55, "[VIP+]", 'a'),
     MVP(0x00AAAA, "[MVP]", 'b'),
     MVP_PLUS(0x00AAAA, "[MVP+]", 'b'),
-    SUPERSTAR(0xFFAA00, "[MVP++]", '6');
+    SUPERSTAR(0xFFAA00, "[MVP++]", '6'),
+    YOUTUBE(0xFF5555, "[YOUTUBE]", 'c');
 
     private final int color;
     private final String tag;

@@ -436,8 +436,21 @@ public class ApiUtil {
         }
     }
 
-    public String getGuildIDFromUUID(String UUID) {
+    public String getGuildFromID(String ID) {
+        if (ID == null) return null;
+        String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&id=" + ID, 300000);
+        if (response == null) return null;
 
+        JSONObject jsonObject = new JSONObject(response);
+
+        try {
+            return jsonObject.getJSONObject("guild").getString("name");
+        } catch (JSONException e) {
+            return null;
+        }
+    }
+
+    public String getGuildIDFromUUID(String UUID) {
         String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&player=" + UUID, 300000);
         if (response == null) return null;
 
