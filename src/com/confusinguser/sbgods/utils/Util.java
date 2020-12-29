@@ -260,10 +260,10 @@ public class Util {
                         rankGiven = "Elite";
                     }
                     if (highestLeaderboardPos < 15) {
-                        rankGiven = "King";
+                        rankGiven = "Skyblock King";
                     }
                     if (highestLeaderboardPos < 5) {
-                        rankGiven = "God";
+                        rankGiven = "Skyblock God";
                     }
 
                     JSONArray guildRanksChange = main.getApiUtil().getGuildRanksChange();
@@ -274,7 +274,7 @@ public class Util {
                         }
                     }
 
-                    if (thePlayer.getGuildRank() != null && !thePlayer.getGuildRank().contains(rankGiven) && (thePlayer.getGuildRank().contains("Member") || thePlayer.getGuildRank().contains("Elite") || thePlayer.getGuildRank().contains("King") || thePlayer.getGuildRank().contains("God"))) {
+                    if (thePlayer.getGuildRank() != null && !thePlayer.getGuildRank().contains(rankGiven) && (thePlayer.getGuildRank().contains("Member") || thePlayer.getGuildRank().contains("Elite") || thePlayer.getGuildRank().contains("Skyblock King") || thePlayer.getGuildRank().contains("Skyblock God"))) {
                         JSONObject newPlayerJson = new JSONObject();
 
                         newPlayerJson.put("uuid", thePlayer.getUUID());
