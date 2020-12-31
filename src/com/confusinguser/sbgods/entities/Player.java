@@ -132,7 +132,9 @@ public class Player {
         }
         list.sort(Comparator.comparingDouble(entry -> -entry.getValue().getAvgSkillLevel()));
         int output = list.stream().map(Map.Entry::getKey).map(Player::getDisplayName).collect(Collectors.toList()).indexOf(getDisplayName());
-        return output == -1 ? getSkillPos(true) : output;
+        return output == -1 ?
+                (includeStaff ? output : getSkillPos(true)) :
+                output;
     }
 
     /**
@@ -154,9 +156,8 @@ public class Player {
         }
         list.sort(Comparator.comparingDouble(entry -> -entry.getValue().getTotalExp()));
         int output = list.stream().map(Map.Entry::getKey).map(Player::getDisplayName).collect(Collectors.toList()).indexOf(getDisplayName());
-        if (output == -1) {
-            return getSlayerPos(true);
-        }
-        return output;
+        return output == -1 ?
+                (includeStaff ? output : getSlayerPos(true)) :
+                output;
     }
 }
