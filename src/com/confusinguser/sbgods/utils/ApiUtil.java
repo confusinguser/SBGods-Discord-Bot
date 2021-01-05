@@ -436,7 +436,7 @@ public class ApiUtil {
         }
     }
 
-    public String getGuildFromID(String ID) {
+    public String getGuildNameFromId(String ID) {
         if (ID == null) return null;
         String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&id=" + ID, 300000);
         if (response == null) return null;

@@ -20,10 +20,10 @@ import java.util.logging.*;
 import java.util.stream.Collectors;
 
 public class SBGods {
-    public static final String VERSION = "0.9.4.6";
+    public static final String VERSION = "0.9.4.7";
     public static final String VERSION_DESCRIPTION_MAJOR = ""; // Change this every major release: 0.9.6.3 -> 1.0
     public static final String VERSION_DESCRIPTION_MINOR = "Added live guild chat"; // Change this every minor release: 0.8.11.5 -> 0.8.12
-    public static final String VERSION_DESCRIPTION_PATCH = "Live GC improvements, SBG id update, got disbanded :/"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
+    public static final String VERSION_DESCRIPTION_PATCH = "More improv"; // Change this every patch: 0.8.11.4 -> 0.8.11.5
     public static final String[] DEVELOPERS = {"244786205873405952", "497210228274757632"};
     /**
      * NOTE: OVERRIDEN IN {@code getActiveServers()} IF NOT IN IDE

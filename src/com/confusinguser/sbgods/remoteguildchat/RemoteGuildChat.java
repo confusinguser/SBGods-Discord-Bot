@@ -20,7 +20,7 @@ public class RemoteGuildChat {
     private String latestGuildmessage = "";
     private final List<String> blockedMessages = new ArrayList<>();
 
-    public void handleGuildMessage(String author, String message, HypixelRank rank, InetAddress requestSenderIpAddr, boolean sbgbot, MessageChannel channel) {
+    public void handleGuildMessage(String author, String message, HypixelRank rank, InetAddress requestSenderIpAddr, boolean showMessageOnly, MessageChannel channel) {
         if (SBGods.getInstance().getDiscord() == null || author.isEmpty() || message.isEmpty()) return;
         boolean shouldSendMessage = !blockedMessages.contains(author + ":" + message) && !latestGuildmessage.equals("Guild > " + author + ": " + message) &&
                 !latestGuildmessageAuthor.equals(author) &&
@@ -31,7 +31,7 @@ public class RemoteGuildChat {
             latestMessageByIP.put(requestSenderIpAddr, author + ":" + message);
             blockedMessages.add(SBGods.getInstance().getUtil().stripColorCodes(author + ":" + message));
             Multithreading.scheduleOnce(() -> blockedMessages.remove(author + ":" + message), 12, TimeUnit.SECONDS);
-            sendMessage(author, message, rank, sbgbot, channel);
+            sendMessage(author, message, rank, showMessageOnly, channel);
         }
     }
 
@@ -49,17 +49,17 @@ public class RemoteGuildChat {
         }
     }
 
-    private void sendMessage(String author, String message, HypixelRank rank, boolean sbgbot, MessageChannel channel) {
+    private void sendMessage(String author, String message, HypixelRank rank, boolean showMessageOnly, MessageChannel channel) {
         if (channel != null) {
             if (latestGuildmessageAuthor.equals(author)) {
-                if (sbgbot) latestGuildmessage += "\n" + message;
-                else latestGuildmessage += "\n" + "Guild > " + author + ": " + message;
+                if (showMessageOnly) latestGuildmessage += "\nGuild > " + message;
+                else latestGuildmessage += "\nGuild > " + author + ": " + message;
                 try {
                     channel.deleteMessageById(channel.getLatestMessageId()).queue();
                 } catch (IllegalStateException ignored) {
                 } // If no last message id found
             } else {
-                if (sbgbot) latestGuildmessage = message;
+                if (showMessageOnly) latestGuildmessage = "Guild > " + message;
                 else latestGuildmessage = "Guild > " + author + ": " + message;
             }
             channel.sendMessage(new EmbedBuilder()

@@ -402,4 +402,8 @@ public class Util {
         }
         return messageBuilder.toString();
     }
+
+//    public int calculatePlayerScore() { TODO
+//        return Math.round((Math.pow())) / 1000;
+//    }
 }

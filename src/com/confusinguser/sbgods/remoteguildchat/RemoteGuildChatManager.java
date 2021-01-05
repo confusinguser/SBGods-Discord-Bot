@@ -113,7 +113,6 @@ public class RemoteGuildChatManager {
                 if (dataInputStream.read(dataBytes) < 1) return;
                 data = new DataInputStream(new ByteArrayInputStream(dataBytes)).readUTF();
                 if (data.isEmpty()) return; // Socket is dead
-                System.out.println(data);
                 parsedJson = JsonParser.parseString(data).getAsJsonObject();
             } catch (IOException ex) { // Stream closed on client side
                 try {
@@ -134,7 +133,7 @@ public class RemoteGuildChatManager {
                 String message = parsedJson.get("message").getAsString();
 
                 if (discordServer == null) {
-                    String guildName = main.getApiUtil().getGuildFromID(clientConnection.getGuildId());
+                    String guildName = main.getApiUtil().getGuildNameFromId(clientConnection.getGuildId());
                     if (guildName == null) {
                         guildName = "none";
                     }
@@ -202,16 +201,11 @@ public class RemoteGuildChatManager {
         }
 
         if (RegexUtil.stringMatches("§2Guild > .*§[a-fA-F0-9](?: |)(\\d{1,2})", text) ||
-                RegexUtil.stringMatches("Guild > .* (\\d{1,2})", text)) { // Spam filter in forge mods
+                RegexUtil.stringMatches("Guild > .* \\(\\d{1,2}\\)", text)) { // Spam filter in forge mods
             StringJoiner joiner = new StringJoiner(" ");
-            String[] split = text.split(" ");
-            for (int i = 0; i < split.length; i++) {
-                String s = split[i];
-                if (i == split.length - 1 && !RegexUtil.stringMatches("\\(\\d{1,2}\\)", s)) {
-                    joiner.add(s);
-                }
-            }
-            text = joiner.toString();
+            String[] fullSplit = text.split(" ");
+            String[] split = Arrays.copyOf(fullSplit, fullSplit.length - 1);
+            text = String.join(" ", split);
         }
 
         String author = main.getUtil().getAuthorFromGuildChatMessage(text);
