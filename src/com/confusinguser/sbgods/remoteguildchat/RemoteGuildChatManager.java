@@ -212,14 +212,16 @@ public class RemoteGuildChatManager {
         String message = main.getUtil().getMessageFromGuildChatMessage(text);
         rank = HypixelRank.getHypixelRankFromRankName(author.substring(0, author.contains("]") ? author.indexOf("]") + 1 : 0));
         boolean showMessageOnly = false;
+        boolean guildPrefix = true;
         if (RegexUtil.stringMatches("§2Guild > (?:§[0-9a-f]\\[[\\w§]+\\] |)\\w{3,16}(?: §e\\[\\w*\\]|)§f: @\\w{3,16}, .*", text)
                 || RegexUtil.stringMatches("Guild > (?:\\[[\\w\\W]+\\] |)\\w{3,16}(?: \\[\\w*\\]|): @\\w{3,16}, .*", text)) {
             message = "SBGBOT > " + main.getUtil().getMessageFromGuildChatMessage(text).replaceFirst(", ", " → ").replace("⭍", "").replace("ࠀ", "");
             showMessageOnly = true;
+            guildPrefix = false;
         }
         if (message.equals(author)) { // Avoid "Guild > stuff: stuff" if something went wrong
             showMessageOnly = true;
         }
-        guildChatMap.get(guildID).handleGuildMessage(author, message, rank, requestSenderIpAddr, showMessageOnly, channel);
+        guildChatMap.get(guildID).handleGuildMessage(author, message, rank, requestSenderIpAddr, showMessageOnly, guildPrefix, channel);
     }
 }

@@ -7,12 +7,14 @@ gradle
 # Ignore Eclipse data
 .settings
 .project
+.classpath
 
 # Ignore compiled class binaries
 *.class
 bin
 classes
 out
+*.jar
 
 # Ignore Gradle build output directory
 build
@@ -21,3 +23,5 @@ build
 .idea
 *.iml
 hs_err_pid*.log
+
+.DS_Store
