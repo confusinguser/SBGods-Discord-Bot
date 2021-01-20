@@ -256,7 +256,6 @@ public enum HelpMessage {
         if (subCommands.length > 0) {
             embedBuilder.addField("Sub-commands", "`" + main.getDiscord().commandPrefix + String.join("`\n`" + main.getDiscord().commandPrefix, subCommands) + "`", false);
         }
-        embedBuilder.setFooter("Version " + SBGods.VERSION);
 
         for (String helpLine : helpLines) {
             embedBuilder.appendDescription(helpLine + "\n");
