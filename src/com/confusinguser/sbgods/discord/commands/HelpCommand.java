@@ -49,7 +49,6 @@ public class HelpCommand extends Command {
         }
         embedBuilder.setDescription(description.toString());
         embedBuilder.setColor(0xe3a702);
-        embedBuilder.setFooter("Version " + SBGods.VERSION);
 
         e.getChannel().sendMessage(embedBuilder.build()).queue();
     }

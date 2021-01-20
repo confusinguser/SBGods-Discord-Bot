@@ -627,6 +627,10 @@ public class ApiUtil {
         getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/setDiscordMcName.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace("#", "*").replace(" ", "%20") + "&mc=" + mcName);
     }
 
+    public void sendGuildMessageToSApi(String guildMessage) {
+        getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/newGuildChatMessage.json?key=HoVoiuWfpdAjJhfTj0YN&message=" + guildMessage);
+    }
+
     public Path downloadFile(String urlStr, File file) throws IOException {
         URL url = new URL(urlStr);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();

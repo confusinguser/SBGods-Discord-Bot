@@ -3,7 +3,6 @@ package com.confusinguser.sbgods.discord.commands;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -26,22 +25,6 @@ public class SbgodsCommand extends Command {
     public void handleCommand(MessageReceivedEvent e, @NotNull DiscordServer currentDiscordServer, @NotNull Member senderMember, String[] args) {
         if (args.length == 1) {
             e.getChannel().sendMessage("Invalid argument! Valid arguments: `version`, `update`, `stop`!").queue();
-            return;
-        }
-
-        if (args[1].equalsIgnoreCase("version")) {
-            EmbedBuilder embedBuilder = new EmbedBuilder()
-                    .setTitle("Version " + SBGods.VERSION)
-                    .setDescription(
-                            "Minor: " + SBGods.VERSION_DESCRIPTION_MINOR +
-                                    "\nPatch: " + SBGods.VERSION_DESCRIPTION_PATCH)
-                    .setFooter("Made by ConfusingUser#5712 and Soopyboo32#3042");
-            e.getChannel().sendMessage(embedBuilder.build()).queue();
-            return;
-        }
-
-        if (args[1].equalsIgnoreCase("test")) {
-            //e.getGuild().addRoleToMember("747232589961625665", e.getGuild().getRoleById("668262322904498210")).queue();
             return;
         }
 
@@ -105,6 +88,6 @@ public class SbgodsCommand extends Command {
                 }
             }
         }
-        e.getChannel().sendMessage("Invalid argument! Valid arguments: `version`, `update`, `stop`!").queue();
+        e.getChannel().sendMessage("Invalid argument! Valid arguments: `update`, `stop`!").queue();
     }
 }

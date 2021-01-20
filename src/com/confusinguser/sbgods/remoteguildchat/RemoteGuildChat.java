@@ -23,12 +23,11 @@ public class RemoteGuildChat {
     public void handleGuildMessage(String author, String message, HypixelRank rank, InetAddress requestSenderIpAddr, boolean showMessageOnly, boolean guildPrefix, MessageChannel channel) {
         if (SBGods.getInstance().getDiscord() == null || author.isEmpty() || message.isEmpty()) return;
         boolean shouldSendMessage = !blockedMessages.contains(author + ":" + message) && !latestGuildmessage.equals((guildPrefix ? "Guild > " : "") + author + ": " + message) &&
-                !latestGuildmessageAuthor.equals(author) &&
-                !latestMessageByIP.getOrDefault(requestSenderIpAddr, "").equals(author + ":" + message);
+                !latestGuildmessageAuthor.equals(author);
 
         if (shouldSendMessage && !latestMessageByIGN.getOrDefault(author, "").equals(message)) {
+            Multithreading.runAsync(() -> SBGods.getInstance().getApiUtil().sendGuildMessageToSApi("§2Guild > §r" + author + ": " + message));
             latestMessageByIGN.put(author, message);
-            latestMessageByIP.put(requestSenderIpAddr, author + ":" + message);
             blockedMessages.add(SBGods.getInstance().getUtil().stripColorCodes(author + ":" + message));
             Multithreading.scheduleOnce(() -> blockedMessages.remove(author + ":" + message), 12, TimeUnit.SECONDS);
             sendMessage(author, message, rank, showMessageOnly, guildPrefix, channel);
@@ -37,13 +36,12 @@ public class RemoteGuildChat {
 
     public void handleJoinLeaveMessage(String player, boolean leaving, HypixelRank rank, InetAddress requestSenderIpAddr, MessageChannel channel) {
         if (SBGods.getInstance().getDiscord() == null || player.isEmpty()) return;
-        boolean shouldSendMessage = (!latestGuildmessage.equals("Guild > " + player + " " + (leaving ? "left" : "joined") + ".") || !latestGuildmessageAuthor.equals(player)) &&
-                !latestMessageByIP.getOrDefault(requestSenderIpAddr, "").equals(player + " " + (leaving ? "left" : "joined") + ".");
+        String fullMessage = "Guild > " + player + " " + (leaving ? "left" : "joined") + ".";
+        boolean shouldSendMessage = !latestGuildmessage.equals(fullMessage) || !latestGuildmessageAuthor.equals(player);
 
-        if (shouldSendMessage && !latestMessageByIGN.getOrDefault(player, "").equals((leaving ? "left" : "joined") + ".")) {
-            latestMessageByIGN.put(player, (leaving ? "left" : "joined") + ".");
-            latestMessageByIP.put(requestSenderIpAddr, player + " " + (leaving ? "left" : "joined") + ".");
+        if (shouldSendMessage) {
             blockedMessages.add(player + " " + (leaving ? "left" : "joined") + ".");
+            Multithreading.runAsync(() -> SBGods.getInstance().getApiUtil().sendGuildMessageToSApi(fullMessage));
             Multithreading.scheduleOnce(() -> blockedMessages.remove(player + " " + (leaving ? "left" : "joined") + "."), 12, TimeUnit.SECONDS);
             sendJoinLeaveMessage(player, rank, leaving, channel);
         }
