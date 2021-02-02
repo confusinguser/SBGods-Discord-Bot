@@ -4,6 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordPerms;
 import com.confusinguser.sbgods.entities.DiscordServer;
+import com.confusinguser.sbgods.utils.Util;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -35,13 +36,13 @@ public abstract class Command extends ListenerAdapter {
 
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.execute(() -> {
-            main.getUtil().setTyping(true, e.getChannel());
+            Util.setTyping(true, e.getChannel());
             try {
                 handleCommand(e, discordServer, member, e.getMessage().getContentRaw().split(" "));
             } catch (Throwable t) {
                 main.getDiscord().reportFail(t, "Command Handler");
             } finally {
-                main.getUtil().setTyping(false, e.getChannel());
+                Util.setTyping(false, e.getChannel());
             }
         });
         executorService.shutdown();

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LangUtil {
@@ -83,37 +84,13 @@ public class LangUtil {
         return String.valueOf(input);
     }
 
-    public String addNotation(double num) {
-        String prefix = "";
-        if (num < 0) {
-            num *= -1;
-            prefix = "-";
+    public static String getAuthorGuildRank(String author) {
+        Matcher matcher = RegexUtil.getMatcher("(?:\\[.*\\]|) \\w{3,32} (\\[.*\\])", author);
+        if (matcher.find()) {
+            String group = matcher.group(1);
+            return group == null ? "" : group;
         }
-        double returnVal;
-        String[] notList = new String[]{"K", "M", "B"};
-        String returnValStr = df.format(num);
-        long checkNum = 1000;
-
-        String notValue;
-        int i = 0;
-        for (int u = notList.length; u > 0; u--) {
-            notValue = notList[i];
-            i++;
-            for (int o = 3; o >= 1; o--) {
-                if (num >= checkNum) {
-                    returnVal = num / checkNum * 100;
-                    returnVal = Math.floor(returnVal);
-                    returnVal = (returnVal / Math.pow(10, o)) * 10;
-                    returnValStr = "" + main.getUtil().round(returnVal, o - 1);
-                    if (returnValStr.endsWith(".0")) {
-                        returnValStr = returnValStr.replace(".0", "");
-                    }
-                    returnValStr += notValue;
-                }
-                checkNum *= 10;
-            }
-        }
-        return prefix + returnValStr;
+        return "";
     }
 
     /**
@@ -218,5 +195,47 @@ public class LangUtil {
             currentOutput.add(message);
         }
         return currentOutput;
+    }
+
+    public static String getAuthorNameAndRank(String author) {
+        Matcher matcher = RegexUtil.getMatcher("((?:\\[.*\\]|) \\w{3,32})", author);
+        if (matcher.find()) {
+            String group = matcher.group(1);
+            return group == null ? "" : group;
+        }
+        return "";
+    }
+
+    public String addNotation(double num) {
+        String prefix = "";
+        if (num < 0) {
+            num *= -1;
+            prefix = "-";
+        }
+        double returnVal;
+        String[] notList = new String[]{"K", "M", "B"};
+        String returnValStr = df.format(num);
+        long checkNum = 1000;
+
+        String notValue;
+        int i = 0;
+        for (int u = notList.length; u > 0; u--) {
+            notValue = notList[i];
+            i++;
+            for (int o = 3; o >= 1; o--) {
+                if (num >= checkNum) {
+                    returnVal = num / checkNum * 100;
+                    returnVal = Math.floor(returnVal);
+                    returnVal = (returnVal / Math.pow(10, o)) * 10;
+                    returnValStr = "" + Util.round(returnVal, o - 1);
+                    if (returnValStr.endsWith(".0")) {
+                        returnValStr = returnValStr.replace(".0", "");
+                    }
+                    returnValStr += notValue;
+                }
+                checkNum *= 10;
+            }
+        }
+        return prefix + returnValStr;
     }
 }

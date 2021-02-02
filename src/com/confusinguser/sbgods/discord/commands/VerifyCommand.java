@@ -4,6 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
+import com.confusinguser.sbgods.utils.Util;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +33,7 @@ public class VerifyCommand extends Command {
                 return;
             }
             if (player.getDiscordTag().equalsIgnoreCase(e.getAuthor().getAsTag())) {
-                switch (main.getUtil().verifyPlayer(senderMember, player.getDisplayName(), e.getGuild(), e.getChannel())) {
+                switch (Util.verifyPlayer(senderMember, player.getDisplayName(), e.getGuild(), e.getChannel())) {
                     case 0:
                         e.getChannel().sendMessage(e.getAuthor().getAsMention() + " you are already verified to the account mc account " + player.getDisplayName()).queue();
                         return;
@@ -65,7 +66,7 @@ public class VerifyCommand extends Command {
             }
 
             // Verify player with mc name mcName
-            main.getUtil().verifyPlayer(senderMember, mcName, e.getGuild(), e.getChannel());
+            Util.verifyPlayer(senderMember, mcName, e.getGuild(), e.getChannel());
         }
     }
 }

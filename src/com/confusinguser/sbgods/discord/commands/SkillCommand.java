@@ -6,6 +6,7 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.leaderboard.LeaderboardValue;
 import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
+import com.confusinguser.sbgods.utils.Util;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -67,13 +68,13 @@ public class SkillCommand extends Command {
             if (spreadsheet) {
                 for (Entry<Player, ? extends LeaderboardValue> currentEntry : leaderboardList) {
                     if (!currentEntry.getValue().isApproximate()) {
-                        response.append(currentEntry.getKey().getDisplayName()).append("    ").append(main.getUtil().round(currentEntry.getValue().getValue(), 2)).append("\n");
+                        response.append(currentEntry.getKey().getDisplayName()).append("    ").append(Util.round(currentEntry.getValue().getValue(), 2)).append("\n");
                     }
                 }
             } else {
                 int totalAvgSkillLvl = 0;
                 for (Entry<Player, ? extends LeaderboardValue> currentEntry : leaderboardList) {
-                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(main.getUtil().round(currentEntry.getValue().getValue(), 2));
+                    response.append("**#").append(leaderboardList.indexOf(currentEntry) + 1).append("** *").append(currentEntry.getKey().getDisplayName()).append(":* ").append(Util.round(currentEntry.getValue().getValue(), 2));
                     if (currentEntry.getValue().isApproximate()) {
                         response.append(" *(appr.)*");
                     }
@@ -84,7 +85,7 @@ public class SkillCommand extends Command {
                     response.append("\n**Average guild skill level: ");
                 else
                     response.append("\n**Average skill level top #").append(topX).append(": ");
-                response.append(main.getUtil().round((double) totalAvgSkillLvl / topX, 2)).append("**");
+                response.append(Util.round((double) totalAvgSkillLvl / topX, 2)).append("**");
             }
 
             String responseString = response.toString();
@@ -110,9 +111,9 @@ public class SkillCommand extends Command {
         StringBuilder descriptionBuilder = embedBuilder.getDescriptionBuilder();
 
         if (skillLevels.isApproximate()) {
-            descriptionBuilder.append("Approximate average skill level: **").append(main.getUtil().round(skillLevels.getAvgSkillLevel(), 3)).append("**\n\n");
+            descriptionBuilder.append("Approximate average skill level: **").append(Util.round(skillLevels.getAvgSkillLevel(), 3)).append("**\n\n");
         } else {
-            descriptionBuilder.append("Average skill level: **").append(main.getUtil().round(skillLevels.getAvgSkillLevel(), 3)).append("**\n\n");
+            descriptionBuilder.append("Average skill level: **").append(Util.round(skillLevels.getAvgSkillLevel(), 3)).append("**\n\n");
         }
 
         descriptionBuilder

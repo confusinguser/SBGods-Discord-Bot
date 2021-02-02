@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -594,7 +595,7 @@ public class ApiUtil {
                 return new PlayerAH("There was an error fetching the player's auctions, please try again later.");
             }
 
-            List<JSONObject> unclaimedAuctionsJson = main.getUtil().turnListIntoSubClassList(auctionJSONArray.toList(), JSONObject.class).stream().filter((auction) -> !auction.getBoolean("claimed")).collect(Collectors.toList());
+            List<JSONObject> unclaimedAuctionsJson = Util.turnListIntoSubClassList(auctionJSONArray.toList(), JSONObject.class).stream().filter((auction) -> !auction.getBoolean("claimed")).collect(Collectors.toList());
             for (JSONObject unclaimedAuction : unclaimedAuctionsJson) {
                 String itemName = unclaimedAuction.getString("item_name");
                 String itemTier = unclaimedAuction.getString("tier");
@@ -628,7 +629,10 @@ public class ApiUtil {
     }
 
     public void sendGuildMessageToSApi(String guildMessage) {
-        getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/newGuildChatMessage.json?key=HoVoiuWfpdAjJhfTj0YN&message=" + guildMessage);
+        try {
+            getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/newGuildChatMessage.json?key=HoVoiuWfpdAjJhfTj0YN&message=" + URLEncoder.encode(guildMessage, "UTF-8"));
+        } catch (UnsupportedEncodingException ignored) {
+        }
     }
 
     public Path downloadFile(String urlStr, File file) throws IOException {
@@ -768,7 +772,7 @@ public class ApiUtil {
         JSONObject jsonObject = new JSONObject(response);
 
         List<SkyblockProfile> output = new ArrayList<>();
-        for (JSONObject profile : main.getUtil().turnListIntoSubClassList(jsonObject.getJSONArray("profiles").toList(), JSONObject.class)) {
+        for (JSONObject profile : Util.turnListIntoSubClassList(jsonObject.getJSONArray("profiles").toList(), JSONObject.class)) {
             List<Player> members = profile.getJSONObject("members").keySet().stream().map(this::getPlayerFromUUID).collect(Collectors.toList());
             String cuteName = profile.getString("cute_name");
             double balance;
@@ -812,7 +816,7 @@ public class ApiUtil {
         JSONObject jsonObject = new JSONObject(response);
 
         DungeonExps bestDungeonExps = new DungeonExps();
-        for (JSONObject profile : main.getUtil().turnListIntoSubClassList(jsonObject.getJSONArray("profiles").toList(), JSONObject.class)) {
+        for (JSONObject profile : Util.turnListIntoSubClassList(jsonObject.getJSONArray("profiles").toList(), JSONObject.class)) {
             Map<String, Double> dungeonLevelsMap = new HashMap<>();
             try {
                 profile = profile.getJSONObject(playerUUID).getJSONObject("dungeons");

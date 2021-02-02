@@ -5,6 +5,7 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
 import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
+import com.confusinguser.sbgods.utils.Util;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -128,7 +129,7 @@ public class ReactionListener extends ListenerAdapter {
             String description = String.format(
                     "Slayer exp: %s\nAvg. skill level: %s\nDiscord: %s",
                     main.getLangUtil().addNotation(slayerExp.getTotalExp()),
-                    main.getUtil().round(skillLevels.getAvgSkillLevel(), 2),
+                    Util.round(skillLevels.getAvgSkillLevel(), 2),
                     user.getAsMention());
             embedBuilder.setDescription(description);
             embedBuilder.setTimestamp(new Date().toInstant());

@@ -5,6 +5,7 @@ import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.leaderboard.DungeonExps;
+import com.confusinguser.sbgods.utils.Util;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -103,7 +104,7 @@ public class DungeonCommand extends Command {
         DungeonExps dungeonExps = main.getApiUtil().getBestDungeonExpsForPlayer(thePlayer.getUUID());
 
         EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x51047d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " Dungeon XP");
-        embedBuilder.addField("Average Dungeon Level", "" + main.getUtil().round(main.getSBUtil().toSkillLevelDungeoneering(dungeonExps.getAverageDungeonExp()), 2), false);
+        embedBuilder.addField("Average Dungeon Level", "" + Util.round(main.getSBUtil().toSkillLevelDungeoneering(dungeonExps.getAverageDungeonExp()), 2), false);
         embedBuilder.addField("Dungeons and Classes",
                 "**Catacombs** " + main.getLangUtil().addCommas(dungeonExps.getCatacombsExp()) + "\n" +
                         "**Healer**    " + main.getLangUtil().addCommas(dungeonExps.getHealerExp()) + "\n" +

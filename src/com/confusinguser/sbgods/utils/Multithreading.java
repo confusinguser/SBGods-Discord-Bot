@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Multithreading {
 
-    public static ExecutorService executor = Executors.newCachedThreadPool(new ThreadFactory() {
+    public static final ExecutorService executor = Executors.newCachedThreadPool(new ThreadFactory() {
         final AtomicInteger counter = new AtomicInteger(0);
 
         @Override

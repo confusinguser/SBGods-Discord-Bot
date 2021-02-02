@@ -29,7 +29,6 @@ public class SBGods {
     private static SBGods instance;
     public final Logger logger = Logger.getLogger(this.getClass().getName());
     private final ApiUtil apiutil;
-    private final Util util;
     private final SBUtil sbUtil;
     private final LangUtil langUtil;
     private final CacheUtil cacheUtil;
@@ -42,6 +41,7 @@ public class SBGods {
     private boolean inIDE = false;
 
     public SBGods(ServerSocket serverSocket) {
+        instance = this;
         try {
             inIDE = !URLDecoder.decode(Start.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6), StandardCharsets.UTF_8.toString()).endsWith(".jar");
         } catch (UnsupportedEncodingException ignored) {
@@ -65,13 +65,11 @@ public class SBGods {
         }
 
         this.apiutil = new ApiUtil(this);
-        this.util = new Util(this);
         this.sbUtil = new SBUtil(this);
         this.langUtil = new LangUtil(this);
         this.cacheUtil = new CacheUtil(this);
         this.remoteGuildChatManager = new RemoteGuildChatManager(this);
         remoteGuildChatManager.startListener(serverSocket);
-        instance = this;
         try {
             this.discordBot = new DiscordBot(this);
         } catch (LoginException e) {
@@ -104,10 +102,6 @@ public class SBGods {
 
     public ApiUtil getApiUtil() {
         return apiutil;
-    }
-
-    public Util getUtil() {
-        return util;
     }
 
     public SBUtil getSBUtil() {

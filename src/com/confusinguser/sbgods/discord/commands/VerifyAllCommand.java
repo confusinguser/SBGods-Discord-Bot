@@ -4,6 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
+import com.confusinguser.sbgods.utils.Util;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -57,7 +58,6 @@ public class VerifyAllCommand extends Command {
                     } catch (HierarchyException ignored) {
                     }
                 }
-
             }
             e.getChannel().sendMessage("Removed everyone's verified and guild roles!").queue();
             return;
@@ -82,7 +82,7 @@ public class VerifyAllCommand extends Command {
             }
             String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag());
             if (!mcName.equals("")) {
-                int response = main.getUtil().verifyPlayer(member, mcName, discord, channel);
+                int response = Util.verifyPlayer(member, mcName, discord, channel);
                 if (response == 1) { // Message was sent
                     playersVerified++;
                 } else if (response == 2) { // Bot still loading
@@ -95,7 +95,7 @@ public class VerifyAllCommand extends Command {
 
         channel.editMessageById(messageId, playersVerified == 0 ? "Did not verify any players" : "Verified " + playersVerified + (playersVerified == 1 ? " player!" : " players!")).queue();
 
-        main.getUtil().scheduleCommandAfter(() ->
+        Util.scheduleCommandAfter(() ->
                 channel.getHistoryAfter(messageId, 100).complete().getRetrievedHistory().stream()
                         .filter(message -> message.getContentRaw().startsWith("Linked") // Get all messages that start with "Linked"
                                 && discord.getJDA().getSelfUser().getId().equals(message.getAuthor().getId()))

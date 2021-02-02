@@ -29,11 +29,11 @@ import java.util.stream.Collectors;
 
 public class Util {
 
-    private final SBGods main;
-    private final List<MessageChannel> typingChannels = new ArrayList<>();
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    private final Pattern stripColorCodesRegex = Pattern.compile("§[a-f0-9rlkmn]");
-    private final int[] colorCodes = new int[]{
+    private static final SBGods main = SBGods.getInstance();
+    private static final List<MessageChannel> typingChannels = new ArrayList<>();
+    private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private static final Pattern stripColorCodesRegex = Pattern.compile("§[a-f0-9rlkmn]");
+    private static final int[] colorCodes = new int[]{
             0x000000, // 0
             0x0000aa, // 1
             0x00aa00, // 2
@@ -52,23 +52,14 @@ public class Util {
             0xffffff  // F
     };
 
-    public Util(SBGods main) {
-        this.main = main;
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
-            synchronized (typingChannels) {
-                for (MessageChannel channel : typingChannels) channel.sendTyping().queue();
-            }
-        }, 0, 3, TimeUnit.SECONDS);
-    }
-
-    public Entry<String, Integer> getHighestKeyValuePair(Map<String, Integer> map, int position) {
+    public static Entry<String, Integer> getHighestKeyValuePair(Map<String, Integer> map, int position) {
         List<Entry<String, Integer>> list = new ArrayList<>(map.entrySet());
         list.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
 
         return list.get(position);
     }
 
-    public Entry<String, SkillLevels> getHighestKeyValuePair(Map<String, SkillLevels> map, int position, boolean isSkillLevel) {
+    public static Entry<String, SkillLevels> getHighestKeyValuePair(Map<String, SkillLevels> map, int position, boolean isSkillLevel) {
         if (!isSkillLevel) {
             return null;
         }
@@ -79,14 +70,14 @@ public class Util {
         return list.get(position);
     }
 
-    public Entry<String, SlayerExp> getHighestKeyValuePairForSlayerExp(Map<String, SlayerExp> map, int position) {
+    public static Entry<String, SlayerExp> getHighestKeyValuePairForSlayerExp(Map<String, SlayerExp> map, int position) {
         List<Entry<String, SlayerExp>> list = new ArrayList<>(map.entrySet());
         list.sort((o1, o2) -> Integer.compare(o2.getValue().getTotalExp(), o1.getValue().getTotalExp()));
 
         return list.get(position);
     }
 
-    public double getAverageFromDoubleList(List<Double> list) {
+    public static double getAverageFromDoubleList(List<Double> list) {
         double output = 0;
         for (Double aDouble : list) {
             output += aDouble;
@@ -95,7 +86,7 @@ public class Util {
         return output;
     }
 
-    public double round(double num, int places) {
+    public static double round(double num, int places) {
         if (places < 0) throw new IllegalArgumentException();
 
         long factor = (long) Math.pow(10, places);
@@ -104,7 +95,7 @@ public class Util {
         return (double) tmp / factor;
     }
 
-    public double getAverageFromSkillLevelArray(SkillLevels[] skillLevels) {
+    public static double getAverageFromSkillLevelArray(SkillLevels[] skillLevels) {
         double output = 0;
         int length = 0;
         for (SkillLevels skillLevel : skillLevels) {
@@ -118,7 +109,7 @@ public class Util {
     }
 
 
-    public double getAverageFromSlayerExpArray(SlayerExp[] array) {
+    public static double getAverageFromSlayerExpArray(SlayerExp[] array) {
         double output = 0;
         for (SlayerExp slayerExp : array) {
             output += slayerExp.getTotalExp();
@@ -134,7 +125,7 @@ public class Util {
      * @param channel The discord {@link MessageChannel} object
      * @return 0 if player was already verified, 1 if player was not verified, or 2 if bot still hasn't loaded leaderboards
      */
-    public int verifyPlayer(Member member, String mcName, Guild discord, MessageChannel channel) {
+    public static int verifyPlayer(Member member, String mcName, Guild discord, MessageChannel channel) {
         try {
             if (!member.getEffectiveName().toLowerCase().contains(mcName.toLowerCase())) {
                 if ((member.getEffectiveName() + " (" + mcName + ")").length() > 32)
@@ -181,11 +172,15 @@ public class Util {
             } catch (HierarchyException ignored) {
             }
         }
-        // Remove all roles that are for other guilds
-        for (Role role : member.getRoles().stream().filter(role -> HypixelGuild.getGuildByName(role.getName()) != guild && HypixelGuild.getGuildByName(role.getName()) != null).collect(Collectors.toList())) {
-            try {
-                discord.removeRoleFromMember(member, role).queue();
-            } catch (HierarchyException ignored) {
+
+        // Avert crisis where everyone's roles guild member roles are taken away if keys invalid
+        if (main.getKeys().length != 0) {
+            // Remove all roles that are for other guilds
+            for (Role role : member.getRoles().stream().filter(role -> HypixelGuild.getGuildByName(role.getName()) != guild && HypixelGuild.getGuildByName(role.getName()) != null).collect(Collectors.toList())) {
+                try {
+                    discord.removeRoleFromMember(member, role).queue();
+                } catch (HierarchyException ignored) {
+                }
             }
         }
 
@@ -300,11 +295,11 @@ public class Util {
         return gotVerified ? 1 : 0;
     }
 
-    public void scheduleCommandAfter(Runnable command, int delay, TimeUnit unit) {
+    public static void scheduleCommandAfter(Runnable command, int delay, TimeUnit unit) {
         scheduler.schedule(command, delay, unit);
     }
 
-    public void setTyping(boolean typing, MessageChannel channel) {
+    public static void setTyping(boolean typing, MessageChannel channel) {
         if (typing) {
             channel.sendTyping().queue();
             synchronized (typingChannels) {
@@ -320,11 +315,11 @@ public class Util {
         }
     }
 
-    public String stripColorCodes(String input) {
+    public static String stripColorCodes(String input) {
         return stripColorCodesRegex.matcher(input).replaceAll("");
     }
 
-    public File getFileToUse(String fileName) {
+    public static File getFileToUse(String fileName) {
         File file = new File(fileName);
         if (file.exists()) {
             file = getFileToUse(fileName.replace(".jar", "") + "_new.jar");
@@ -336,13 +331,13 @@ public class Util {
         return text == null ? null : RegexUtil.getMatcher("(?i)§[0-9A-FK-OR]", text).replaceAll("");
     }
 
-    public String getAuthorFromGuildChatMessage(String message) {
+    public static String getAuthorFromGuildChatMessage(String message) {
         message = getTextWithoutFormattingCodes(message);
         if (message.startsWith("Guild > ")) message = message.substring(8);
         return message.split(":")[0];
     }
 
-    public String getMessageFromGuildChatMessage(String message) {
+    public static String getMessageFromGuildChatMessage(String message) {
         try {
             return getTextWithoutFormattingCodes(message.split(":")[1]);
         } catch (ArrayIndexOutOfBoundsException ex) {
@@ -350,12 +345,12 @@ public class Util {
         }
     }
 
-    public <T> List<T> turnListIntoSubClassList(List<?> list, Class<T> subclass) { // Looked at like 8 different stackoverflow threads to write this
+    public static <T> List<T> turnListIntoSubClassList(List<?> list, Class<T> subclass) { // Looked at like 8 different stackoverflow threads to write this
         if (list.isEmpty()) return new ArrayList<>();
         return list.stream().filter(e -> subclass.isAssignableFrom(list.get(0).getClass())).map(subclass::cast).collect(Collectors.toList());
     }
 
-    public int singleHexDigitToInt(char hex) {
+    public static int singleHexDigitToInt(char hex) {
         if (hex >= '0' && hex <= '9')
             return hex - '0';
         if (hex >= 'A' && hex <= 'F')
@@ -365,7 +360,7 @@ public class Util {
         return -1;
     }
 
-    public Character closestMCColorCode(Color color) {
+    public static Character closestMCColorCode(Color color) {
         if (color == null) return null;
         int leastTotalDiff = Integer.MAX_VALUE;
         Character closestColorCode = null;
@@ -384,13 +379,13 @@ public class Util {
         return closestColorCode;
     }
 
-    public Color mcColorCodeToColor(char colorCode) {
+    public static Color mcColorCodeToColor(char colorCode) {
         int colorCodeIndex = singleHexDigitToInt(colorCode);
         if (colorCodeIndex < 0 || colorCodeIndex >= 16) return null;
         return new Color(colorCodes[colorCodeIndex]);
     }
 
-    public String bypassAntiSpam(String message) {
+    public static String bypassAntiSpam(String message) {
         final char[] chars = new char[]{
                 '⭍',
                 'ࠀ'
@@ -403,7 +398,7 @@ public class Util {
         return messageBuilder.toString();
     }
 
-//    public int calculatePlayerScore() { TODO
+//    public static int calculatePlayerScore() { TODO
 //        return Math.round((Math.pow())) / 1000;
 //    }
 }

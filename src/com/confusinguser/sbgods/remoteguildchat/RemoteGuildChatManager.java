@@ -6,6 +6,7 @@ import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.HypixelRank;
 import com.confusinguser.sbgods.utils.Multithreading;
 import com.confusinguser.sbgods.utils.RegexUtil;
+import com.confusinguser.sbgods.utils.Util;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
@@ -76,7 +77,7 @@ public class RemoteGuildChatManager {
                         jsonData.addProperty("type", "chat");
                         jsonData.addProperty("message", message.getValue());
                         if (i == socketsThatDontWork.size()) // If it's the first socket that works
-                            jsonData.addProperty("send_to_chat", /*"/gc " + */main.getUtil().bypassAntiSpam(main.getUtil().stripColorCodes(message.getValue())));
+                            jsonData.addProperty("send_to_chat", /*"/gc " + */Util.bypassAntiSpam(Util.stripColorCodes(message.getValue())));
                         System.out.println(jsonData.toString());
                         output.writeUTF(jsonData.toString());
                         output.flush();
@@ -183,7 +184,7 @@ public class RemoteGuildChatManager {
 
     public void handleGuildMessage(String guildID, String text, InetAddress requestSenderIpAddr, MessageChannel channel) {
         if (guildChatMap.get(guildID) == null) {
-            RemoteGuildChat remoteGuildChat = new RemoteGuildChat();
+            RemoteGuildChat remoteGuildChat = new RemoteGuildChat(guildID);
             guildChatMap.put(guildID, remoteGuildChat);
         }
 
@@ -193,7 +194,7 @@ public class RemoteGuildChatManager {
         if (RegexUtil.stringMatches("§2Guild > §[0-9a-f]\\w{3,16} §e(?:left|joined)\\.", text) || RegexUtil.stringMatches("Guild > \\w{3,16} (?:left|joined)\\.", text)) {
             rank = text.contains("§") ? HypixelRank.getHypixelRankFromRankColorCode(text.substring(11, 12).charAt(0)) : HypixelRank.DEFAULT; // §2Guild > §aConfusingUser §eleft.
             guildChatMap.get(guildID).handleJoinLeaveMessage(
-                    main.getUtil().stripColorCodes(text).substring(8)
+                    Util.stripColorCodes(text).substring(8)
                             .replace(" left.", "")
                             .replace(" joined.", ""),
                     text.contains("left"), rank, requestSenderIpAddr, channel);
@@ -201,25 +202,26 @@ public class RemoteGuildChatManager {
         }
 
         if (RegexUtil.stringMatches("§2Guild > .*§[a-fA-F0-9](?: |)(\\d{1,2})", text) ||
-                RegexUtil.stringMatches("Guild > .* \\(\\d{1,2}\\)", text)) { // Spam filter in forge mods
+                RegexUtil.stringMatches("Guild > .* \\(\\d{1,2}\\)", text)) { // Spam filter
             StringJoiner joiner = new StringJoiner(" ");
             String[] fullSplit = text.split(" ");
             String[] split = Arrays.copyOf(fullSplit, fullSplit.length - 1);
             text = String.join(" ", split);
         }
 
-        String author = main.getUtil().getAuthorFromGuildChatMessage(text);
-        String message = main.getUtil().getMessageFromGuildChatMessage(text);
+        String author = Util.getAuthorFromGuildChatMessage(text);
+        String message = Util.getMessageFromGuildChatMessage(text);
         rank = HypixelRank.getHypixelRankFromRankName(author.substring(0, author.contains("]") ? author.indexOf("]") + 1 : 0));
         boolean showMessageOnly = false;
         boolean guildPrefix = true;
         if (RegexUtil.stringMatches("§2Guild > (?:§[0-9a-f]\\[[\\w§]+\\] |)\\w{3,16}(?: §e\\[\\w*\\]|)§f: @\\w{3,16}, .*", text)
                 || RegexUtil.stringMatches("Guild > (?:\\[[\\w\\W]+\\] |)\\w{3,16}(?: \\[\\w*\\]|): @\\w{3,16}, .*", text)) {
-            message = "SBGBOT > " + main.getUtil().getMessageFromGuildChatMessage(text).replaceFirst(", ", " → ").replace("⭍", "").replace("ࠀ", "");
+            message = "SBGBOT > " + Util.getMessageFromGuildChatMessage(text).replaceFirst(", ", " → ").replace("⭍", "").replace("ࠀ", "");
             showMessageOnly = true;
             guildPrefix = false;
+            rank = HypixelRank.VIP; // Green Color!
         }
-        if (message.equals(author)) { // Avoid "Guild > stuff: stuff" if something went wrong
+        if (message.equals(author)) { // Avoid "Guild > stuff: stuff" if invalid message format
             showMessageOnly = true;
         }
         guildChatMap.get(guildID).handleGuildMessage(author, message, rank, requestSenderIpAddr, showMessageOnly, guildPrefix, channel);

@@ -7,6 +7,7 @@ import com.confusinguser.sbgods.entities.Pet;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
 import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
+import com.confusinguser.sbgods.utils.Util;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -80,7 +81,7 @@ public class PlayerCommand extends Command {
 
         embedBuilder.addField("Guild", guildName == null ? "Not in a guild!" : guildName, false);
 
-        embedBuilder.addField("Average skill level", main.getUtil().round(skillLevels.getAvgSkillLevel(), 2) + (skillLevels.isApproximate() ? " (Approx)" : ""), true);
+        embedBuilder.addField("Average skill level", Util.round(skillLevels.getAvgSkillLevel(), 2) + (skillLevels.isApproximate() ? " (Approx)" : ""), true);
         embedBuilder.addField("Slayer EXP", main.getLangUtil().addNotation(slayerExp.getTotalExp()), true);
         embedBuilder.addField("Total money (All coops)", totalMoney == 0 ? "Banking API off" : main.getLangUtil().addNotation(totalMoney), true);
 

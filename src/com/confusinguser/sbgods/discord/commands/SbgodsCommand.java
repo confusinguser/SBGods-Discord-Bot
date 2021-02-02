@@ -3,6 +3,7 @@ package com.confusinguser.sbgods.discord.commands;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
+import com.confusinguser.sbgods.utils.Util;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +43,7 @@ public class SbgodsCommand extends Command {
 
             String messageId = e.getChannel().sendMessage("Downloading update...").complete().getId();
 
-            File file = main.getUtil().getFileToUse(latestReleaseUrl.getKey());
+            File file = Util.getFileToUse(latestReleaseUrl.getKey());
             Path newFilePath;
             try {
                 newFilePath = main.getApiUtil().downloadFile(latestReleaseUrl.getValue(), file);
@@ -76,7 +77,7 @@ public class SbgodsCommand extends Command {
                 return;
             }
             e.getChannel().sendMessage("Stopping bot...").complete(); // Bot is going to shut down so we have to complete this before
-            main.getUtil().setTyping(false, e.getChannel());
+            Util.setTyping(false, e.getChannel());
             System.exit(0);
             return;
         }

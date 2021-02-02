@@ -4,6 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
+import com.confusinguser.sbgods.utils.Util;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -77,7 +78,7 @@ public class KillsCommand extends Command {
             }
 
             for (int i = 0; i < topX; i++) {
-                Entry<String, Integer> currentEntry = main.getUtil().getHighestKeyValuePair(totalKills, i);
+                Entry<String, Integer> currentEntry = Util.getHighestKeyValuePair(totalKills, i);
                 embedBuilder.appendDescription("**#" + Math.incrementExact(i) + "**\t" + currentEntry.getKey() + ": " + main.getLangUtil().addNotation(currentEntry.getValue()) + '\n');
             }
 
