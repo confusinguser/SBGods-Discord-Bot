@@ -60,11 +60,11 @@ public class ReactionListener extends ListenerAdapter {
 
         e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar(0.25, 20) + ")").queue();
 
-        SlayerExp slayerExp = main.getApiUtil().getPlayerSlayerExp(player.getUUID());
+        SlayerExp slayerExp = main.getApiUtil().getPlayerSlayerExp(player);
 
         e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar(0.5, 20) + ")").queue();
 
-        SkillLevels skillLevels = main.getApiUtil().getBestPlayerSkillLevels(player.getUUID());
+        SkillLevels skillLevels = main.getApiUtil().getBestPlayerSkillLevels(player);
 
         e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar(0.75, 20) + ")").queue();
 

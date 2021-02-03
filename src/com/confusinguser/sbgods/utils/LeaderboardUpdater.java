@@ -22,7 +22,7 @@ public class LeaderboardUpdater {
     public LeaderboardUpdater(SBGods main) {
         instance = this;
         this.main = main;
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+        Multithreading.scheduleAtFixedRate(() -> {
             try {
                 for (HypixelGuild hypixelGuild : HypixelGuild.values()) {
                     updateLeaderboardCache(hypixelGuild);
@@ -65,7 +65,7 @@ public class LeaderboardUpdater {
             Player thePlayer = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
             Player.mergePlayerAndGuildMember(thePlayer, guildMember);
 
-            LeaderboardValues leaderboardValues = main.getApiUtil().getBestLeaderboardValues(thePlayer.getUUID());
+            LeaderboardValues leaderboardValues = main.getApiUtil().getBestLeaderboardValues(thePlayer);
             playerStatMap.put(thePlayer, leaderboardValues);
             guild.setLeaderboardProgress(i++);
         }

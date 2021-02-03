@@ -100,7 +100,7 @@ public class SlayerCommand extends Command {
             return;
         }
 
-        SlayerExp playerSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer.getUUID());
+        SlayerExp playerSlayerExp = main.getApiUtil().getPlayerSlayerExp(thePlayer);
 
         EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x51047d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " Slayer XP");
         embedBuilder.addField("Total Slayer XP: ", main.getLangUtil().addCommas(playerSlayerExp.getTotalExp()), false);

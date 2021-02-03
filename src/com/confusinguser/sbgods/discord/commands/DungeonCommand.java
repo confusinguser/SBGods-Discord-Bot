@@ -101,7 +101,7 @@ public class DungeonCommand extends Command {
             return;
         }
 
-        DungeonExps dungeonExps = main.getApiUtil().getBestDungeonExpsForPlayer(thePlayer.getUUID());
+        DungeonExps dungeonExps = main.getApiUtil().getBestDungeonExpsForPlayer(thePlayer);
 
         EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x51047d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " Dungeon XP");
         embedBuilder.addField("Average Dungeon Level", "" + Util.round(main.getSBUtil().toSkillLevelDungeoneering(dungeonExps.getAverageDungeonExp()), 2), false);

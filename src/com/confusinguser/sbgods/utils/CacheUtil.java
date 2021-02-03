@@ -5,6 +5,7 @@ import com.confusinguser.sbgods.entities.Response;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -43,11 +44,11 @@ public class CacheUtil {
     public Response getCachedResponse(String url, long cacheTime) {
         long currentTime = new Date().getTime();
 
-        for (int i = 0; i < cache.size(); i++) {
-            Response response = cache.get(i);
+        Iterator<Response> it = cache.iterator();
+        while (it.hasNext()) {
+            Response response = it.next();
             if (currentTime - (response.getTimeStamp()) > MAX_CACHE_TIME) {
-                cache.remove(response);
-                i--;
+                it.remove();
             }
             if (response.getURL().contentEquals(url)) {
                 if ((currentTime - response.getTimeStamp()) < Math.min(MAX_CACHE_TIME, cacheTime)) {

@@ -100,7 +100,7 @@ public class EventCommand extends Command {
                 playerData.put("lastLogin", player.getLastLogin());
                 playerData.put("lastLogout", player.getLastLogout());
 
-                LeaderboardValues leaderboardValues = main.getApiUtil().getBestLeaderboardValues(player.getUUID());
+                LeaderboardValues leaderboardValues = main.getApiUtil().getBestLeaderboardValues(player);
                 playerData.put("slayerTotal", leaderboardValues.getSlayerExp().getTotalExp());
                 playerData.put("slayerZombie", leaderboardValues.getSlayerExp().getZombie());
                 playerData.put("slayerSpider", leaderboardValues.getSlayerExp().getSpider());
@@ -288,7 +288,7 @@ public class EventCommand extends Command {
 
             JSONObject playerProgress = new JSONObject();
 
-            SlayerExp slayer = main.getApiUtil().getPlayerSlayerExp(memberDataJSON.getString("uuid"));
+            SlayerExp slayer = main.getApiUtil().getPlayerSlayerExp(main.getApiUtil().getPlayerFromUUID(memberDataJSON.getString("uuid")));
 
             playerProgress.put("slayerZombie", slayer.getZombie() - memberData.getSlayerExp().getZombie());
             playerProgress.put("slayerSpider", slayer.getSpider() - memberData.getSlayerExp().getSpider());
@@ -309,7 +309,7 @@ public class EventCommand extends Command {
 
                 playerProgress.put("skillTotal", 0);
             } else {
-                SkillLevels skillLevels = main.getApiUtil().getBestPlayerSkillLevels(memberDataJSON.getString("uuid"));
+                SkillLevels skillLevels = main.getApiUtil().getBestPlayerSkillLevels(main.getApiUtil().getPlayerFromUUID(memberDataJSON.getString("uuid")));
 
                 int totalSkillProgress = 0;
                 playerProgress.put("skillAlchemy", (main.getSBUtil().toSkillExp(skillLevels.getAlchemy())) - memberData.getSkillLevels().getAlchemy());

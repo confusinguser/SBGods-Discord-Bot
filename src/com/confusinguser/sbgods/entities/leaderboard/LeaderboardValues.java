@@ -16,6 +16,13 @@ public class LeaderboardValues {
         this.dungeonExps = dungeonExps;
     }
 
+    public LeaderboardValues() {
+        this.slayerExp = new SlayerExp();
+        this.bankBalance = new BankBalance();
+        this.skillLevels = new SkillLevels();
+        this.dungeonExps = new DungeonExps();
+    }
+
     public static LeaderboardValues fromJSON(JSONObject data) {
         SlayerExp slayerExp = null;
         try {

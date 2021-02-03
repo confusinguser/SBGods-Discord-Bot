@@ -105,7 +105,7 @@ public class SkillCommand extends Command {
             return;
         }
 
-        SkillLevels skillLevels = main.getApiUtil().getBestPlayerSkillLevels(thePlayer.getUUID());
+        SkillLevels skillLevels = main.getApiUtil().getBestPlayerSkillLevels(thePlayer);
 
         EmbedBuilder embedBuilder = new EmbedBuilder().setColor(0x03731d).setTitle(main.getLangUtil().makePossessiveForm(thePlayer.getDisplayName()) + " skill levels");
         StringBuilder descriptionBuilder = embedBuilder.getDescriptionBuilder();

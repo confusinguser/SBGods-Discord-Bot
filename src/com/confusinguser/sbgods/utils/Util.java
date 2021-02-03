@@ -141,9 +141,9 @@ public class Util {
         boolean gotVerified = false;
         for (Role role : discord.getRolesByName("verified", true)) {
             try {
-                if (!member.getRoles().contains(role)) {
+                if (!memberRoleNames.contains(role.getName())) {
                     gotVerified = true;
-                    discord.addRoleToMember(member, role).complete();
+                    discord.addRoleToMember(member, role).queue();
                 }
             } catch (HierarchyException ignored) {
             }

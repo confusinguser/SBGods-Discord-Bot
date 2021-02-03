@@ -95,11 +95,7 @@ public class ApiUtil {
             try {
                 if (con != null) responseCode = con.getResponseCode();
             } catch (IOException ex) {
-                if (fails > 20) return null;
-                fails++;
-                if (fails % 10 == 0) {
-                    main.logger.warning("Failed to connect to the Hypixel API " + fails + " times: " + ex);
-                }
+                if (onIOException(ioException)) return null;
             }
 
             if (responseCode == 429) {
@@ -115,14 +111,20 @@ public class ApiUtil {
                 main.removeApiKey(main.getCurrentApiKey());
                 return null;
             } else {
-                if (fails > 20) return null;
-                fails++;
-                if (fails % 10 == 0) {
-                    main.logger.warning("Failed to connect to the Hypixel API " + fails + " times: " + ioException);
-                }
+                if (onIOException(ioException)) return null;
                 return getResponse(url_string, cacheTime);
             }
         }
+    }
+
+    private boolean onIOException(IOException ioException) {
+        if (fails > 20) return true;
+        fails++;
+        if (fails % 10 == 0 || fails == 1) {
+            main.logger.warning("Failed to connect to the Hypixel API " + fails + " times: " + ioException);
+            main.getDiscord().reportFail(ioException, "ApiUtil getResponse()");
+        }
+        return false;
     }
 
     public String getNonHypixelResponse(String url_string) {
@@ -308,20 +310,20 @@ public class ApiUtil {
         return new Player(uuid, username, discord, lastLogin, lastLogout, new ArrayList<>(profiles.keySet()));
     }
 
-    public SlayerExp getPlayerSlayerExp(String playerUUID) {
+    public SlayerExp getPlayerSlayerExp(Player thePlayer) {
         Map<String, Integer> output = new HashMap<>();
         for (String slayer_type : Constants.slayer_types) {
             output.put(slayer_type, 0);
         }
 
-        JSONObject response = new JSONObject(getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + playerUUID, 60000));
+        JSONObject response = new JSONObject(getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + thePlayer.getUUID(), 60000));
 
         for (int i = 0; i < response.getJSONArray("profiles").length(); i++) {
             JSONObject jsonObject = response.getJSONArray("profiles").getJSONObject(i);
 
 
             try {
-                jsonObject = jsonObject.getJSONObject("members").getJSONObject(playerUUID).getJSONObject("slayer_bosses");
+                jsonObject = jsonObject.getJSONObject("members").getJSONObject(thePlayer.getUUID()).getJSONObject("slayer_bosses");
             } catch (JSONException e) {
                 continue;
             }
@@ -415,11 +417,11 @@ public class ApiUtil {
         return SkillLevels.fromSkillExp(skillMap, true);
     }
 
-    public LeaderboardValues getBestLeaderboardValues(String uuid) {
-        SlayerExp slayerExp = getPlayerSlayerExp(uuid);
-        SkillLevels skillLevels = getBestPlayerSkillLevels(uuid);
-        DungeonExps dungeonExps = getBestDungeonExpsForPlayer(uuid);
-        BankBalance bankBalance = getTotalCoinsInPlayer(uuid);
+    public LeaderboardValues getBestLeaderboardValues(Player thePlayer) {
+        SlayerExp slayerExp = getPlayerSlayerExp(thePlayer);
+        SkillLevels skillLevels = getBestPlayerSkillLevels(thePlayer);
+        DungeonExps dungeonExps = getBestDungeonExpsForPlayer(thePlayer);
+        BankBalance bankBalance = getTotalCoinsInPlayer(thePlayer);
         return new LeaderboardValues(slayerExp, bankBalance, skillLevels, dungeonExps);
     }
 
@@ -555,13 +557,7 @@ public class ApiUtil {
         return output;
     }
 
-    public SkillLevels getBestPlayerSkillLevels(String uuid) {
-        Player thePlayer = getPlayerFromUUID(uuid);
-
-        if (thePlayer.getSkyblockProfiles().isEmpty()) {
-            return null;
-        }
-
+    public SkillLevels getBestPlayerSkillLevels(Player thePlayer) {
         SkillLevels highestSkillLevels = new SkillLevels();
         for (String profile : thePlayer.getSkyblockProfiles()) {
             SkillLevels skillLevels = getProfileSkills(profile, thePlayer.getUUID());
@@ -730,38 +726,26 @@ public class ApiUtil {
         return new TaxPayer(player.getUUID(), player.getDisplayName(), player.getGuildId(), playerJson, main);
     }
 
-    public double getTotalCoinsInProfile(String profileUUID) {
-        String response = main.getApiUtil().getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 600000);
-        if (response == null) return 0;
-        JSONObject jsonObject = new JSONObject(response);
-
-        if (!jsonObject.getBoolean("success")) {
-            main.logger.warning("API REQ FAILED: " + jsonObject.getString("cause"));
-            return 0;
-        }
-
-        double totalMoney = 0;
-        try {
-            totalMoney += jsonObject.getJSONObject("profile").getJSONObject("banking").getLong("balance");
-        } catch (JSONException ignore) {
-        }
-        try {
-            for (String profMemberUuid : jsonObject.getJSONObject("profile").getJSONObject("members").keySet()) {
-                try {
-                    totalMoney += jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(profMemberUuid).getLong("coin_purse");
-                } catch (JSONException ignore) {
-                }
-            }
-        } catch (JSONException ignore) {
-
-        }
-        return totalMoney;
-    }
-
-    public BankBalance getTotalCoinsInPlayer(String uuid) {
+    public BankBalance getTotalCoinsInPlayer(Player thePlayer) {
         double totalCoins = 0;
-        for (String profile : getPlayerFromUUID(uuid).getSkyblockProfiles()) {
-            totalCoins += getTotalCoinsInProfile(profile);
+        String response = main.getApiUtil().getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + thePlayer.getUUID(), 600000);
+        JSONObject jsonObject = new JSONObject(response);
+        for (Object profile : jsonObject.getJSONArray("profiles").toList()) {
+            @SuppressWarnings("unchecked") JSONObject profileJson = new JSONObject((Map<Object, Object>) profile);
+
+            try {
+                totalCoins += jsonObject.getJSONObject("profile").getJSONObject("banking").getLong("balance");
+            } catch (JSONException ignore) {
+            }
+            try {
+                for (String profMemberUuid : jsonObject.getJSONObject("profile").getJSONObject("members").keySet()) {
+                    try {
+                        totalCoins += jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(profMemberUuid).getLong("coin_purse");
+                    } catch (JSONException ignore) {
+                    }
+                }
+            } catch (JSONException ignore) {
+            }
         }
         return new BankBalance(totalCoins);
     }
@@ -772,12 +756,14 @@ public class ApiUtil {
         JSONObject jsonObject = new JSONObject(response);
 
         List<SkyblockProfile> output = new ArrayList<>();
-        for (JSONObject profile : Util.turnListIntoSubClassList(jsonObject.getJSONArray("profiles").toList(), JSONObject.class)) {
-            List<Player> members = profile.getJSONObject("members").keySet().stream().map(this::getPlayerFromUUID).collect(Collectors.toList());
-            String cuteName = profile.getString("cute_name");
+        for (Object profile : jsonObject.getJSONArray("profiles").toList()) {
+            @SuppressWarnings("unchecked") JSONObject profileJson = new JSONObject((Map<Object, Object>) profile);
+
+            List<Player> members = profileJson.getJSONObject("members").keySet().stream().map(this::getPlayerFromUUID).collect(Collectors.toList());
+            String cuteName = profileJson.getString("cute_name");
             double balance;
             try {
-                balance = profile.getJSONObject("banking").getDouble("balance");
+                balance = profileJson.getJSONObject("banking").getDouble("balance");
             } catch (JSONException e) { // Banking API off
                 output.add(new SkyblockProfile(members, cuteName, new BankBalance()));
                 continue;
@@ -810,21 +796,23 @@ public class ApiUtil {
         return null;
     }*/
 
-    public DungeonExps getBestDungeonExpsForPlayer(String playerUUID) {
-        String response = main.getApiUtil().getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + playerUUID, 600000);
+    @SuppressWarnings("unchecked")
+    public DungeonExps getBestDungeonExpsForPlayer(Player thePlayer) {
+        String response = main.getApiUtil().getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + thePlayer.getUUID(), 600000);
         if (response == null) return null;
         JSONObject jsonObject = new JSONObject(response);
 
         DungeonExps bestDungeonExps = new DungeonExps();
-        for (JSONObject profile : Util.turnListIntoSubClassList(jsonObject.getJSONArray("profiles").toList(), JSONObject.class)) {
+        for (Object profile : jsonObject.getJSONArray("profiles").toList()) {
+            JSONObject profilejson = new JSONObject((Map<Object, Object>) profile);
             Map<String, Double> dungeonLevelsMap = new HashMap<>();
             try {
-                profile = profile.getJSONObject(playerUUID).getJSONObject("dungeons");
+                profilejson = profilejson.getJSONObject("members").getJSONObject(thePlayer.getUUID()).getJSONObject("dungeons");
                 for (String dungeonClass : Constants.dungeon_classes) {
-                    dungeonLevelsMap.put(dungeonClass, profile.getJSONObject("player_classes").getJSONObject(dungeonClass).getDouble("experience"));
+                    dungeonLevelsMap.put(dungeonClass, profilejson.getJSONObject("player_classes").getJSONObject(dungeonClass).getDouble("experience"));
                 }
                 for (String dungeon : Constants.dungeons) {
-                    dungeonLevelsMap.put(dungeon, profile.getJSONObject("dungeon_types").getJSONObject(dungeon).getDouble("experience"));
+                    dungeonLevelsMap.put(dungeon, profilejson.getJSONObject("dungeon_types").getJSONObject(dungeon).getDouble("experience"));
                 }
             } catch (JSONException ex) {
                 main.getDiscord().reportFail(ex, "Dungeon Level Fetcher");

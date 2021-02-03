@@ -5,8 +5,7 @@ import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Pet;
 import com.confusinguser.sbgods.entities.Player;
-import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
-import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
+import com.confusinguser.sbgods.entities.leaderboard.LeaderboardValues;
 import com.confusinguser.sbgods.utils.Util;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -48,12 +47,10 @@ public class PlayerCommand extends Command {
             }
         }
 
-        SkillLevels skillLevels = new SkillLevels();
         List<Pet> totalPets = new ArrayList<>();
-        SlayerExp slayerExp = new SlayerExp();
         String guildName;
-        double totalMoney = 0.0;
         double progress = 0.0;
+        LeaderboardValues leaderboardValues = new LeaderboardValues();
 
         for (int i = 0; i < player.getSkyblockProfiles().size(); i++) {
             String profileId = player.getSkyblockProfiles().get(i);
@@ -63,9 +60,7 @@ public class PlayerCommand extends Command {
             List<Pet> pets = main.getApiUtil().getProfilePets(profileId, player.getUUID()); // Pets in profile
             totalPets.addAll(pets);
 
-            skillLevels = main.getApiUtil().getBestPlayerSkillLevels(player.getUUID());
-            totalMoney += main.getApiUtil().getTotalCoinsInProfile(profileId);
-            slayerExp = SlayerExp.addExps(slayerExp, main.getApiUtil().getProfileSlayerExp(profileId, player.getUUID()));
+            leaderboardValues = main.getApiUtil().getBestLeaderboardValues(player);
         }
         guildName = main.getApiUtil().getGuildFromUUID(player.getUUID());
 
@@ -81,9 +76,9 @@ public class PlayerCommand extends Command {
 
         embedBuilder.addField("Guild", guildName == null ? "Not in a guild!" : guildName, false);
 
-        embedBuilder.addField("Average skill level", Util.round(skillLevels.getAvgSkillLevel(), 2) + (skillLevels.isApproximate() ? " (Approx)" : ""), true);
-        embedBuilder.addField("Slayer EXP", main.getLangUtil().addNotation(slayerExp.getTotalExp()), true);
-        embedBuilder.addField("Total money (All coops)", totalMoney == 0 ? "Banking API off" : main.getLangUtil().addNotation(totalMoney), true);
+        embedBuilder.addField("Average skill level", Util.round(leaderboardValues.getSkillLevels().getAvgSkillLevel(), 2) + (leaderboardValues.getSkillLevels().isApproximate() ? " (Approx)" : ""), true);
+        embedBuilder.addField("Slayer EXP", main.getLangUtil().addNotation(leaderboardValues.getSlayerExp().getTotalExp()), true);
+        embedBuilder.addField("Total money (All coops)", leaderboardValues.getBankBalance().getCoins() == 0 ? "Banking API off" : main.getLangUtil().addNotation(leaderboardValues.getBankBalance().getCoins()), true);
 
         embedBuilder.addField("Skill LB Position", player.getSkillPos(true) == -1 ? "Not in guild" : player.getSkillPos(true) == -2 ? "Bot is loading..." : "#" + (player.getSkillPos(true) + 1), true);
         embedBuilder.addField("Slayer LB Position", player.getSlayerPos(true) == -1 ? "Not in guild" : player.getSkillPos(true) == -2 ? "Bot is loading..." : "#" + (player.getSlayerPos(true) + 1), true);
