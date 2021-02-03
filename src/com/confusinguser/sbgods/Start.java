@@ -1,5 +1,7 @@
 package com.confusinguser.sbgods;
 
+import com.confusinguser.dynamicvcs.DynamicVCs;
+
 import java.awt.*;
 import java.io.Console;
 import java.io.IOException;
@@ -42,5 +44,6 @@ class Start {
                 SBGods.getInstance().getDiscord().reportFail(t, "General Bot");
             }
         }
+        new DynamicVCs();
     }
 }
