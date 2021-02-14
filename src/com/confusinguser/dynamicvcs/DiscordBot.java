@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class DiscordBot {
         List<GatewayIntent> intents = new ArrayList<>();
         intents.add(GatewayIntent.GUILD_VOICE_STATES);
         JDABuilder jdaBuilder = JDABuilder.create(token, intents)
+                .disableCache(CacheFlag.ACTIVITY, CacheFlag.EMOTE, CacheFlag.CLIENT_STATUS)
                 .setStatus(OnlineStatus.ONLINE)
                 .setActivity(Activity.playing("Dynamic Voice Channels! ConfusingUser"));
 
@@ -43,7 +45,6 @@ public class DiscordBot {
             jdaBuilder.addEventListeners(listener);
         }
         jda = jdaBuilder.build();
-        jda.getPresence().setActivity(Activity.playing("Dynamic Voice Channels! ConfusingUser"));
         main.logger.info("Bot ready to take commands on " + Arrays.stream(main.getActiveServers()).map(DiscordServer::toString).collect(Collectors.joining(", ")));
     }
 

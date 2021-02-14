@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 import javax.security.auth.login.LoginException;
 import java.util.ArrayList;
@@ -22,7 +23,6 @@ public class DiscordBot {
     public final VerifyAllCommand verifyAllCommand;
     public final EventCommand eventCommand;
     private final SBGods main;
-    private final List<ListenerAdapter> commands;
     private final JDA jda;
     public String commandPrefix = "-";
 
@@ -53,7 +53,7 @@ public class DiscordBot {
         MessageListener messageListener = new MessageListener(main, this);
         ReactionListener reactionListener = new ReactionListener(main, this);
 
-        commands = new ArrayList<>(Arrays.asList(
+        List<ListenerAdapter> commands = new ArrayList<>(Arrays.asList(
                 slayerCommand,
                 skillCommand,
                 skillExpCommand,
@@ -83,28 +83,16 @@ public class DiscordBot {
         intents.add(GatewayIntent.GUILD_MEMBERS);
         intents.add(GatewayIntent.GUILD_EMOJIS);
         intents.add(GatewayIntent.GUILD_MESSAGE_REACTIONS);
-        intents.add(GatewayIntent.DIRECT_MESSAGES);
-        intents.add(GatewayIntent.DIRECT_MESSAGE_TYPING);
         JDABuilder jdaBuilder = JDABuilder.create(token, intents)
+                .disableCache(CacheFlag.ACTIVITY, CacheFlag.EMOTE, CacheFlag.CLIENT_STATUS, CacheFlag.VOICE_STATE)
                 .setStatus(OnlineStatus.ONLINE)
-                .setActivity(Activity.playing("The SBG / SBF Discord Bot" + "\nMade by ConfusingUser#5712 & Soopyboo32#3042"));
+                .setActivity(Activity.playing("The SBG Discord Bot" + "\nMade by ConfusingUser#5712 & Soopyboo32#3042"));
 
         for (ListenerAdapter listener : commands) {
             jdaBuilder.addEventListeners(listener);
         }
         jda = jdaBuilder.build();
-        jda.getPresence().setActivity(Activity.playing("The SBG / SBF Discord Bot" + "\nMade by ConfusingUser#5712 & Soopyboo32#3042"));
         main.logger.info("Bot ready to take commands on " + Arrays.stream(main.getActiveServers()).map(DiscordServer::toString).collect(Collectors.joining(", ")));
-    }
-
-    public boolean isValidCommand(String command) {
-        for (Command validCommand : commands.stream().filter(listener -> listener instanceof Command).map(listener -> (Command) listener).collect(Collectors.toList())) {
-            String validCommandString = validCommand.getName();
-            if (command.equalsIgnoreCase(validCommandString)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public JDA getJDA() {

@@ -706,15 +706,6 @@ public class ApiUtil {
         sendData(dataString, "https://soopymc.my.to/api/sbgDiscord/setGuildRanksChange.json?key=HoVoiuWfpdAjJhfTj0YN");
     }
 
-    public JSONArray getEventData() {
-        return new JSONObject(getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getEventData.json?key=HoVoiuWfpdAjJhfTj0YN")).getJSONArray("data");
-    }
-
-    public void setEventData(JSONArray data) {
-        String dataString = data.toString(4);
-        sendData(dataString, "https://soopymc.my.to/api/sbgDiscord/setEventData.json?key=HoVoiuWfpdAjJhfTj0YN");
-    }
-
     public TaxPayer getTaxPayer(Player player) {
         JSONObject taxData = getTaxData();
         JSONObject playerJson;
@@ -807,12 +798,24 @@ public class ApiUtil {
             JSONObject profilejson = new JSONObject((Map<Object, Object>) profile);
             Map<String, Double> dungeonLevelsMap = new HashMap<>();
             try {
-                profilejson = profilejson.getJSONObject("members").getJSONObject(thePlayer.getUUID()).getJSONObject("dungeons");
+                try {
+                    profilejson = profilejson.getJSONObject("members").getJSONObject(thePlayer.getUUID()).getJSONObject("dungeons");
+                } catch (JSONException ex) {
+                    continue;
+                }
                 for (String dungeonClass : Constants.dungeon_classes) {
-                    dungeonLevelsMap.put(dungeonClass, profilejson.getJSONObject("player_classes").getJSONObject(dungeonClass).getDouble("experience"));
+                    try {
+                        dungeonLevelsMap.put(dungeonClass, profilejson.getJSONObject("player_classes").getJSONObject(dungeonClass).getDouble("experience"));
+                    } catch (JSONException ex) {
+                        dungeonLevelsMap.put(dungeonClass, 0d);
+                    }
                 }
                 for (String dungeon : Constants.dungeons) {
-                    dungeonLevelsMap.put(dungeon, profilejson.getJSONObject("dungeon_types").getJSONObject(dungeon).getDouble("experience"));
+                    try {
+                        dungeonLevelsMap.put(dungeon, profilejson.getJSONObject("dungeon_types").getJSONObject(dungeon).getDouble("experience"));
+                    } catch (JSONException ex) {
+                        dungeonLevelsMap.put(dungeon, 0d);
+                    }
                 }
             } catch (JSONException ex) {
                 main.getDiscord().reportFail(ex, "Dungeon Level Fetcher");

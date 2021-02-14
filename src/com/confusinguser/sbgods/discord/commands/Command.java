@@ -18,7 +18,7 @@ public abstract class Command extends ListenerAdapter {
     DiscordBot discord = main.getDiscord();
     String name;
     String usage;
-    String[] aliases;
+    String[] aliases = new String[]{};
     DiscordPerms perm = DiscordPerms.DEFAULT;
 
     @Override

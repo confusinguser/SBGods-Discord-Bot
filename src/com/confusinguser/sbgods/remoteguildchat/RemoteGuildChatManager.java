@@ -26,6 +26,7 @@ import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 public class RemoteGuildChatManager {
@@ -207,6 +208,11 @@ public class RemoteGuildChatManager {
             String[] fullSplit = text.split(" ");
             String[] split = Arrays.copyOf(fullSplit, fullSplit.length - 1);
             text = String.join(" ", split);
+        }
+
+        Matcher matcher = RegexUtil.getMatcher("\\[\\d{1,2}:\\d{2}\\]", text); // For those timestamp mods
+        if (matcher.find() && matcher.start() == 0) {
+            text = matcher.replaceFirst("");
         }
 
         String author = Util.getAuthorFromGuildChatMessage(text);

@@ -6,8 +6,6 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.leaderboard.LeaderboardValues;
-import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
-import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
 import com.confusinguser.sbgods.utils.LeaderboardUpdater;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -23,19 +21,22 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class EventCommand extends Command {
 
     public final static Collection<String> validProgressTypes = List.of("totalSlayer", "totalSkill", "wolfSlayer", "spiderSlayer", "zombieSlayer", "alchemySkill", "carpentrySkill", "combatSkill", "enchantingSkill", "farmingSkill", "fishingSkill", "foragingSkill", "miningSkill", "runecraftingSkill", "tamingSkill");
+    private JSONArray eventData;
     public String progressTypeToPost;
 
     public EventCommand(SBGods main, DiscordBot discord) {
         this.main = main;
         this.discord = discord;
         this.name = "event";
-        this.aliases = new String[]{};
         this.progressTypeToPost = "";
-        this.usage = getName() + " `start`, `progress`, `startPostingLeaderboard`, `stopPostingLb`, `stop`";
+        //TODO EventManager
+        this.eventData = new JSONArray();
+        this.usage = getName() + " <start, progress, sendLb, startPostingLeaderboard, stopPostingLb, stop>";
     }
 
     @Override
@@ -55,7 +56,7 @@ public class EventCommand extends Command {
 
         if (args[1].equals("startPostingLb") || args[1].equals("startPostingLeaderboard")) {
             if (args.length == 2 || !validProgressTypes.contains(args[2])) {
-                e.getChannel().sendMessage("Usage: -event startPostingLeaderboard <Progress Type (Case Sensitive)>.\n" +
+                e.getChannel().sendMessage("Usage: -event startPostingLeaderboard <Progress Type>.\n" +
                         "Valid progress types are: `totalSlayer`, `totalSkill`, `wolfSlayer`, `spiderSlayer`, `zombieSlayer`, `alchemySkill`, `carpentrySkill`, `combatSkill`, `enchantingSkill`, `farmingSkill`, `fishingSkill`, `foragingSkill`, `miningSkill`, `runecraftingSkill`, `tamingSkill`").queue();
             } else {
                 this.progressTypeToPost = args[2];
@@ -88,54 +89,58 @@ public class EventCommand extends Command {
             JSONArray eventData = new JSONArray();
             List<Player> guildmembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
             int i = 0;
-            for (Player guildMember : guildmembers) {
+            Map<Player, LeaderboardValues> playerStatMap = HypixelGuild.SBG.getPlayerStatMap();
+            if (playerStatMap == null || playerStatMap.isEmpty()) {
+                e.getChannel().deleteMessageById(messageId).queue();
+                e.getChannel().sendMessage("Leaderboards haven't loaded, try again in a few minutes").queue();
+                return;
+            }
+            for (Map.Entry<Player, LeaderboardValues> playerStat : playerStatMap.entrySet()) {
                 if (i++ % 3 == 0) {
                     e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar((double) i / guildmembers.size(), 50) + ")").queue();
                 }
                 JSONObject playerData = new JSONObject();
 
-                Player player = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
-                playerData.put("uuid", player.getUUID());
-                playerData.put("displayName", player.getDisplayName());
-                playerData.put("lastLogin", player.getLastLogin());
-                playerData.put("lastLogout", player.getLastLogout());
+                playerData.put("uuid", playerStat.getKey().getUUID());
+                playerData.put("displayName", playerStat.getKey().getDisplayName());
+                playerData.put("lastLogin", playerStat.getKey().getLastLogin());
+                playerData.put("lastLogout", playerStat.getKey().getLastLogout());
 
-                LeaderboardValues leaderboardValues = main.getApiUtil().getBestLeaderboardValues(player);
-                playerData.put("slayerTotal", leaderboardValues.getSlayerExp().getTotalExp());
-                playerData.put("slayerZombie", leaderboardValues.getSlayerExp().getZombie());
-                playerData.put("slayerSpider", leaderboardValues.getSlayerExp().getSpider());
-                playerData.put("slayerWolf", leaderboardValues.getSlayerExp().getWolf());
+                playerData.put("slayerTotal", playerStat.getValue().getSlayerExp().getTotalExp());
+                playerData.put("slayerZombie", playerStat.getValue().getSlayerExp().getZombie());
+                playerData.put("slayerSpider", playerStat.getValue().getSlayerExp().getSpider());
+                playerData.put("slayerWolf", playerStat.getValue().getSlayerExp().getWolf());
 
-                playerData.put("skillTotal", leaderboardValues.getSkillLevels().getTotalSkillExp());
-                playerData.put("skillAlchemy", main.getSBUtil().toSkillExp(leaderboardValues.getSkillLevels().getAlchemy()));
-                playerData.put("skillCarpentry", main.getSBUtil().toSkillExp(leaderboardValues.getSkillLevels().getCarpentry()));
-                playerData.put("skillCombat", main.getSBUtil().toSkillExp(leaderboardValues.getSkillLevels().getCombat()));
-                playerData.put("skillEnchanting", main.getSBUtil().toSkillExp(leaderboardValues.getSkillLevels().getEnchanting()));
-                playerData.put("skillFarming", main.getSBUtil().toSkillExp(leaderboardValues.getSkillLevels().getFarming()));
-                playerData.put("skillFishing", main.getSBUtil().toSkillExp(leaderboardValues.getSkillLevels().getFishing()));
-                playerData.put("skillForaging", main.getSBUtil().toSkillExp(leaderboardValues.getSkillLevels().getForaging()));
-                playerData.put("skillMining", main.getSBUtil().toSkillExp(leaderboardValues.getSkillLevels().getMining()));
-                playerData.put("skillRunecrafting", main.getSBUtil().toSkillExp(leaderboardValues.getSkillLevels().getRunecrafting()));
-                playerData.put("skillTaming", main.getSBUtil().toSkillExp(leaderboardValues.getSkillLevels().getTaming()));
+                playerData.put("skillTotal", playerStat.getValue().getSkillLevels().getTotalSkillExp());
+                playerData.put("skillAlchemy", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getAlchemy()));
+                playerData.put("skillCarpentry", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getCarpentry()));
+                playerData.put("skillCombat", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getCombat()));
+                playerData.put("skillEnchanting", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getEnchanting()));
+                playerData.put("skillFarming", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getFarming()));
+                playerData.put("skillFishing", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getFishing()));
+                playerData.put("skillForaging", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getForaging()));
+                playerData.put("skillMining", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getMining()));
+                playerData.put("skillRunecrafting", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getRunecrafting()));
+                playerData.put("skillTaming", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getTaming()));
 
-                playerData.put("dungeonClassTotal", leaderboardValues.getDungeonLevels().getTotalClassExp());
-                playerData.put("dungeonClassHealer", leaderboardValues.getDungeonLevels().getHealerExp());
-                playerData.put("dungeonClassBerserk", leaderboardValues.getDungeonLevels().getBerserkExp());
-                playerData.put("dungeonClassArcher", leaderboardValues.getDungeonLevels().getArcherExp());
-                playerData.put("dungeonClassTank", leaderboardValues.getDungeonLevels().getTankExp());
-                playerData.put("dungeonDungeonCatacombs", leaderboardValues.getDungeonLevels().getCatacombsExp());
+                playerData.put("dungeonClassTotal", playerStat.getValue().getDungeonLevels().getTotalClassExp());
+                playerData.put("dungeonClassHealer", playerStat.getValue().getDungeonLevels().getHealerExp());
+                playerData.put("dungeonClassBerserk", playerStat.getValue().getDungeonLevels().getBerserkExp());
+                playerData.put("dungeonClassArcher", playerStat.getValue().getDungeonLevels().getArcherExp());
+                playerData.put("dungeonClassTank", playerStat.getValue().getDungeonLevels().getTankExp());
+                playerData.put("dungeonDungeonCatacombs", playerStat.getValue().getDungeonLevels().getCatacombsExp());
 
                 eventData.put(playerData);
             }
 
-            main.getApiUtil().setEventData(eventData);
+            this.eventData = eventData;
             e.getChannel().editMessageById(messageId, "Started event!").queue();
             return;
         }
 
         if (args[1].equals("stop")) {
             String messageId = e.getChannel().sendMessage("...").complete().getId();
-            main.getApiUtil().setEventData(new JSONArray());
+            eventData = new JSONArray();
             e.getChannel().editMessageById(messageId, "Removed all event data!").queue(); // TODO here are the final scores
             return;
         }
@@ -264,18 +269,17 @@ public class EventCommand extends Command {
         String messageId = "";
 
         if (showLoadingMsg) {
-            messageId = channel.sendMessage("Loading... (" + main.getLangUtil().getProgressBar(0, 50) + ")").complete().getId();
+            messageId = channel.sendMessage("Loading... (" + main.getLangUtil().getProgressBar(0, 12) + ")").complete().getId();
         }
 
-        JSONArray data = main.getApiUtil().getEventData();
-
-        for (int i = 0; i < data.length(); i++) {
-            if (i % 3 == 0 && showLoadingMsg) {
-                channel.editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar((double) i / data.length(), 50) + ")").queue();
+        for (int i = 0; i < eventData.length(); i++) {
+            if (i % 10 == 0 && showLoadingMsg) {
+                channel.editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar((double) i / eventData.length(), 12) + ")").queue();
             }
 
-            JSONObject memberDataJSON = data.getJSONObject(i);
+            JSONObject memberDataJSON = eventData.getJSONObject(i);
             LeaderboardValues memberData = LeaderboardValues.fromJSON(memberDataJSON);
+            LeaderboardValues currData = main.getApiUtil().getBestLeaderboardValues(main.getApiUtil().getPlayerFromUUID(memberDataJSON.getString("uuid")));
 //            Player player = main.getApiUtil().getPlayerFromUUID(memberData.getString("uuid"));
 //
 //            if (memberData.getInt("lastLogin") > memberData.getInt("lastLogout")) {
@@ -288,12 +292,10 @@ public class EventCommand extends Command {
 
             JSONObject playerProgress = new JSONObject();
 
-            SlayerExp slayer = main.getApiUtil().getPlayerSlayerExp(main.getApiUtil().getPlayerFromUUID(memberDataJSON.getString("uuid")));
-
-            playerProgress.put("slayerZombie", slayer.getZombie() - memberData.getSlayerExp().getZombie());
-            playerProgress.put("slayerSpider", slayer.getSpider() - memberData.getSlayerExp().getSpider());
-            playerProgress.put("slayerWolf", slayer.getWolf() - memberData.getSlayerExp().getWolf());
-            playerProgress.put("slayerTotal", slayer.getTotalExp() - memberData.getSlayerExp().getTotalExp());
+            playerProgress.put("slayerZombie", currData.getSlayerExp().getZombie() - memberData.getSlayerExp().getZombie());
+            playerProgress.put("slayerSpider", currData.getSlayerExp().getSpider() - memberData.getSlayerExp().getSpider());
+            playerProgress.put("slayerWolf", currData.getSlayerExp().getWolf() - memberData.getSlayerExp().getWolf());
+            playerProgress.put("slayerTotal", currData.getSlayerExp().getTotalExp() - memberData.getSlayerExp().getTotalExp());
 
             if (memberData.getSkillLevels() == null) { // Skill api off
                 playerProgress.put("skillAlchemy", 0);
@@ -309,39 +311,29 @@ public class EventCommand extends Command {
 
                 playerProgress.put("skillTotal", 0);
             } else {
-                SkillLevels skillLevels = main.getApiUtil().getBestPlayerSkillLevels(main.getApiUtil().getPlayerFromUUID(memberDataJSON.getString("uuid")));
 
-                int totalSkillProgress = 0;
-                playerProgress.put("skillAlchemy", (main.getSBUtil().toSkillExp(skillLevels.getAlchemy())) - memberData.getSkillLevels().getAlchemy());
-                totalSkillProgress += playerProgress.getInt("skillAlchemy");
-                playerProgress.put("skillCombat", main.getSBUtil().toSkillExp(skillLevels.getCombat()) - memberData.getSkillLevels().getCombat());
-                totalSkillProgress += playerProgress.getInt("skillCombat");
-                playerProgress.put("skillEnchanting", main.getSBUtil().toSkillExp(skillLevels.getEnchanting()) - memberData.getSkillLevels().getEnchanting());
-                totalSkillProgress += playerProgress.getInt("skillEnchanting");
-                playerProgress.put("skillFarming", main.getSBUtil().toSkillExp(skillLevels.getFarming()) - memberData.getSkillLevels().getFarming());
-                totalSkillProgress += playerProgress.getInt("skillFarming");
-                playerProgress.put("skillFishing", main.getSBUtil().toSkillExp(skillLevels.getFishing()) - memberData.getSkillLevels().getFishing());
-                totalSkillProgress += playerProgress.getInt("skillFishing");
-                playerProgress.put("skillForaging", main.getSBUtil().toSkillExp(skillLevels.getForaging()) - memberData.getSkillLevels().getForaging());
-                totalSkillProgress += playerProgress.getInt("skillForaging");
-                playerProgress.put("skillMining", main.getSBUtil().toSkillExp(skillLevels.getMining()) - memberData.getSkillLevels().getMining());
-                totalSkillProgress += playerProgress.getInt("skillMining");
-                playerProgress.put("skillTaming", main.getSBUtil().toSkillExp(skillLevels.getTaming()) - memberData.getSkillLevels().getTaming());
-                totalSkillProgress += playerProgress.getInt("skillTaming");
-                playerProgress.put("skillCarpentry", main.getSBUtil().toSkillExp(skillLevels.getCarpentry()) - memberData.getSkillLevels().getCarpentry());
-                playerProgress.put("skillRunecrafting", main.getSBUtil().toSkillExpRunecrafting(skillLevels.getRunecrafting()) - memberData.getSkillLevels().getRunecrafting());
-                playerProgress.put("skillTotal", totalSkillProgress);
+                playerProgress.put("skillAlchemy", main.getSBUtil().toSkillExp(currData.getSkillLevels().getAlchemy()) - memberData.getSkillLevels().getAlchemy());
+                playerProgress.put("skillCombat", main.getSBUtil().toSkillExp(currData.getSkillLevels().getCombat()) - memberData.getSkillLevels().getCombat());
+                playerProgress.put("skillEnchanting", main.getSBUtil().toSkillExp(currData.getSkillLevels().getEnchanting()) - memberData.getSkillLevels().getEnchanting());
+                playerProgress.put("skillFarming", main.getSBUtil().toSkillExp(currData.getSkillLevels().getFarming()) - memberData.getSkillLevels().getFarming());
+                playerProgress.put("skillFishing", main.getSBUtil().toSkillExp(currData.getSkillLevels().getFishing()) - memberData.getSkillLevels().getFishing());
+                playerProgress.put("skillForaging", main.getSBUtil().toSkillExp(currData.getSkillLevels().getForaging()) - memberData.getSkillLevels().getForaging());
+                playerProgress.put("skillMining", main.getSBUtil().toSkillExp(currData.getSkillLevels().getMining()) - memberData.getSkillLevels().getMining());
+                playerProgress.put("skillTaming", main.getSBUtil().toSkillExp(currData.getSkillLevels().getTaming()) - memberData.getSkillLevels().getTaming());
+                playerProgress.put("skillCarpentry", main.getSBUtil().toSkillExp(currData.getSkillLevels().getCarpentry()) - memberData.getSkillLevels().getCarpentry());
+                playerProgress.put("skillRunecrafting", main.getSBUtil().toSkillExpRunecrafting(currData.getSkillLevels().getRunecrafting()) - memberData.getSkillLevels().getRunecrafting());
+                playerProgress.put("skillTotal", main.getSBUtil().toSkillExp(currData.getSkillLevels().getTotalSkillExp()) - memberData.getSkillLevels().getTotalSkillExp());
             }
             memberDataJSON.put("playerProgress", playerProgress);
-            data.remove(i);
-            addToPos(i, memberDataJSON, data);
+            eventData.remove(i);
+            addToPos(i, memberDataJSON, eventData);
         }
 
         if (showLoadingMsg) {
             channel.deleteMessageById(messageId).queue();
         }
 
-        return data;
+        return eventData;
     }
 
     public String getLeaderboardTitleForProgressType(String progressType) {

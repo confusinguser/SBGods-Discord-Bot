@@ -92,20 +92,27 @@ public class SBUtil {
             exp += (Constants.skill_exp_levels[(int) Math.floor(level) + 1] - Constants.skill_exp_levels[(int) Math.floor(level) - 1]) *
                     (level - Math.floor(level));
         } catch (ArrayIndexOutOfBoundsException ex) {
-            SBGods.getInstance().getDiscord().reportFail(ex, "Skill Exp Converter");
+            return 60;
         }
         return exp;
     }
 
     public int toSkillExpRunecrafting(double level) {
-        int exp = 0;
-        for (int i = 0; i < level && i < Constants.runecrafting_exp_levels.length; i++) {
-            exp += Constants.runecrafting_exp_levels[i];
+        int exp = toSkillExpRunecrafting((int) Math.floor(level));
+        try {
+            exp += (Constants.runecrafting_exp_levels[(int) Math.floor(level) + 1] - Constants.runecrafting_exp_levels[(int) Math.floor(level) - 1]) *
+                    (level - Math.floor(level));
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return 24;
         }
-        if (level == 24) return Constants.runecrafting_exp_levels[23];
-        exp += (Constants.runecrafting_exp_levels[(int) Math.floor(level) + 1] - Constants.runecrafting_exp_levels[(int) Math.floor(level) - 1]) *
-                (level - Math.floor(level));
+        return exp;
+    }
 
+    public int toSkillExpRunecrafting(int level) {
+        int exp = 0;
+        for (int i = 0; i < level && i < Constants.skill_exp_levels.length; i++) {
+            exp += Constants.skill_exp_levels[i];
+        }
         return exp;
     }
 

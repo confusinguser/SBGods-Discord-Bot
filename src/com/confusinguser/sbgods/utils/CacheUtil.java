@@ -4,15 +4,14 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.Response;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class CacheUtil {
 
     //private static final long MAX_CACHE_TIME = 86400000; //1 day store, probs wont use the full day
-    private static final long MAX_CACHE_TIME = 300; //5 min store
+    private static final long MAX_CACHE_TIME = 900000; //15 min store
 
     // private SBGods main;
 
@@ -23,26 +22,16 @@ public class CacheUtil {
     }
 
     public String stripUnnecesaryInfo(String url_string) {
-        Pattern pattern = Pattern.compile("key=[0-9A-Za-z\\-]{36}");
-        String output = pattern.matcher(url_string).replaceAll("").replace("https://", "").replace("http://", "").replace("?&", "?").replace("&&", "&");
+        Matcher matcher = RegexUtil.getMatcher("(?:&|)key=[0-9A-Za-z\\-]{36}(?:&|)", url_string);
+        String output = matcher.replaceAll("&").replace("https://", "").replace("http://", "");
         if (output.endsWith("&")) {
             output = output.substring(0, output.length() - 1);
         }
         return output;
     }
 
-    public boolean isCached(String url, long cacheTime) {
-        long currentTime = new Date().getTime();
-        for (Response response : cache) {
-            if (response.getURL().contentEquals(url)) {
-                return (currentTime - (response.getTimeStamp()) <= Math.min(cacheTime, MAX_CACHE_TIME));
-            }
-        }
-        return false;
-    }
-
     public Response getCachedResponse(String url, long cacheTime) {
-        long currentTime = new Date().getTime();
+        long currentTime = System.currentTimeMillis();
 
         Iterator<Response> it = cache.iterator();
         while (it.hasNext()) {
