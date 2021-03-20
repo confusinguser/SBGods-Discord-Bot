@@ -3,6 +3,10 @@ package com.confusinguser.sbgods.utils;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.*;
 import com.confusinguser.sbgods.entities.leaderboard.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -558,9 +562,27 @@ public class ApiUtil {
     }
 
     public SkillLevels getBestPlayerSkillLevels(Player thePlayer) {
+        String response = getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + thePlayer.getUUID(), 300000);
         SkillLevels highestSkillLevels = new SkillLevels();
-        for (String profile : thePlayer.getSkyblockProfiles()) {
-            SkillLevels skillLevels = getProfileSkills(profile, thePlayer.getUUID());
+
+        SkillLevels skillLevels;
+        for (JsonElement jsonElement : JsonParser.parseString(response).getAsJsonObject().getAsJsonArray("profiles")) {
+            JsonObject profile = jsonElement.getAsJsonObject();
+            JsonObject member;
+            try {
+                member = profile.getAsJsonObject("members").getAsJsonObject(thePlayer.getUUID());
+            } catch (NullPointerException e) {
+                continue;
+            }
+            Map<String, Integer> skillMap = new HashMap<>();
+            for (String skill_type : Constants.skill_types) {
+                try {
+                    skillMap.put(skill_type, (int) Math.floor(member.get("experience_skill_" + skill_type).getAsDouble()));
+                } catch (JSONException | NullPointerException e) {
+                    skillMap.put(skill_type, 0);
+                }
+            }
+            skillLevels = SkillLevels.fromSkillExp(skillMap, false);
 
             if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
                 highestSkillLevels = skillLevels;
@@ -568,12 +590,13 @@ public class ApiUtil {
         }
 
         if (highestSkillLevels.getAvgSkillLevel() == 0) {
-            SkillLevels skillLevels = getProfileSkillsAlternate(thePlayer.getUUID());
+            skillLevels = getProfileSkillsAlternate(thePlayer.getUUID());
 
             if (highestSkillLevels.getAvgSkillLevel() < skillLevels.getAvgSkillLevel()) {
                 highestSkillLevels = skillLevels;
             }
         }
+
         return highestSkillLevels;
     }
 
@@ -607,6 +630,15 @@ public class ApiUtil {
         return new PlayerAH(items.toArray(new AhItem[0]));
     }
 
+    public JSONArray getEventData() {
+        return new JSONObject(getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getEventData.json?key=HoVoiuWfpdAjJhfTj0YN")).getJSONArray("data");
+    }
+
+    public void setEventData(JSONArray data) {
+        String dataString = data.toString(4);
+        sendData(dataString, "https://soopymc.my.to/api/sbgDiscord/setEventData.json?key=HoVoiuWfpdAjJhfTj0YN");
+    }
+
     public String getMcNameFromDisc(String discordName) {
         discordName = discordName.replace("#", "*");
         try {
@@ -629,6 +661,15 @@ public class ApiUtil {
             getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/newGuildChatMessage.json?key=HoVoiuWfpdAjJhfTj0YN&message=" + URLEncoder.encode(guildMessage, "UTF-8"));
         } catch (UnsupportedEncodingException ignored) {
         }
+    }
+
+    public List<JsonObject> getSMPMessageQueue() {
+        JsonArray queue = JsonParser.parseString(getNonHypixelResponse("https://soopymc.my.to/api/smp/getMessageQ.json?key=HoVoiuWfpdAjJhfTj0YN")).getAsJsonObject().getAsJsonArray("data");
+        List<JsonObject> output = new ArrayList<>();
+        for (JsonElement message : queue) {
+            output.add(message.getAsJsonObject());
+        }
+        return output;
     }
 
     public Path downloadFile(String urlStr, File file) throws IOException {

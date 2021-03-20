@@ -8,7 +8,6 @@ import com.confusinguser.sbgods.utils.Util;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -24,22 +23,18 @@ public class RemoteGuildChat {
     }
 
 
-    public void handleGuildMessage(String author, String message, HypixelRank rank, InetAddress requestSenderIpAddr, boolean showMessageOnly, boolean guildPrefix, MessageChannel channel) {
+    public void handleGuildMessage(String author, String message, HypixelRank rank, boolean showMessageOnly, boolean guildPrefix, boolean messageFromSMP, MessageChannel channel) {
         if (SBGods.getInstance().getDiscord() == null || author.isEmpty() || message.isEmpty()) return;
         boolean shouldSendMessage = !blockedMessages.contains(author + ":" + message);
 
         if (shouldSendMessage) {
-            if (guildID.equals("5fea32eb8ea8c9724b8e3f3c")) {
-                String gRank = LangUtil.getAuthorGuildRank(author);
-                Multithreading.runAsync(() -> SBGods.getInstance().getApiUtil().sendGuildMessageToSApi("§2Guild > §" + rank.getColorCode() + LangUtil.getAuthorNameAndRank(author) + " " + "§7" + LangUtil.getAuthorGuildRank(author) + "§f:" + message));
-            }
             blockedMessages.add(Util.stripColorCodes(author + ":" + message));
             Multithreading.scheduleOnce(() -> blockedMessages.remove(author + ":" + message), 12, TimeUnit.SECONDS);
-            sendMessage(author, message, rank, showMessageOnly, guildPrefix, channel);
+            sendMessage(author, message, rank, showMessageOnly, guildPrefix, messageFromSMP, channel);
         }
     }
 
-    public void handleJoinLeaveMessage(String player, boolean leaving, HypixelRank rank, InetAddress requestSenderIpAddr, MessageChannel channel) {
+    public void handleJoinLeaveMessage(String player, boolean leaving, HypixelRank rank, MessageChannel channel) {
         if (SBGods.getInstance().getDiscord() == null || player.isEmpty()) return;
         String fullMessage = "§2Guild > §r" + player + " " + (leaving ? "left" : "joined") + ".";
         boolean shouldSendMessage = !blockedMessages.contains(fullMessage);
@@ -52,7 +47,7 @@ public class RemoteGuildChat {
         }
     }
 
-    private void sendMessage(String author, String message, HypixelRank rank, boolean showMessageOnly, boolean guildPrefix, MessageChannel channel) {
+    private void sendMessage(String author, String message, HypixelRank rank, boolean showMessageOnly, boolean guildPrefix, boolean messageFromSMP, MessageChannel channel) {
         if (channel == null) return;
         if (latestGuildmessageAuthor.equals(author) && !showMessageOnly) {
             latestGuildmessage += "\n" + (guildPrefix ? "Guild > " : "") + author + ": " + message;
@@ -63,6 +58,14 @@ public class RemoteGuildChat {
         } else {
             if (showMessageOnly) latestGuildmessage = (guildPrefix ? "Guild > " : "") + message;
             else latestGuildmessage = (guildPrefix ? "Guild > " : "") + author + ": " + message;
+        }
+        if (guildID.equals("5fea32eb8ea8c9724b8e3f3c") && !messageFromSMP) {
+            String gRank = LangUtil.getAuthorGuildRank(author);
+            char colorCode = rank.getColorCode();
+            String nameAndRank = LangUtil.getAuthorNameAndRank(author);
+            String msgToSend = (guildPrefix ? "§2Guild > " : "") +
+                    (showMessageOnly ? "" : "§" + colorCode + nameAndRank + (gRank.isEmpty() ? "" : " §7") + gRank + "§f:") + message;
+            Multithreading.runAsync(() -> SBGods.getInstance().getApiUtil().sendGuildMessageToSApi(msgToSend));
         }
         channel.sendMessage(new EmbedBuilder()
                 .setColor(rank.getColor())

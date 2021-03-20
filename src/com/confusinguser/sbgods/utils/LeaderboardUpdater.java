@@ -1,16 +1,15 @@
 package com.confusinguser.sbgods.utils;
 
 import com.confusinguser.sbgods.SBGods;
+import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.leaderboard.LeaderboardValues;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.entities.TextChannel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class LeaderboardUpdater {
@@ -44,14 +43,24 @@ public class LeaderboardUpdater {
             }
         }, 0, 15, TimeUnit.MINUTES);
 
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+        Multithreading.scheduleAtFixedRate(() -> {
             try {
                 main.getDiscord().verifyAllCommand.verifyAll(main.getDiscord().getJDA().awaitReady().getTextChannelById("713012939258593290"));
                 main.getDiscord().verifyAllCommand.verifyAll(main.getDiscord().getJDA().awaitReady().getTextChannelById("713024923945402431"));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-        }, 10, 180, TimeUnit.MINUTES); // Every 3h
+        }, 1, 24, TimeUnit.HOURS);
+
+        Multithreading.scheduleAtFixedRate(() -> {
+            List<JsonObject> messages = main.getApiUtil().getSMPMessageQueue();
+            messages.add(JsonParser.parseString("{\"uuid\":\"dc8c3964-7b29-4e03-ae9e-d13ebd65dd29\",\"player\":\"Soopyboo32\",\"message\":\"i hate debris mining\"}").getAsJsonObject());
+            for (JsonObject message : messages) {
+                String fullText = "§3SMP > §f" + message.get("player").getAsString() + ": " + message.get("message").getAsString();
+                main.getRemoteGuildChatManager().handleGuildMessage(HypixelGuild.SBG.getGuildId(), DiscordServer.SBGods, true, Util.getTextWithoutFormattingCodes(fullText));
+                main.getRemoteGuildChatManager().queue.offer(new AbstractMap.SimpleEntry<>(HypixelGuild.SBG.getGuildId(), fullText));
+            }
+        }, 0, 5, TimeUnit.SECONDS);
     }
 
     private void updateLeaderboardCache(HypixelGuild guild) {

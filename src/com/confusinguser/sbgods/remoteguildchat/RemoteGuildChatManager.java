@@ -161,29 +161,30 @@ public class RemoteGuildChatManager {
                     main.getRemoteGuildChatManager().handleGuildMessage(
                             clientConnection.getGuildId(),
                             message,
-                            ipAddr,
+                            false,
                             (MessageChannel) guildChannel); // For test server list of guilds
                     continue;
                 }
                 main.getRemoteGuildChatManager().handleGuildMessage(
                         clientConnection.getGuildId(),
                         discordServer,
-                        message,
-                        ipAddr);
+                        false,
+                        message
+                );
             } catch (Throwable t) {
                 main.getDiscord().reportFail(t, "Remote Guild Chat Manager");
             }
         }
     }
 
-    public void handleGuildMessage(String guildID, DiscordServer discordServer, String text, InetAddress requestSenderIpAddr) {
+    public void handleGuildMessage(String guildID, DiscordServer discordServer, boolean messageFromSMP, String text) {
         MessageChannel channel;
         if ((channel = SBGods.getInstance().getDiscord().getJDA().getTextChannelById(discordServer.getGuildChatChannelId())) != null) {
-            handleGuildMessage(guildID, text, requestSenderIpAddr, channel);
+            handleGuildMessage(guildID, text, messageFromSMP, channel);
         }
     }
 
-    public void handleGuildMessage(String guildID, String text, InetAddress requestSenderIpAddr, MessageChannel channel) {
+    public void handleGuildMessage(String guildID, String text, boolean messageFromSMP, MessageChannel channel) {
         if (guildChatMap.get(guildID) == null) {
             RemoteGuildChat remoteGuildChat = new RemoteGuildChat(guildID);
             guildChatMap.put(guildID, remoteGuildChat);
@@ -198,7 +199,7 @@ public class RemoteGuildChatManager {
                     Util.stripColorCodes(text).substring(8)
                             .replace(" left.", "")
                             .replace(" joined.", ""),
-                    text.contains("left"), rank, requestSenderIpAddr, channel);
+                    text.contains("left"), rank, channel);
             return;
         }
 
@@ -222,14 +223,16 @@ public class RemoteGuildChatManager {
         boolean guildPrefix = true;
         if (RegexUtil.stringMatches("§2Guild > (?:§[0-9a-f]\\[[\\w§]+\\] |)\\w{3,16}(?: §e\\[\\w*\\]|)§f: @\\w{3,16}, .*", text)
                 || RegexUtil.stringMatches("Guild > (?:\\[[\\w\\W]+\\] |)\\w{3,16}(?: \\[\\w*\\]|): @\\w{3,16}, .*", text)) {
-            message = "SBGBOT > " + Util.getMessageFromGuildChatMessage(text).replaceFirst(", ", " → ").replace("⭍", "").replace("ࠀ", "");
+            message = "SBGBOT > " + Util.getMessageFromGuildChatMessage(text).replaceFirst(", ", " → ").replace("\u2B4D", "").replace("\u0800", "");
             showMessageOnly = true;
             guildPrefix = false;
             rank = HypixelRank.VIP; // Green Color!
         }
+
+        if (text.startsWith("SMP > ")) guildPrefix = false;
         if (message.equals(author)) { // Avoid "Guild > stuff: stuff" if invalid message format
             showMessageOnly = true;
         }
-        guildChatMap.get(guildID).handleGuildMessage(author, message, rank, requestSenderIpAddr, showMessageOnly, guildPrefix, channel);
+        guildChatMap.get(guildID).handleGuildMessage(author, message, rank, showMessageOnly, guildPrefix, messageFromSMP, channel);
     }
 }
