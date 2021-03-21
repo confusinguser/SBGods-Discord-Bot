@@ -6,7 +6,6 @@ import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.leaderboard.LeaderboardValues;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.util.*;
@@ -54,9 +53,9 @@ public class LeaderboardUpdater {
 
         Multithreading.scheduleAtFixedRate(() -> {
             List<JsonObject> messages = main.getApiUtil().getSMPMessageQueue();
-            messages.add(JsonParser.parseString("{\"uuid\":\"dc8c3964-7b29-4e03-ae9e-d13ebd65dd29\",\"player\":\"Soopyboo32\",\"message\":\"i hate debris mining\"}").getAsJsonObject());
+//            messages.add(JsonParser.parseString("{\"uuid\":\"dc8c3964-7b29-4e03-ae9e-d13ebd65dd29\",\"player\":\"Soopyboo32\",\"message\":\"i hate debris mining\"}").getAsJsonObject());
             for (JsonObject message : messages) {
-                String fullText = "§3SMP > §f" + message.get("player").getAsString() + ": " + message.get("message").getAsString();
+                String fullText = "SMP > " + message.get("player").getAsString() + ": " + message.get("message").getAsString();
                 main.getRemoteGuildChatManager().handleGuildMessage(HypixelGuild.SBG.getGuildId(), DiscordServer.SBGods, true, Util.getTextWithoutFormattingCodes(fullText));
                 main.getRemoteGuildChatManager().queue.offer(new AbstractMap.SimpleEntry<>(HypixelGuild.SBG.getGuildId(), fullText));
             }

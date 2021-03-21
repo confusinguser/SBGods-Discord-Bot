@@ -68,9 +68,9 @@ public class RemoteGuildChatManager {
                 }
 
                 List<ClientConnection> socketsThatDontWork = new ArrayList<>();
-                List<ClientConnection> collect = clientConnections.stream().filter(clientConnection -> message.getKey() == null || (clientConnection.getGuildId() != null && clientConnection.getGuildId().equals(message.getKey()))).collect(Collectors.toList());
-                for (int i = 0; i < collect.size(); i++) {
-                    ClientConnection clientConnection = collect.get(i);
+                List<ClientConnection> socketsToSendTo = clientConnections.stream().filter(clientConnection -> message.getKey() == null || (clientConnection.getGuildId() != null && clientConnection.getGuildId().equals(message.getKey()))).collect(Collectors.toList());
+                for (int i = 0; i < socketsToSendTo.size(); i++) {
+                    ClientConnection clientConnection = socketsToSendTo.get(i);
                     DataOutputStream output;
                     try {
                         output = new DataOutputStream(clientConnection.getSocket().getOutputStream());
@@ -78,7 +78,7 @@ public class RemoteGuildChatManager {
                         jsonData.addProperty("type", "chat");
                         jsonData.addProperty("message", message.getValue());
                         if (i == socketsThatDontWork.size()) // If it's the first socket that works
-                            jsonData.addProperty("send_to_chat", /*"/gc " + */Util.bypassAntiSpam(Util.stripColorCodes(message.getValue())));
+                            jsonData.addProperty("send_to_chat", "/gc " + Util.stripColorCodes(message.getValue()));
                         System.out.println(jsonData.toString());
                         output.writeUTF(jsonData.toString());
                         output.flush();
@@ -230,6 +230,7 @@ public class RemoteGuildChatManager {
         }
 
         if (text.startsWith("SMP > ")) guildPrefix = false;
+        if (messageFromSMP) rank = HypixelRank.MVP;
         if (message.equals(author)) { // Avoid "Guild > stuff: stuff" if invalid message format
             showMessageOnly = true;
         }
