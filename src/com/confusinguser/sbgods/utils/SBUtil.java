@@ -1,59 +1,19 @@
 package com.confusinguser.sbgods.utils;
 
-import com.confusinguser.sbgods.SBGods;
-import com.confusinguser.sbgods.entities.PetTier;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public class SBUtil {
-
-    public SBUtil(SBGods main) {
-    }
-
-    public int toPetLevel(int xpAmount, PetTier tier) {
-
-        int rarityOffset = tier.getRairityOffset();
-        List<Integer> levels = new ArrayList<>(Arrays.asList(Constants.pet_levels)).subList(rarityOffset, rarityOffset + 99);
-
-        int xpTotal = 0;
-        int level = 1;
-
-        for (int i = 0; i < 100; i++) {
-            try {
-                xpTotal += levels.get(i);
-            } catch (IndexOutOfBoundsException ex) {
-                return 100;
-            }
-
-            if (xpTotal > xpAmount) {
-                break;
-            } else {
-                level++;
-            }
-        }
-
-        if (level > 100) {
-            level = 100;
-        }
-
-        return level;
-    }
-
-    public double toSkillLevel(int xp) {
+    public static double toSkillLevel(int xp) {
         return toSkillLevel(xp, Constants.skill_exp_levels);
     }
 
-    public double toSkillLevelRunecrafting(int xp) {
+    public static double toSkillLevelRunecrafting(int xp) {
         return toSkillLevel(xp, Constants.runecrafting_exp_levels);
     }
 
-    public double toSkillLevelDungeoneering(double xp) {
+    public static double toSkillLevelDungeoneering(double xp) {
         return toSkillLevel(xp, Constants.dungeoneering_exp_levels);
     }
 
-    private double toSkillLevel(double xp, int[] nonCumulativeLevelRequirements) {
+    private static double toSkillLevel(double xp, int[] nonCumulativeLevelRequirements) {
         int xpTotal = 0;
         int level = 0;
         double xpForNext = Double.POSITIVE_INFINITY;
@@ -78,7 +38,7 @@ public class SBUtil {
         return level + progress;
     }
 
-    public int toSkillExp(int level) {
+    public static int toSkillExp(int level) {
         int exp = 0;
         for (int i = 0; i < level && i < Constants.skill_exp_levels.length; i++) {
             exp += Constants.skill_exp_levels[i];
@@ -86,7 +46,7 @@ public class SBUtil {
         return exp;
     }
 
-    public int toSkillExp(double level) {
+    public static int toSkillExp(double level) {
         int exp = toSkillExp((int) Math.floor(level));
         try {
             exp += (Constants.skill_exp_levels[(int) Math.floor(level) + 1] - Constants.skill_exp_levels[(int) Math.floor(level) - 1]) *
@@ -97,7 +57,7 @@ public class SBUtil {
         return exp;
     }
 
-    public int toSkillExpRunecrafting(double level) {
+    public static int toSkillExpRunecrafting(double level) {
         int exp = toSkillExpRunecrafting((int) Math.floor(level));
         try {
             exp += (Constants.runecrafting_exp_levels[(int) Math.floor(level) + 1] - Constants.runecrafting_exp_levels[(int) Math.floor(level) - 1]) *
@@ -108,7 +68,7 @@ public class SBUtil {
         return exp;
     }
 
-    public int toSkillExpRunecrafting(int level) {
+    public static int toSkillExpRunecrafting(int level) {
         int exp = 0;
         for (int i = 0; i < level && i < Constants.skill_exp_levels.length; i++) {
             exp += Constants.skill_exp_levels[i];
@@ -116,7 +76,7 @@ public class SBUtil {
         return exp;
     }
 
-    public String alternateToNormalSkillType(String skill_type) {
+    public static String alternateToNormalSkillType(String skill_type) {
         for (int i = 0; i < Constants.alternate_skill_types.length; i++) {
             if (Constants.alternate_skill_types[i].contentEquals(skill_type)) {
                 return Constants.skill_types[i];

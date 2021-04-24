@@ -4,6 +4,8 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.leaderboard.LeaderboardValues;
+import com.confusinguser.sbgods.utils.ApiUtil;
+import com.confusinguser.sbgods.utils.LangUtil;
 import com.confusinguser.sbgods.utils.Util;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -46,22 +48,22 @@ public class ReactionListener extends ListenerAdapter {
     }
 
     private void apply(MessageReactionAddEvent e, User user, DiscordServer currentDiscordServer) {
-        String messageId = e.getChannel().sendMessage("Loading... (" + main.getLangUtil().getProgressBar(0.0, 20) + ")").complete().getId();
+        String messageId = e.getChannel().sendMessage("Loading... (" + LangUtil.getProgressBar(0.0, 20) + ")").complete().getId();
 
-        String playerIGN = main.getApiUtil().getMcNameFromDisc(user.getAsTag());
+        String playerIGN = ApiUtil.getMcNameFromDisc(user.getAsTag());
 
         if (playerIGN == null || playerIGN.equals("")) {
             e.getChannel().sendMessage(user.getAsMention() + ", you need to verify before applying.").complete().delete().queueAfter(30, TimeUnit.SECONDS);
             e.getChannel().deleteMessageById(messageId).queue();
         }
 
-        Player player = main.getApiUtil().getPlayerFromUsername(playerIGN);
+        Player player = ApiUtil.getPlayerFromUsername(playerIGN);
 
-        e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar(0.25, 20) + ")").queue();
+        e.getChannel().editMessageById(messageId, "Loading... (" + LangUtil.getProgressBar(0.25, 20) + ")").queue();
 
-        LeaderboardValues stats = main.getApiUtil().getBestLeaderboardValues(player);
+        LeaderboardValues stats = ApiUtil.getBestLeaderboardValues(player);
 
-        e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar(0.75, 20) + ")").queue();
+        e.getChannel().editMessageById(messageId, "Loading... (" + LangUtil.getProgressBar(0.75, 20) + ")").queue();
 
         try {
             if (((TextChannel) e.getGuild().getChannels().stream().filter(channel -> channel.getName().contains("accepted-applications"))
@@ -100,7 +102,7 @@ public class ReactionListener extends ListenerAdapter {
             if (stats.getSkillLevels().getAvgSkillLevel() > currentDiscordServer.getHypixelGuild().getSkillReq()) {
                 meetsSkill = true;
             }
-            e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar(1.0, 20) + ")").queue();
+            e.getChannel().editMessageById(messageId, "Loading... (" + LangUtil.getProgressBar(1.0, 20) + ")").queue();
 
             if (!meetsSkill && !meetsSlayer) {
                 e.getChannel().sendMessage(user.getAsMention() + " you dont meet the slayer requirement of " + currentDiscordServer.getHypixelGuild().getSlayerReq() + " slayer exp" + "\nor the skill requirement of " + currentDiscordServer.getHypixelGuild().getSkillReq() + " average skill level").complete().delete().queueAfter(30, TimeUnit.SECONDS);
@@ -118,12 +120,12 @@ public class ReactionListener extends ListenerAdapter {
             double playerScore = ((double) stats.getSlayerExp().getTotalExp() / currentDiscordServer.getHypixelGuild().getSlayerReq() + (stats.getSkillLevels().getAvgSkillLevel()) / currentDiscordServer.getHypixelGuild().getSkillReq()) / 2;
 
             EmbedBuilder embedBuilder = new EmbedBuilder()
-                    .setTitle(main.getLangUtil().makePossessiveForm(player.getDisplayName()) + " application (Score " + Math.round(playerScore * 100) + ")").setColor(new Color((int) (117 * Math.min(playerScore, 2)) /* Gets "redder" the higher score you have */, 48, 11));
+                    .setTitle(LangUtil.makePossessiveForm(player.getDisplayName()) + " application (Score " + Math.round(playerScore * 100) + ")").setColor(new Color((int) (117 * Math.min(playerScore, 2)) /* Gets "redder" the higher score you have */, 48, 11));
 
             embedBuilder.setThumbnail("https://visage.surgeplay.com/bust/" + player.getUUID());
             String description = String.format(
                     "Slayer exp: %s\nAvg. skill level: %s\nDiscord: %s",
-                    main.getLangUtil().addNotation(stats.getSlayerExp().getTotalExp()),
+                    LangUtil.addNotation(stats.getSlayerExp().getTotalExp()),
                     Util.round(stats.getSkillLevels().getAvgSkillLevel(), 2),
                     user.getAsMention());
             embedBuilder.setDescription(description);

@@ -4,6 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
+import com.confusinguser.sbgods.utils.ApiUtil;
 import com.confusinguser.sbgods.utils.Util;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -27,7 +28,7 @@ public class VerifyCommand extends Command {
 
         if (args.length >= 2) {
             // Check if that is actual player ign
-            Player player = main.getApiUtil().getPlayerFromUsername(args[1]);
+            Player player = ApiUtil.getPlayerFromUsername(args[1]);
             if (player == null || player.getDiscordTag() == null) {
                 e.getChannel().sendMessage(e.getAuthor().getAsMention() + " could not find MC account " + args[1]).queue();
                 return;
@@ -41,7 +42,7 @@ public class VerifyCommand extends Command {
                         e.getChannel().sendMessage("Bot is still loading the leaderboards! Try again in a few minutes").queue();
                         return;
                     default:
-                        main.logger.fine("Added " + currentDiscordServer.toString() + " verified role to " + e.getAuthor().getAsTag());
+                        main.logger.fine("Added " + currentDiscordServer + " verified role to " + e.getAuthor().getAsTag());
                         return;
                 }
             }
@@ -59,7 +60,7 @@ public class VerifyCommand extends Command {
                     break;
             }
         } else {
-            String mcName = main.getApiUtil().getMcNameFromDisc(e.getAuthor().getAsTag());
+            String mcName = ApiUtil.getMcNameFromDisc(e.getAuthor().getAsTag());
             if (mcName.isEmpty()) {
                 e.getChannel().sendMessage("There was an error auto-detecting your minecraft ign. Please do -verify <IGN>").queue();
                 return;

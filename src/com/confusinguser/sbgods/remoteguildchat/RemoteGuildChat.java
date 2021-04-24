@@ -2,6 +2,7 @@ package com.confusinguser.sbgods.remoteguildchat;
 
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.HypixelRank;
+import com.confusinguser.sbgods.utils.ApiUtil;
 import com.confusinguser.sbgods.utils.LangUtil;
 import com.confusinguser.sbgods.utils.Multithreading;
 import com.confusinguser.sbgods.utils.Util;
@@ -41,7 +42,7 @@ public class RemoteGuildChat {
 
         if (shouldSendMessage) {
             blockedMessages.add(fullMessage);
-//            Multithreading.runAsync(() -> SBGods.getInstance().getApiUtil().sendGuildMessageToSApi("§2" + fullMessage));
+//            Multithreading.runAsync(() -> ApiUtil.sendGuildMessageToSApi("§2" + fullMessage));
             Multithreading.scheduleOnce(() -> blockedMessages.remove(fullMessage), 8, TimeUnit.SECONDS);
             sendJoinLeaveMessage(player, rank, leaving, channel);
         }
@@ -65,7 +66,7 @@ public class RemoteGuildChat {
             String nameAndRank = LangUtil.getAuthorNameAndRank(author);
             String msgToSend = (guildPrefix ? "§2Guild > " : "") +
                     (showMessageOnly ? "" : "§" + colorCode + nameAndRank + (gRank.isEmpty() ? "" : " §7") + gRank + "§f:") + message;
-            Multithreading.runAsync(() -> SBGods.getInstance().getApiUtil().sendGuildMessageToSApi(msgToSend));
+            Multithreading.runAsync(() -> ApiUtil.sendGuildMessageToSApi(msgToSend));
         }
         channel.sendMessage(new EmbedBuilder()
                 .setColor(rank.getColor())

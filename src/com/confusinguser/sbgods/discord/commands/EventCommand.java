@@ -6,6 +6,9 @@ import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.Player;
 import com.confusinguser.sbgods.entities.leaderboard.LeaderboardValues;
+import com.confusinguser.sbgods.utils.ApiUtil;
+import com.confusinguser.sbgods.utils.LangUtil;
+import com.confusinguser.sbgods.utils.SBUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -34,7 +37,7 @@ public class EventCommand extends Command {
         this.name = "event";
         this.progressTypeToPost = "";
         //TODO EventManager
-        this.eventData = main.getApiUtil().getEventData();
+        this.eventData = ApiUtil.getEventData();
         this.usage = getName() + " <start, progress, startPostingLeaderboard, stopPostingLb, stop>";
     }
 
@@ -71,9 +74,9 @@ public class EventCommand extends Command {
         }
 
         if (args[1].equals("start")) {
-            String messageId = e.getChannel().sendMessage("Loading... (" + main.getLangUtil().getProgressBar(0, 50) + ")").complete().getId();
+            String messageId = e.getChannel().sendMessage("Loading... (" + LangUtil.getProgressBar(0, 50) + ")").complete().getId();
             JSONArray eventData = new JSONArray();
-            List<Player> guildmembers = main.getApiUtil().getGuildMembers(HypixelGuild.SBG);
+            List<Player> guildmembers = ApiUtil.getGuildMembers(HypixelGuild.SBG);
             int i = 0;
             Map<Player, LeaderboardValues> playerStatMap = HypixelGuild.SBG.getPlayerStatMap();
             if (playerStatMap == null || playerStatMap.isEmpty()) {
@@ -83,7 +86,7 @@ public class EventCommand extends Command {
             }
             for (Map.Entry<Player, LeaderboardValues> playerStat : playerStatMap.entrySet()) {
                 if (i++ % 3 == 0) {
-                    e.getChannel().editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar((double) i / guildmembers.size(), 50) + ")").queue();
+                    e.getChannel().editMessageById(messageId, "Loading... (" + LangUtil.getProgressBar((double) i / guildmembers.size(), 50) + ")").queue();
                 }
                 JSONObject playerData = new JSONObject();
 
@@ -98,16 +101,16 @@ public class EventCommand extends Command {
                 playerData.put("slayerWolf", playerStat.getValue().getSlayerExp().getWolf());
 
                 playerData.put("skillTotal", playerStat.getValue().getSkillLevels().getTotalSkillExp());
-                playerData.put("skillAlchemy", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getAlchemy()));
-                playerData.put("skillCarpentry", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getCarpentry()));
-                playerData.put("skillCombat", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getCombat()));
-                playerData.put("skillEnchanting", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getEnchanting()));
-                playerData.put("skillFarming", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getFarming()));
-                playerData.put("skillFishing", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getFishing()));
-                playerData.put("skillForaging", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getForaging()));
-                playerData.put("skillMining", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getMining()));
-                playerData.put("skillRunecrafting", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getRunecrafting()));
-                playerData.put("skillTaming", main.getSBUtil().toSkillExp(playerStat.getValue().getSkillLevels().getTaming()));
+                playerData.put("skillAlchemy", SBUtil.toSkillExp(playerStat.getValue().getSkillLevels().getAlchemy()));
+                playerData.put("skillCarpentry", SBUtil.toSkillExp(playerStat.getValue().getSkillLevels().getCarpentry()));
+                playerData.put("skillCombat", SBUtil.toSkillExp(playerStat.getValue().getSkillLevels().getCombat()));
+                playerData.put("skillEnchanting", SBUtil.toSkillExp(playerStat.getValue().getSkillLevels().getEnchanting()));
+                playerData.put("skillFarming", SBUtil.toSkillExp(playerStat.getValue().getSkillLevels().getFarming()));
+                playerData.put("skillFishing", SBUtil.toSkillExp(playerStat.getValue().getSkillLevels().getFishing()));
+                playerData.put("skillForaging", SBUtil.toSkillExp(playerStat.getValue().getSkillLevels().getForaging()));
+                playerData.put("skillMining", SBUtil.toSkillExp(playerStat.getValue().getSkillLevels().getMining()));
+                playerData.put("skillRunecrafting", SBUtil.toSkillExp(playerStat.getValue().getSkillLevels().getRunecrafting()));
+                playerData.put("skillTaming", SBUtil.toSkillExp(playerStat.getValue().getSkillLevels().getTaming()));
 
                 playerData.put("dungeonClassTotal", playerStat.getValue().getDungeonLevels().getTotalClassExp());
                 playerData.put("dungeonClassHealer", playerStat.getValue().getDungeonLevels().getHealerExp());
@@ -121,7 +124,7 @@ public class EventCommand extends Command {
 
             this.eventData = eventData;
             e.getChannel().editMessageById(messageId, "Started event!").queue();
-            main.getApiUtil().setEventData(eventData);
+            ApiUtil.setEventData(eventData);
             return;
         }
 
@@ -234,13 +237,13 @@ public class EventCommand extends Command {
         JSONArray leaderboardList = sortPlayerProgressArray(eventProgress, key);
         for (int i = 0; i < leaderboardList.length(); i++) {
             JSONObject player = leaderboardList.getJSONObject(i);
-            messageBuilder.append("#").append(i + 1).append(" ").append(player.getString("displayName").replace("_", "\\_")).append(": ").append(main.getLangUtil().addNotation(player.getJSONObject("playerProgress").getInt(key))).append("\n");
+            messageBuilder.append("#").append(i + 1).append(" ").append(player.getString("displayName").replace("_", "\\_")).append(": ").append(LangUtil.addNotation(player.getJSONObject("playerProgress").getInt(key))).append("\n");
         }
         message = messageBuilder.toString();
 
-        List<String> messageSend = main.getLangUtil().processMessageForDiscord(message, 2000);
+        List<String> messageSend = LangUtil.processMessageForDiscord(message, 2000);
 
-        ArrayList<String> res = new ArrayList<>();
+        List<String> res = new ArrayList<>();
         for (String messageSending : messageSend) {
             String id = channel.sendMessage(new EmbedBuilder().setDescription(messageSending).build()).complete().getId();
             res.add(id);
@@ -260,18 +263,18 @@ public class EventCommand extends Command {
         String messageId = "";
 
         if (showLoadingMsg) {
-            messageId = channel.sendMessage("Loading... (" + main.getLangUtil().getProgressBar(0, 12) + ")").complete().getId();
+            messageId = channel.sendMessage("Loading... (" + LangUtil.getProgressBar(0, 12) + ")").complete().getId();
         }
 
         for (int i = 0; i < eventData.length(); i++) {
             if (i % 10 == 0 && showLoadingMsg) {
-                channel.editMessageById(messageId, "Loading... (" + main.getLangUtil().getProgressBar((double) i / eventData.length(), 12) + ")").queue();
+                channel.editMessageById(messageId, "Loading... (" + LangUtil.getProgressBar((double) i / eventData.length(), 12) + ")").queue();
             }
 
             JSONObject memberDataJSON = eventData.getJSONObject(i);
             LeaderboardValues memberData = LeaderboardValues.fromJSON(memberDataJSON);
-            LeaderboardValues currData = main.getApiUtil().getBestLeaderboardValues(main.getApiUtil().getPlayerFromUUID(memberDataJSON.getString("uuid")));
-//            Player player = main.getApiUtil().getPlayerFromUUID(memberData.getString("uuid"));
+            LeaderboardValues currData = ApiUtil.getBestLeaderboardValues(ApiUtil.getPlayerFromUUID(memberDataJSON.getString("uuid")));
+//            Player player = ApiUtil.getPlayerFromUUID(memberData.getString("uuid"));
 //
 //            if (memberData.getInt("lastLogin") > memberData.getInt("lastLogout")) {
 //                needToUpdateData = true;

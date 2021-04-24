@@ -4,6 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.Player;
+import com.confusinguser.sbgods.utils.ApiUtil;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -27,13 +28,13 @@ public class WhatguildCommand extends Command {
 
         String messageId = e.getChannel().sendMessage("...").complete().getId();
 
-        Player thePlayer = main.getApiUtil().getPlayerFromUsername(args[1]);
+        Player thePlayer = ApiUtil.getPlayerFromUsername(args[1]);
         if (thePlayer.getSkyblockProfiles().isEmpty()) {
             e.getChannel().deleteMessageById(messageId).queue();
             e.getChannel().sendMessage("Player **" + args[1] + "** does not exist").queue();
             return;
         }
-        String guildName = main.getApiUtil().getGuildFromUUID(thePlayer.getUUID());
+        String guildName = ApiUtil.getGuildFromUUID(thePlayer.getUUID());
 
         if (guildName == null) {
             e.getChannel().deleteMessageById(messageId).queue();

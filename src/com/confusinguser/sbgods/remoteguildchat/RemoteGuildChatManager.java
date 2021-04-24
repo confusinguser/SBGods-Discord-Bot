@@ -4,6 +4,7 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
 import com.confusinguser.sbgods.entities.HypixelRank;
+import com.confusinguser.sbgods.utils.ApiUtil;
 import com.confusinguser.sbgods.utils.Multithreading;
 import com.confusinguser.sbgods.utils.RegexUtil;
 import com.confusinguser.sbgods.utils.Util;
@@ -45,10 +46,11 @@ public class RemoteGuildChatManager {
             while (true) {
                 try {
                     socket.set(serverSocket.accept());
-                    clientConnections.add(new ClientConnection(socket.get()));
+                    ClientConnection clientConnection = new ClientConnection(socket.get());
+                    clientConnections.add(clientConnection);
                     Multithreading.runAsync(() -> {
-                        listenForSocketMessages(new ClientConnection(socket.get()));
-                        clientConnections.remove(new ClientConnection(socket.get()));
+                        listenForSocketMessages(clientConnection);
+                        clientConnections.remove(clientConnection);
                     });
                 } catch (IOException ioException) {
                     main.getDiscord().reportFail(ioException, "Listener Thread");
@@ -79,7 +81,7 @@ public class RemoteGuildChatManager {
                         jsonData.addProperty("message", message.getValue());
                         if (i == socketsThatDontWork.size()) // If it's the first socket that works
                             jsonData.addProperty("send_to_chat", "/gc " + Util.stripColorCodes(message.getValue()));
-                        System.out.println(jsonData.toString());
+                        System.out.println(jsonData);
                         output.writeUTF(jsonData.toString());
                         output.flush();
                     } catch (IOException ex) {
@@ -129,13 +131,16 @@ public class RemoteGuildChatManager {
                 return;
             }
             try {
-                clientConnection.setUuid(parsedJson.get("senderUUID").getAsString());
-                clientConnection.setGuildId(main.getApiUtil().getGuildIDFromUUID(clientConnection.getUuid()));
+                if (parsedJson.has("senderUUID")) {
+                    clientConnection.setUuid(parsedJson.get("senderUUID").getAsString());
+                    Multithreading.runAsync(() -> clientConnection.setGuildId(ApiUtil.getGuildIDFromUUID(clientConnection.getUuid())));
+                }
+                if (!parsedJson.has("message")) continue;
                 DiscordServer discordServer = DiscordServer.getDiscordServerFromHypixelGuild(HypixelGuild.getGuildById(clientConnection.getGuildId()), true);
                 String message = parsedJson.get("message").getAsString();
 
                 if (discordServer == null) {
-                    String guildName = main.getApiUtil().getGuildNameFromId(clientConnection.getGuildId());
+                    String guildName = ApiUtil.getGuildNameFromId(clientConnection.getGuildId());
                     if (guildName == null) {
                         guildName = "none";
                     }
@@ -186,8 +191,10 @@ public class RemoteGuildChatManager {
 
     public void handleGuildMessage(String guildID, String text, boolean messageFromSMP, MessageChannel channel) {
         if (guildChatMap.get(guildID) == null) {
-            RemoteGuildChat remoteGuildChat = new RemoteGuildChat(guildID);
-            guildChatMap.put(guildID, remoteGuildChat);
+            if (guildID != null) {
+                RemoteGuildChat remoteGuildChat = new RemoteGuildChat(guildID);
+                guildChatMap.put(guildID, remoteGuildChat);
+            } else return;
         }
 
         text = text.replace("§r", "");
@@ -221,7 +228,7 @@ public class RemoteGuildChatManager {
         rank = HypixelRank.getHypixelRankFromRankName(author.substring(0, author.contains("]") ? author.indexOf("]") + 1 : 0));
         boolean showMessageOnly = false;
         boolean guildPrefix = true;
-        if (RegexUtil.stringMatches("§2Guild > (?:§[0-9a-f]\\[[\\w§]+\\] |)\\w{3,16}(?: §e\\[\\w*\\]|)§f: @\\w{3,16}, .*", text)
+        if (RegexUtil.stringMatches("§2Guild > (?:§[0-9a-f]\\[[\\w§]+\\] |)\\w{3,16}(?: §3\\[\\w*\\]|)§f: @\\w{3,16}, .*", text)
                 || RegexUtil.stringMatches("Guild > (?:\\[[\\w\\W]+\\] |)\\w{3,16}(?: \\[\\w*\\]|): @\\w{3,16}, .*", text)) {
             message = "SBGBOT > " + Util.getMessageFromGuildChatMessage(text).replaceFirst(", ", " → ").replace("\u2B4D", "").replace("\u0800", "");
             showMessageOnly = true;

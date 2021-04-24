@@ -3,7 +3,8 @@ package com.confusinguser.sbgods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.remoteguildchat.RemoteGuildChatManager;
-import com.confusinguser.sbgods.utils.*;
+import com.confusinguser.sbgods.utils.LangUtil;
+import com.confusinguser.sbgods.utils.LeaderboardUpdater;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
@@ -25,15 +26,10 @@ public class SBGods {
     /**
      * NOTE: OVERRIDEN IN {@code getActiveServers()} IF NOT IN IDE
      */
-    private static DiscordServer[] servers = {DiscordServer.Test}; // For testing
+    private static DiscordServer[] servers = {DiscordServer.Test};
     private static SBGods instance;
     public final Logger logger = Logger.getLogger(this.getClass().getName());
-    private final ApiUtil apiutil;
-    private final SBUtil sbUtil;
-    private final LangUtil langUtil;
-    private final CacheUtil cacheUtil;
     private final LeaderboardUpdater leaderboardUpdater;
-    private final LeaderboardUtil leaderboardUtil;
     private final RemoteGuildChatManager remoteGuildChatManager;
     private String[] keys = null;
     private DiscordBot discordBot;
@@ -63,11 +59,6 @@ public class SBGods {
             handler.setLevel(Level.ALL); // Make handler send all events
             logger.setLevel(Level.ALL); // Show all logging events
         }
-
-        this.apiutil = new ApiUtil(this);
-        this.sbUtil = new SBUtil(this);
-        this.langUtil = new LangUtil(this);
-        this.cacheUtil = new CacheUtil(this);
         this.remoteGuildChatManager = new RemoteGuildChatManager(this);
         remoteGuildChatManager.startListener(serverSocket);
         try {
@@ -77,7 +68,6 @@ public class SBGods {
             System.exit(-1);
         }
         this.leaderboardUpdater = new LeaderboardUpdater(this);
-        leaderboardUtil = new LeaderboardUtil(this);
     }
 
     public static SBGods getInstance() {
@@ -100,22 +90,6 @@ public class SBGods {
         keys = keysTemp.toArray(keys);
     }
 
-    public ApiUtil getApiUtil() {
-        return apiutil;
-    }
-
-    public SBUtil getSBUtil() {
-        return sbUtil;
-    }
-
-    public LangUtil getLangUtil() {
-        return langUtil;
-    }
-
-    public CacheUtil getCacheUtil() {
-        return cacheUtil;
-    }
-
     public DiscordBot getDiscord() {
         return discordBot;
     }
@@ -126,10 +100,6 @@ public class SBGods {
 
     public LeaderboardUpdater getLeaderboardUpdater() {
         return leaderboardUpdater;
-    }
-
-    public LeaderboardUtil getLeaderboardUtil() {
-        return leaderboardUtil;
     }
 
     public Logger getLogger() {
@@ -171,9 +141,9 @@ public class SBGods {
     }
 
     /**
-     * Alias for {@code getLangUtil().getMessageByKey(String key)}
+     * Alias for {@code LangUtil.getMessageByKey(String key)}
      */
     public String getMessageByKey(String key) {
-        return getLangUtil().getMessageByKey(key);
+        return LangUtil.getMessageByKey(key);
     }
 }

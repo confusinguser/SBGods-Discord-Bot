@@ -3,6 +3,7 @@ package com.confusinguser.sbgods.discord.commands;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
+import com.confusinguser.sbgods.utils.ApiUtil;
 import com.confusinguser.sbgods.utils.Util;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -35,7 +36,7 @@ public class SbgodsCommand extends Command {
                 return;
             }
 
-            Map.Entry<String, String> latestReleaseUrl = main.getApiUtil().getLatestReleaseUrl();
+            Map.Entry<String, String> latestReleaseUrl = ApiUtil.getLatestReleaseUrl();
             if (latestReleaseUrl.getValue().equals("")) {
                 e.getChannel().sendMessage("There are no releases available!").queue();
                 return;
@@ -46,7 +47,7 @@ public class SbgodsCommand extends Command {
             File file = Util.getFileToUse(latestReleaseUrl.getKey());
             Path newFilePath;
             try {
-                newFilePath = main.getApiUtil().downloadFile(latestReleaseUrl.getValue(), file);
+                newFilePath = ApiUtil.downloadFile(latestReleaseUrl.getValue(), file);
             } catch (IOException ex) {
                 e.getChannel().sendMessage("There was a problem when downloading the latest release").queue();
                 main.getDiscord().reportFail(ex, "Release Downloader");
@@ -61,7 +62,7 @@ public class SbgodsCommand extends Command {
             e.getChannel().editMessageById(messageId, "**Success!** Downloaded new version and going to restart bot!").complete();
             try {
                 new ProcessBuilder("cmd /c exit").inheritIO().start().waitFor();
-                new ProcessBuilder("cmd /c start cmd /k java -jar \"" + newFilePath.toString() + "\"").start().waitFor();
+                new ProcessBuilder("cmd /c start cmd /k java -jar \"" + newFilePath + "\"").start().waitFor();
                 System.exit(0);
             } catch (IOException | InterruptedException ex) {
 //                e.getChannel().editMessageById(messageId, "Could not start new version, try stopping the bot").queue();

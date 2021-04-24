@@ -3,6 +3,8 @@ package com.confusinguser.sbgods.entities;
 import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.entities.leaderboard.SkillLevels;
 import com.confusinguser.sbgods.entities.leaderboard.SlayerExp;
+import com.confusinguser.sbgods.utils.ApiUtil;
+import com.confusinguser.sbgods.utils.LeaderboardUtil;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -81,7 +83,7 @@ public class Player {
         if (getUUID() == null) {
             return null;
         }
-        return main.getApiUtil().getGuildIDFromUUID(getUUID());
+        return ApiUtil.getGuildIDFromUUID(getUUID());
     }
 
     public String getDisplayName() {
@@ -122,7 +124,7 @@ public class Player {
 
         if (guild == null) return -1;
 
-        List<Map.Entry<Player, SkillLevels>> skillExpList = new ArrayList<>(((Map<Player, SkillLevels>) main.getLeaderboardUtil().convertPlayerStatMap(
+        List<Map.Entry<Player, SkillLevels>> skillExpList = new ArrayList<>(((Map<Player, SkillLevels>) LeaderboardUtil.convertPlayerStatMap(
                 guild.getPlayerStatMap(), entry -> entry.getValue().getSkillLevels())).entrySet());
         if (skillExpList.isEmpty()) return -2;
 
@@ -146,7 +148,7 @@ public class Player {
         HypixelGuild guild = HypixelGuild.getGuildById(getGuildId());
         if (guild == null) return -1;
 
-        List<Map.Entry<Player, SlayerExp>> slayerExpList = new ArrayList<>(((Map<Player, SlayerExp>) main.getLeaderboardUtil().convertPlayerStatMap(
+        List<Map.Entry<Player, SlayerExp>> slayerExpList = new ArrayList<>(((Map<Player, SlayerExp>) LeaderboardUtil.convertPlayerStatMap(
                 guild.getPlayerStatMap(), entry -> entry.getValue().getSlayerExp())).entrySet());
         if (slayerExpList.isEmpty()) return -2;
 

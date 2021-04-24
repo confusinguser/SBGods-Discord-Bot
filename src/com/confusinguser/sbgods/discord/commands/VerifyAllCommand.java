@@ -4,13 +4,14 @@ import com.confusinguser.sbgods.SBGods;
 import com.confusinguser.sbgods.discord.DiscordBot;
 import com.confusinguser.sbgods.entities.DiscordServer;
 import com.confusinguser.sbgods.entities.HypixelGuild;
+import com.confusinguser.sbgods.utils.ApiUtil;
+import com.confusinguser.sbgods.utils.LangUtil;
 import com.confusinguser.sbgods.utils.Util;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
 
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -66,11 +67,7 @@ public class VerifyAllCommand extends Command {
     }
 
     private void verifyAll(MessageChannel channel, Guild discord) {
-        if (discord.getId().equals(DiscordServer.SBGods.getServerId())) {
-            main.getApiUtil().setGuildRanksChange(new JSONArray());
-        }
-
-        String messageId = channel.sendMessage("Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(0.0, 30) + ") [0/" + discord.getMembers().size() + "]").complete().getId();
+        String messageId = channel.sendMessage("Attempting to auto-verify all players! (" + LangUtil.getProgressBar(0.0, 30) + ") [0/" + discord.getMembers().size() + "]").complete().getId();
 
         int playersVerified = 0;
         int i = 0; // For loading animation
@@ -78,9 +75,9 @@ public class VerifyAllCommand extends Command {
         for (Member member : discord.getMembers()) {
             i++;
             if (i % 10 == 0) {//only once every 10 times (to stop from overloading discord queue)
-                channel.editMessageById(messageId, "Attempting to auto-verify all players! (" + main.getLangUtil().getProgressBar(i / (double) discord.getMembers().size(), 30) + ") [" + i + "/" + discord.getMembers().size() + "]").queue();
+                channel.editMessageById(messageId, "Attempting to auto-verify all players! (" + LangUtil.getProgressBar(i / (double) discord.getMembers().size(), 30) + ") [" + i + "/" + discord.getMembers().size() + "]").queue();
             }
-            String mcName = main.getApiUtil().getMcNameFromDisc(member.getUser().getAsTag());
+            String mcName = ApiUtil.getMcNameFromDisc(member.getUser().getAsTag());
             if (!mcName.equals("")) {
                 int response = Util.verifyPlayer(member, mcName, discord, channel);
                 if (response == 1) { // Message was sent

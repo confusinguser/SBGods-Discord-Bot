@@ -1,7 +1,5 @@
 package com.confusinguser.sbgods.utils;
 
-import com.confusinguser.sbgods.SBGods;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
@@ -13,31 +11,26 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LangUtil {
+    private static final Pattern addCommaPattern = Pattern.compile("\\d{1,3}(?=(\\d{3})+(?=\\.))");
+    private static final DecimalFormat df = new DecimalFormat("#");
+    private static final ResourceBundle resourceBundle = ResourceBundle.getBundle("language", Locale.ENGLISH);
 
-    private final SBGods main;
-
-    private final Pattern addCommaPattern = Pattern.compile("\\d{1,3}(?=(\\d{3})+(?=\\.))");
-    private final DecimalFormat df = new DecimalFormat("#");
-
-    private final ResourceBundle resourceBundle = ResourceBundle.getBundle("language", Locale.ENGLISH);
-
-    public LangUtil(SBGods main) {
-        this.main = main;
+    static {
         df.setMaximumFractionDigits(16);
     }
 
-    public String makePossessiveForm(String text) {
+    public static String makePossessiveForm(String text) {
         if (text.endsWith("s")) {
             return text + "'";
         }
         return text + "'s";
     }
 
-    public String toLowerCaseButFirstLetter(String text) {
+    public static String toLowerCaseButFirstLetter(String text) {
         return text.substring(0, 1).toUpperCase() + text.substring(1).toLowerCase();
     }
 
-    public String prettifyInt(int input) {
+    public static String prettifyInt(int input) {
         if (input < 1000) {
             return String.valueOf(input);
         }
@@ -57,7 +50,7 @@ public class LangUtil {
         return String.valueOf(input);
     }
 
-    public String prettifyLong(long input) {
+    public static String prettifyLong(long input) {
         if (input < 1000) {
             return String.valueOf(input);
         }
@@ -77,7 +70,7 @@ public class LangUtil {
         return String.valueOf(input);
     }
 
-    public String prettifyDouble(double input) {
+    public static String prettifyDouble(double input) {
         if (input % 1 == 0) {
             return String.valueOf((int) Math.floor(input));
         }
@@ -99,11 +92,11 @@ public class LangUtil {
      * @param num The number (eg. 150385.6725)
      * @return Returns the number but with commas (eg. 150,385.6725)
      */
-    public String addCommas(double num) {
+    public static String addCommas(double num) {
         return addCommaPattern.matcher(String.valueOf(num)).replaceAll("$1,");
     }
 
-    public String addNotationOrCommas(double num) {
+    public static String addNotationOrCommas(double num) {
         String notationNum = addNotation(num);
         int toHellAndBack = parseIntegerWithSuffixes(notationNum);
         if (num == toHellAndBack) return notationNum; // notationNum does not affect the value of the number
@@ -117,7 +110,7 @@ public class LangUtil {
      * @param lengthOfBar The total length of the progress bar
      * @return The unicode progress bar using the arguments
      */
-    public String getProgressBar(double amountDone, int lengthOfBar) {
+    public static String getProgressBar(double amountDone, int lengthOfBar) {
         String returnVal = "";
         String progressChar = "■";
         String otherChar = "□";
@@ -132,7 +125,7 @@ public class LangUtil {
         return returnVal;
     }
 
-    public String loopString(String input, int loops) {
+    public static String loopString(String input, int loops) {
         StringBuilder output = new StringBuilder();
 
         for (int i = 0; i < loops; i++) {
@@ -142,7 +135,7 @@ public class LangUtil {
         return output.toString();
     }
 
-    public String generateStackTraceView(Throwable throwable) {
+    public static String generateStackTraceView(Throwable throwable) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         throwable.printStackTrace(pw);
@@ -150,11 +143,11 @@ public class LangUtil {
         return sw.toString();
     }
 
-    public String getMessageByKey(String key) {
+    public static String getMessageByKey(String key) {
         return resourceBundle.getString(key);
     }
 
-    public int parseIntegerWithSuffixes(String input) {
+    public static int parseIntegerWithSuffixes(String input) {
         int amount;
         try {
             return Integer.parseInt(input);
@@ -168,7 +161,7 @@ public class LangUtil {
         }
     }
 
-    public String beautifyInt(int integer) {
+    public static String beautifyInt(int integer) {
         String intStr = addNotation(integer);
         if (parseIntegerWithSuffixes(intStr) == integer) {
             return intStr;
@@ -176,11 +169,11 @@ public class LangUtil {
         return addCommas(integer);
     }
 
-    public List<String> processMessageForDiscord(String message, int limit) {
+    public static List<String> processMessageForDiscord(String message, int limit) {
         return processMessageForDiscord(message, limit, new ArrayList<>());
     }
 
-    private List<String> processMessageForDiscord(String message, int limit, List<String> currentOutput) {
+    private static List<String> processMessageForDiscord(String message, int limit, List<String> currentOutput) {
         if (message.length() > limit) {
             int lastIndex = 0;
             for (int index = message.indexOf('\n'); index >= 0; index = message.indexOf('\n', index + 1)) {
@@ -206,7 +199,7 @@ public class LangUtil {
         return "";
     }
 
-    public String addNotation(double num) {
+    public static String addNotation(double num) {
         String prefix = "";
         if (num < 0) {
             num *= -1;

@@ -1,7 +1,9 @@
 package com.confusinguser.sbgods.utils;
 
 import com.confusinguser.sbgods.SBGods;
-import com.confusinguser.sbgods.entities.*;
+import com.confusinguser.sbgods.entities.HypixelGuild;
+import com.confusinguser.sbgods.entities.Player;
+import com.confusinguser.sbgods.entities.Response;
 import com.confusinguser.sbgods.entities.leaderboard.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -20,27 +22,25 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ApiUtil {
 
-    public final String BASE_URL = "https://api.hypixel.net/";
-    private final String USER_AGENT = "Mozilla/5.0";
-    private final SBGods main;
-    private final int REQUEST_RATE; // unit: requests
-    private long LAST_CHECK = System.currentTimeMillis();
-    private int allowance; // unit: requests
-    private int fails = 0;
+    public static final String BASE_URL = "https://api.hypixel.net/";
+    private static final String USER_AGENT = "Mozilla/5.0";
+    private static final SBGods main = SBGods.getInstance();
+    private static int REQUEST_RATE = 0; // unit: requests
+    private static long LAST_CHECK = System.currentTimeMillis();
+    private static int allowance; // unit: requests
+    private static int fails = 0;
 
-    public ApiUtil(SBGods main) {
-        this.main = main;
-        REQUEST_RATE = 115 * main.getKeys().length; //caps at 120 actually
-        allowance = REQUEST_RATE;
-    }
+    public static String getResponse(String url_string, int cacheTime) {
+        if (REQUEST_RATE == 0) {
+            REQUEST_RATE = 115 * main.getKeys().length;
+            allowance = REQUEST_RATE;
+        }
 
-    public String getResponse(String url_string, int cacheTime) {
         // See if request already in cache
-        Response cacheResponse = main.getCacheUtil().getCachedResponse(main.getCacheUtil().stripUnnecesaryInfo(url_string), cacheTime);
+        Response cacheResponse = CacheUtil.getCachedResponse(CacheUtil.stripUnnecesaryInfo(url_string), cacheTime);
         if (cacheResponse != null) {
             return cacheResponse.getJson();
         }
@@ -91,7 +91,7 @@ public class ApiUtil {
             }
             in.close();
             fails = 0;
-            main.getCacheUtil().addToCache(main.getCacheUtil().stripUnnecesaryInfo(url_string), response.toString());
+            CacheUtil.addToCache(CacheUtil.stripUnnecesaryInfo(url_string), response.toString());
             return response.toString();
         } catch (IOException ioException) {
 
@@ -102,7 +102,7 @@ public class ApiUtil {
                 if (onIOException(ioException)) return null;
             }
 
-            if (responseCode == 429) {
+            if (responseCode == 429) { // Throttled
                 try {
                     Thread.sleep(17000);
                 } catch (InterruptedException e) {
@@ -110,7 +110,7 @@ public class ApiUtil {
                 }
                 return getResponse(url_string, cacheTime);
 
-            } else if (responseCode == 403) {
+            } else if (responseCode == 403) { // Invalid api key
                 main.logger.severe("The API key \"" + main.getCurrentApiKey() + "\" is invalid!");
                 main.removeApiKey(main.getCurrentApiKey());
                 return null;
@@ -121,7 +121,7 @@ public class ApiUtil {
         }
     }
 
-    private boolean onIOException(IOException ioException) {
+    private static boolean onIOException(IOException ioException) {
         if (fails > 20) return true;
         fails++;
         if (fails % 10 == 0 || fails == 1) {
@@ -131,7 +131,7 @@ public class ApiUtil {
         return false;
     }
 
-    public String getNonHypixelResponse(String url_string) {
+    public static String getNonHypixelResponse(String url_string) {
         StringBuffer response;
         HttpURLConnection con = null;
         IOException ioException;
@@ -190,7 +190,7 @@ public class ApiUtil {
         }
     }
 
-    public void sendData(String dataString, String urlString) {
+    public static void sendData(String dataString, String urlString) {
         try {
             URL url = new URL(urlString);
             URLConnection con = url.openConnection();
@@ -212,7 +212,7 @@ public class ApiUtil {
         }
     }
 
-    public List<Player> getGuildMembers(HypixelGuild guild) {
+    public static List<Player> getGuildMembers(HypixelGuild guild) {
         String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&id=" + guild.getGuildId(), 300000);
         if (response == null) return getGuildMembers(guild);
 
@@ -234,7 +234,7 @@ public class ApiUtil {
         return output;
     }
 
-    public List<Player> getGuildMembersDeep(HypixelGuild guild) { // Might be used in the future
+    public static List<Player> getGuildMembersDeep(HypixelGuild guild) { // Might be used in the future
         String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&id=" + guild.getGuildId(), 300000);
         if (response == null) return getGuildMembersDeep(guild);
 
@@ -252,7 +252,7 @@ public class ApiUtil {
         return output;
     }
 
-    public Player getPlayerFromUUID(String UUID) {
+    public static Player getPlayerFromUUID(String UUID) {
         String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&uuid=" + UUID, 300000);
         if (response == null) return new Player();
 
@@ -283,7 +283,7 @@ public class ApiUtil {
         return new Player(uuid, username, discord, lastLogin, lastLogout, new ArrayList<>(profiles.keySet()));
     }
 
-    public Player getPlayerFromUsername(String name) {
+    public static Player getPlayerFromUsername(String name) {
         String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&name=" + name, 300000);
         if (response == null) return new Player();
 
@@ -314,7 +314,7 @@ public class ApiUtil {
         return new Player(uuid, username, discord, lastLogin, lastLogout, new ArrayList<>(profiles.keySet()));
     }
 
-    public SlayerExp getPlayerSlayerExp(Player thePlayer) {
+    public static SlayerExp getPlayerSlayerExp(Player thePlayer) {
         Map<String, Integer> output = new HashMap<>();
         for (String slayer_type : Constants.slayer_types) {
             output.put(slayer_type, 0);
@@ -342,7 +342,7 @@ public class ApiUtil {
         return new SlayerExp(output);
     }
 
-    public SlayerExp getProfileSlayerExp(String profileUUID, String playerUUID) {
+    public static SlayerExp getProfileSlayerExp(String profileUUID, String playerUUID) {
         Map<String, Integer> output = new HashMap<>();
         for (String slayer_type : Constants.slayer_types) {
             output.put(slayer_type, 0);
@@ -367,7 +367,7 @@ public class ApiUtil {
         return new SlayerExp(output);
     }
 
-    public SkillLevels getProfileSkills(String profileUUID, String playerUUID) {
+    public static SkillLevels getProfileSkills(String profileUUID, String playerUUID) {
 
         String response = getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + playerUUID, 300000);
         if (response == null) return new SkillLevels();
@@ -396,7 +396,7 @@ public class ApiUtil {
         return SkillLevels.fromSkillExp(skillMap, false);
     }
 
-    public SkillLevels getProfileSkillsAlternate(String playerUUID) {
+    public static SkillLevels getProfileSkillsAlternate(String playerUUID) {
 
         String response = getResponse(BASE_URL + "player" + "?key=" + main.getNextApiKey() + "&uuid=" + playerUUID, 300000);
         if (response == null) return new SkillLevels();
@@ -412,8 +412,8 @@ public class ApiUtil {
         Map<String, Integer> skillMap = new HashMap<>();
         for (String skill_type : Constants.alternate_skill_types) {
             try {
-                skillMap.put(main.getSBUtil().alternateToNormalSkillType(skill_type), main.getSBUtil().toSkillExp(jsonObject.getInt("skyblock_" + skill_type)));
-                skillMap.put(main.getSBUtil().alternateToNormalSkillType(skill_type), main.getSBUtil().toSkillExp(jsonObject.getInt("skyblock_" + skill_type)));
+                skillMap.put(SBUtil.alternateToNormalSkillType(skill_type), SBUtil.toSkillExp(jsonObject.getInt("skyblock_" + skill_type)));
+                skillMap.put(SBUtil.alternateToNormalSkillType(skill_type), SBUtil.toSkillExp(jsonObject.getInt("skyblock_" + skill_type)));
             } catch (JSONException e) {
                 skillMap.put(skill_type, 0);
             }
@@ -421,7 +421,7 @@ public class ApiUtil {
         return SkillLevels.fromSkillExp(skillMap, true);
     }
 
-    public LeaderboardValues getBestLeaderboardValues(Player thePlayer) {
+    public static LeaderboardValues getBestLeaderboardValues(Player thePlayer) {
         SlayerExp slayerExp = getPlayerSlayerExp(thePlayer);
         SkillLevels skillLevels = getBestPlayerSkillLevels(thePlayer);
         DungeonExps dungeonExps = getBestDungeonExpsForPlayer(thePlayer);
@@ -429,7 +429,7 @@ public class ApiUtil {
         return new LeaderboardValues(slayerExp, bankBalance, skillLevels, dungeonExps);
     }
 
-    public String getGuildFromUUID(String UUID) {
+    public static String getGuildFromUUID(String UUID) {
 
         String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&player=" + UUID, 300000);
         if (response == null) return null;
@@ -443,7 +443,7 @@ public class ApiUtil {
         }
     }
 
-    public String getGuildNameFromId(String ID) {
+    public static String getGuildNameFromId(String ID) {
         if (ID == null) return null;
         String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&id=" + ID, 300000);
         if (response == null) return null;
@@ -457,7 +457,7 @@ public class ApiUtil {
         }
     }
 
-    public String getGuildIDFromUUID(String UUID) {
+    public static String getGuildIDFromUUID(String UUID) {
         String response = getResponse(BASE_URL + "guild" + "?key=" + main.getNextApiKey() + "&player=" + UUID, 300000);
         if (response == null) return null;
 
@@ -470,52 +470,7 @@ public class ApiUtil {
         }
     }
 
-    public List<Pet> getProfilePets(String profileUUID, String playerUUID) {
-
-        String response = getResponse(BASE_URL + "skyblock/profile" + "?key=" + main.getNextApiKey() + "&profile=" + profileUUID, 300000);
-        if (response == null) return new ArrayList<>();
-
-        JSONObject jsonObject = new JSONObject(response);
-
-        try {
-            jsonObject = jsonObject.getJSONObject("profile").getJSONObject("members").getJSONObject(playerUUID);
-        } catch (JSONException e) {
-            return new ArrayList<>();
-        }
-
-        JSONArray pets;
-        try {
-            pets = jsonObject.getJSONArray("pets");
-        } catch (JSONException e) {
-            return new ArrayList<>();
-        }
-
-        List<Pet> output = new ArrayList<>();
-        for (int i = 0; i < pets.length(); i++) {
-            String type;
-            int xp;
-            PetTier tier;
-            boolean active;
-            try {
-                type = pets.getJSONObject(i).getString("type");
-                tier = PetTier.valueOf(pets.getJSONObject(i).getString("tier").toUpperCase());
-                xp = pets.getJSONObject(i).getInt("exp");
-                active = pets.getJSONObject(i).getBoolean("active");
-            } catch (JSONException e) {
-                continue;
-            }
-            if (type.equals("")) {
-                continue;
-            }
-            type = type.toLowerCase().replace("_", " ");
-            type = type.substring(0, 1).toUpperCase() + type.substring(1);
-
-            output.add(new Pet(type, tier, active, xp));
-        }
-        return output;
-    }
-
-    public Map<String, Integer> getProfileKills(String profileUUID, String playerUUID) {
+    public static Map<String, Integer> getProfileKills(String profileUUID, String playerUUID) {
 
         Map<String, Integer> output = new HashMap<>();
 
@@ -532,13 +487,13 @@ public class ApiUtil {
 
         for (String type : jsonObject.keySet()) {
             if (type.startsWith("kills_")) {
-                output.put(main.getLangUtil().toLowerCaseButFirstLetter(type.replace("kills_", "").replace("_", " ")), jsonObject.getInt(type));
+                output.put(LangUtil.toLowerCaseButFirstLetter(type.replace("kills_", "").replace("_", " ")), jsonObject.getInt(type));
             }
         }
         return output;
     }
 
-    public Map<String, Integer> getProfileDeaths(String profileUUID, String playerUUID) {
+    public static Map<String, Integer> getProfileDeaths(String profileUUID, String playerUUID) {
 
         Map<String, Integer> output = new HashMap<>();
 
@@ -555,13 +510,13 @@ public class ApiUtil {
 
         for (String type : jsonObject.keySet()) {
             if (type.startsWith("deaths_")) {
-                output.put(main.getLangUtil().toLowerCaseButFirstLetter(type.replace("deaths_", "").replace("_", " ")), jsonObject.getInt(type));
+                output.put(LangUtil.toLowerCaseButFirstLetter(type.replace("deaths_", "").replace("_", " ")), jsonObject.getInt(type));
             }
         }
         return output;
     }
 
-    public SkillLevels getBestPlayerSkillLevels(Player thePlayer) {
+    public static SkillLevels getBestPlayerSkillLevels(Player thePlayer) {
         String response = getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + thePlayer.getUUID(), 300000);
         SkillLevels highestSkillLevels = new SkillLevels();
 
@@ -600,46 +555,16 @@ public class ApiUtil {
         return highestSkillLevels;
     }
 
-    public PlayerAH getPlayerAHFromUsername(Player player) {
-        List<AhItem> items = new ArrayList<>();
-        for (String profile : player.getSkyblockProfiles()) {
-            String response = getResponse(BASE_URL + "skyblock/auction" + "?key=" + main.getNextApiKey() + "&profile=" + profile, 60000);
-            if (response == null)
-                return new PlayerAH("There was an error fetching that user's auctions, please try again later.");
-
-            JSONArray auctionJSONArray;
-            try {
-                auctionJSONArray = new JSONObject(response).getJSONArray("auctions");
-            } catch (JSONException error) {
-                return new PlayerAH("There was an error fetching the player's auctions, please try again later.");
-            }
-
-            List<JSONObject> unclaimedAuctionsJson = Util.turnListIntoSubClassList(auctionJSONArray.toList(), JSONObject.class).stream().filter((auction) -> !auction.getBoolean("claimed")).collect(Collectors.toList());
-            for (JSONObject unclaimedAuction : unclaimedAuctionsJson) {
-                String itemName = unclaimedAuction.getString("item_name");
-                String itemTier = unclaimedAuction.getString("tier");
-                long startingBid = unclaimedAuction.getLong("starting_bid");
-                long highestBid = unclaimedAuction.getLong("highest_bid_amount");
-                String category = unclaimedAuction.getString("category");
-                long end = unclaimedAuction.getLong("end");
-                int bids = unclaimedAuction.getJSONArray("bids").length(); // Number of bids on the item
-
-                items.add(new AhItem(itemName, itemTier, startingBid, highestBid, category, end, bids));
-            }
-        }
-        return new PlayerAH(items.toArray(new AhItem[0]));
-    }
-
-    public JSONArray getEventData() {
+    public static JSONArray getEventData() {
         return new JSONObject(getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getEventData.json?key=HoVoiuWfpdAjJhfTj0YN")).getJSONArray("data");
     }
 
-    public void setEventData(JSONArray data) {
-        String dataString = data.toString(4);
+    public static void setEventData(JSONArray data) {
+        String dataString = data.toString().replace("\n", "");
         sendData(dataString, "https://soopymc.my.to/api/sbgDiscord/setEventData.json?key=HoVoiuWfpdAjJhfTj0YN");
     }
 
-    public String getMcNameFromDisc(String discordName) {
+    public static String getMcNameFromDisc(String discordName) {
         discordName = discordName.replace("#", "*");
         try {
             String response = getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getMcNameFromDisc.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace(" ", "%20"));
@@ -652,18 +577,18 @@ public class ApiUtil {
 
     }
 
-    public void setDiscNameFromMc(String mcName, String discordName) { // For auto verification in the future it will already have data
+    public static void setDiscNameFromMc(String mcName, String discordName) { // For auto verification in the future it will already have data
         getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/setDiscordMcName.json?key=HoVoiuWfpdAjJhfTj0YN&disc=" + discordName.replace("#", "*").replace(" ", "%20") + "&mc=" + mcName);
     }
 
-    public void sendGuildMessageToSApi(String guildMessage) {
+    public static void sendGuildMessageToSApi(String guildMessage) {
         try {
             getNonHypixelResponse("http://soopymc.my.to/api/sbgDiscord/newGuildChatMessage.json?key=HoVoiuWfpdAjJhfTj0YN&message=" + URLEncoder.encode(guildMessage, "UTF-8"));
         } catch (UnsupportedEncodingException ignored) {
         }
     }
 
-    public List<JsonObject> getSMPMessageQueue() {
+    public static List<JsonObject> getSMPMessageQueue() {
         JsonArray queue = JsonParser.parseString(getNonHypixelResponse("https://soopymc.my.to/api/smp/getMessageQ.json?key=HoVoiuWfpdAjJhfTj0YN")).getAsJsonObject().getAsJsonArray("data");
         List<JsonObject> output = new ArrayList<>();
         for (JsonElement message : queue) {
@@ -672,7 +597,7 @@ public class ApiUtil {
         return output;
     }
 
-    public Path downloadFile(String urlStr, File file) throws IOException {
+    public static Path downloadFile(String urlStr, File file) throws IOException {
         URL url = new URL(urlStr);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setDoInput(true);
@@ -693,8 +618,8 @@ public class ApiUtil {
         return Paths.get(file.getPath());
     }
 
-    public Map.Entry<String, String> getLatestReleaseUrl() {
-        StringBuffer response = null;
+    public static Map.Entry<String, String> getLatestReleaseUrl() {
+        StringBuilder response = null;
         HttpURLConnection con;
         try {
             URL url = new URL("https://api.github.com/repos/confusinguser/SBGods-Discord-Bot/releases");
@@ -705,7 +630,7 @@ public class ApiUtil {
             con.setRequestProperty("Authorization", "token f159901613c898cb80cdc39b3d8f89d2eb9f51bb");
 
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            response = new StringBuffer();
+            response = new StringBuilder();
 
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
@@ -729,38 +654,22 @@ public class ApiUtil {
         }
     }
 
-    public JSONObject getTaxData() {
+    public static JSONObject getTaxData() {
         return new JSONObject(getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getTaxData.json?key=HoVoiuWfpdAjJhfTj0YN")).getJSONObject("tax");
     }
 
-    public void setTaxData(JSONObject data) {
+    public static void setTaxData(JSONObject data) {
         String dataString = data.toString(4);
         sendData(dataString, "https://soopymc.my.to/api/sbgDiscord/updateTaxData.json?key=HoVoiuWfpdAjJhfTj0YN");
     }
 
-    public JSONArray getGuildRanksChange() {
+    public static JSONArray getGuildRanksChange() {
         return new JSONObject(getNonHypixelResponse("https://soopymc.my.to/api/sbgDiscord/getGuildRanksChange.json?key=HoVoiuWfpdAjJhfTj0YN")).getJSONArray("data");
     }
 
-    public void setGuildRanksChange(JSONArray data) {
-        String dataString = data.toString(4);
-        sendData(dataString, "https://soopymc.my.to/api/sbgDiscord/setGuildRanksChange.json?key=HoVoiuWfpdAjJhfTj0YN");
-    }
-
-    public TaxPayer getTaxPayer(Player player) {
-        JSONObject taxData = getTaxData();
-        JSONObject playerJson;
-        try {
-            playerJson = taxData.getJSONObject("guilds").getJSONObject(player.getGuildId()).getJSONObject("members").getJSONObject(player.getUUID());
-        } catch (JSONException e) {
-            playerJson = null;
-        }
-        return new TaxPayer(player.getUUID(), player.getDisplayName(), player.getGuildId(), playerJson, main);
-    }
-
-    public BankBalance getTotalCoinsInPlayer(Player thePlayer) {
+    public static BankBalance getTotalCoinsInPlayer(Player thePlayer) {
         double totalCoins = 0;
-        String response = main.getApiUtil().getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + thePlayer.getUUID(), 600000);
+        String response = ApiUtil.getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + thePlayer.getUUID(), 600000);
         JSONObject jsonObject = new JSONObject(response);
         for (Object profile : jsonObject.getJSONArray("profiles").toList()) {
             @SuppressWarnings("unchecked") JSONObject profileJson = new JSONObject((Map<Object, Object>) profile);
@@ -782,55 +691,9 @@ public class ApiUtil {
         return new BankBalance(totalCoins);
     }
 
-    public List<SkyblockProfile> getSkyblockProfilesByPlayerUUID(String playerUUID) {
-        String response = main.getApiUtil().getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + playerUUID, 600000);
-        if (response == null) return new ArrayList<>();
-        JSONObject jsonObject = new JSONObject(response);
-
-        List<SkyblockProfile> output = new ArrayList<>();
-        for (Object profile : jsonObject.getJSONArray("profiles").toList()) {
-            @SuppressWarnings("unchecked") JSONObject profileJson = new JSONObject((Map<Object, Object>) profile);
-
-            List<Player> members = profileJson.getJSONObject("members").keySet().stream().map(this::getPlayerFromUUID).collect(Collectors.toList());
-            String cuteName = profileJson.getString("cute_name");
-            double balance;
-            try {
-                balance = profileJson.getJSONObject("banking").getDouble("balance");
-            } catch (JSONException e) { // Banking API off
-                output.add(new SkyblockProfile(members, cuteName, new BankBalance()));
-                continue;
-            }
-            output.add(new SkyblockProfile(members, cuteName, new BankBalance(balance)));
-        }
-        return output;
-    }
-
-    /*public SkyblockProfilePlayer getSkyblockProfilePlayer(String playerUUID, String profileUUID) {
-        String response = main.getApiUtil().getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&player=" + playerUUID, 600000);
-        if (response == null) return null;
-        JSONObject jsonObject = new JSONObject(response);
-
-        for (Object profile : jsonObject.getJSONArray("profiles")) {
-            if (profile instanceof JSONObject && ((JSONObject) profile).getString("profile_id").equals(profileUUID)) {
-                try {
-                    JSONObject member = ((JSONObject) profile).getJSONObject("members").getJSONObject(playerUUID);
-                    String inv_contents = member.getJSONObject("inv_contents").getString("data");
-                    String talisman_bag = member.getJSONObject("talisman_bag").getString("data");
-                    String candy_inventory_contents = member.getJSONObject("candy_inventory_contents").getString("data");
-                    String wardrobe_contents = member.getJSONObject("wardrobe_contents").getString("data");
-                    //String pets = member.getJSONObject("pets").getString("data");
-                } catch (JSONException e) {
-                    return null;
-                }
-
-            }
-        }
-        return null;
-    }*/
-
     @SuppressWarnings("unchecked")
-    public DungeonExps getBestDungeonExpsForPlayer(Player thePlayer) {
-        String response = main.getApiUtil().getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + thePlayer.getUUID(), 600000);
+    public static DungeonExps getBestDungeonExpsForPlayer(Player thePlayer) {
+        String response = ApiUtil.getResponse(BASE_URL + "skyblock/profiles" + "?key=" + main.getNextApiKey() + "&uuid=" + thePlayer.getUUID(), 600000);
         if (response == null) return null;
         JSONObject jsonObject = new JSONObject(response);
 
@@ -869,7 +732,7 @@ public class ApiUtil {
         return bestDungeonExps;
     }
 
-    /*public int getNetWorth(String playerUUID) {
+    /*public static int getNetWorth(String playerUUID) {
         int netWorth = 0;
         for (SkyblockProfile profile : getSkyblockProfilesByPlayerUUID(playerUUID)) {
             netWorth += profile.getBalance();

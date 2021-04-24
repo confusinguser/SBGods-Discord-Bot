@@ -14,17 +14,22 @@ import java.util.concurrent.TimeUnit;
 public class LeaderboardUpdater {
 
     public static LeaderboardUpdater instance;
-    private final SBGods main;
     private List<String> latestEventLeaderboardIds = new ArrayList<>();
 
     public LeaderboardUpdater(SBGods main) {
         instance = this;
-        this.main = main;
         Multithreading.scheduleAtFixedRate(() -> {
             try {
                 for (HypixelGuild hypixelGuild : HypixelGuild.values()) {
                     updateLeaderboardCache(hypixelGuild);
                 }
+            } catch (Throwable t) {
+                main.getDiscord().reportFail(t, "Leaderboard Updater");
+            }
+        }, 0, 15, TimeUnit.MINUTES);
+
+        Multithreading.scheduleAtFixedRate(() -> {
+            try {
                 if (!main.getDiscord().eventCommand.progressTypeToPost.isEmpty()) {
                     String title = main.getDiscord().eventCommand.getLeaderboardTitleForProgressType(main.getDiscord().eventCommand.progressTypeToPost);
                     if (title == null) return;
@@ -35,12 +40,12 @@ public class LeaderboardUpdater {
                                 textChannel.deleteMessageById(messageId).queue();
                         }
                     }
-                    latestEventLeaderboardIds = main.getDiscord().eventCommand.sendProgressLeaderboard(main.getDiscord().getJDA().awaitReady().getTextChannelById("753934993788633170"), main.getDiscord().eventCommand.progressTypeToPost, title, false);
+                    latestEventLeaderboardIds = main.getDiscord().eventCommand.sendProgressLeaderboard(main.getDiscord().getJDA().awaitReady().getTextChannelById("753934993788633170"), main.getDiscord().eventCommand.progressTypeToPost, title, true);
                 }
             } catch (Throwable t) {
-                main.getDiscord().reportFail(t, "Leaderboard Updater");
+                main.getDiscord().reportFail(t, "Event Leaderboard Updater");
             }
-        }, 0, 15, TimeUnit.MINUTES);
+        }, 0, 1, TimeUnit.MINUTES);
 
         Multithreading.scheduleAtFixedRate(() -> {
             try {
@@ -49,31 +54,31 @@ public class LeaderboardUpdater {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-        }, 1, 24, TimeUnit.HOURS);
+        }, 1, 6, TimeUnit.HOURS);
 
         Multithreading.scheduleAtFixedRate(() -> {
-            List<JsonObject> messages = main.getApiUtil().getSMPMessageQueue();
+            List<JsonObject> messages = ApiUtil.getSMPMessageQueue();
 //            messages.add(JsonParser.parseString("{\"uuid\":\"dc8c3964-7b29-4e03-ae9e-d13ebd65dd29\",\"player\":\"Soopyboo32\",\"message\":\"i hate debris mining\"}").getAsJsonObject());
             for (JsonObject message : messages) {
                 String fullText = "SMP > " + message.get("player").getAsString() + ": " + message.get("message").getAsString();
                 main.getRemoteGuildChatManager().handleGuildMessage(HypixelGuild.SBG.getGuildId(), DiscordServer.SBGods, true, Util.getTextWithoutFormattingCodes(fullText));
                 main.getRemoteGuildChatManager().queue.offer(new AbstractMap.SimpleEntry<>(HypixelGuild.SBG.getGuildId(), fullText));
             }
-        }, 0, 5, TimeUnit.SECONDS);
+        }, 0, 15, TimeUnit.SECONDS);
     }
 
     private void updateLeaderboardCache(HypixelGuild guild) {
         Map<Player, LeaderboardValues> playerStatMap = new HashMap<>();
 
-        List<Player> guildMembers = main.getApiUtil().getGuildMembers(guild);
+        List<Player> guildMembers = ApiUtil.getGuildMembers(guild);
 
         int i = 0;
         guild.setLeaderboardProgress(0);
         for (Player guildMember : guildMembers) {
-            Player thePlayer = main.getApiUtil().getPlayerFromUUID(guildMember.getUUID());
+            Player thePlayer = ApiUtil.getPlayerFromUUID(guildMember.getUUID());
             Player.mergePlayerAndGuildMember(thePlayer, guildMember);
 
-            LeaderboardValues leaderboardValues = main.getApiUtil().getBestLeaderboardValues(thePlayer);
+            LeaderboardValues leaderboardValues = ApiUtil.getBestLeaderboardValues(thePlayer);
             playerStatMap.put(thePlayer, leaderboardValues);
             guild.setLeaderboardProgress(i++);
         }
